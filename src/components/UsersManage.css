@@ -1,0 +1,27 @@
+.container {
+    max-width: 800px; /* Limit the width of the container for better readability */
+    margin: auto; /* Center the container */
+}
+
+.button-container .btn-sm {
+    margin-left: 0.5rem;  
+} 
+
+.min-width-button {
+    min-width: 120px; /* Minimum width for the Add User button */
+}
+
+.user-row:hover {
+    background-color: #f1f1f1; /* Highlight row on hover */
+}
+
+.action-icon {
+    cursor: pointer;
+    font-size: 1.2rem; /* Slightly larger icons */
+    margin-right: 10px;
+    color: #007bff; /* Default Bootstrap primary color */
+}
+
+.action-icon:hover {
+    color: #0056b3; /* Darker shade on hover */
+}

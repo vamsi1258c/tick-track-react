@@ -1,0 +1,187 @@
+.ticket-list-container {
+    padding: 5px;
+}
+
+/* .header-container {
+    display: flex;  
+    justify-content: space-between;  
+    align-items: center;  
+    width: 100%;  
+    padding-right: 5px ;
+}
+
+.header-container h2 {
+    margin: 0;  
+}
+
+.button-container {
+    display: flex;  
+} */
+
+.button-container .btn-sm {
+    margin-left: 0.5rem;  
+} 
+
+
+/* Sticky Title */
+h2 {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 3;  
+    padding: 5px 0;  
+    margin-bottom: 0;
+    font-size: 1.5rem; 
+    border-bottom: 1px solid #e0e0e0;  
+}
+
+/* Sticky Filters and Searchbar */
+.filters, .search-filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 40px;  
+    background-color: white;
+    z-index: 2;  
+    padding: 5px 0;  
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;  
+}
+
+/* Compact Filters and Search Bar */
+.filters .dropdown, .filters .form-control {
+    margin-right: 10px;
+    max-width: 150px;  
+}
+
+.search-filter-container {
+    display: flex;
+    gap: 10px;
+}
+
+.search-bar {
+    flex: 1;
+    max-width: 300px;
+    margin-right: 10px;
+}
+
+/* Table and Row Styling */
+.custom-table {
+    margin-top: 10px;
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+.action-buttons {
+    display: flex; /* Use flex to keep buttons aligned */
+    justify-content: space-around; /* Space buttons evenly */
+    min-width: 100px; /* Ensure enough space for buttons */
+}
+
+@media (max-width: 768px) {
+    .custom-table th, .custom-table td {
+        font-size: 12px; /* Smaller font size on mobile devices */
+    }
+
+    .action-buttons button {
+        padding: 0.2rem 0.5rem; /* Smaller button padding */
+        font-size: 0.8rem; /* Smaller font size for buttons */
+    }
+}
+
+.table-responsive {
+    overflow-x: auto; 
+}
+
+.custom-table thead th {
+    cursor: pointer;
+}
+
+.custom-table thead th:hover {
+    background-color: #f1f1f1;
+}
+
+.custom-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Ensuring row clickability */
+.custom-table tbody tr:active {
+    background-color: #ececec;  
+}
+
+/* Modal-related z-index */
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
+.attachment-button {
+    background: none; 
+    border: none; 
+    color: inherit;  
+    cursor: pointer; 
+    padding: 0;  
+    font: inherit;  
+    text-align: left;  
+    text-decoration: none;  
+    transition: text-decoration 0.2s ease;  
+}
+
+.attachment-button:hover {
+    text-decoration: underline;  
+}
+
+.select-filter {
+    font-size: 12px;
+    min-height: 30px;
+}
+
+.select-filter .select__multi-value {
+    font-size: 10px;
+    max-width: 80px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.select-filter .select__control {
+    min-height: 30px;
+}
+
+.search-input {
+    font-size: 12px;
+}
+
+.select-filter .select__clear-indicator,
+.select-filter .select__dropdown-indicator {
+    padding: 2px;  
+}
+
+.search-filter-container .mx-2 {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.sticky-header h2 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.search-input {
+    font-size: 10px;           
+    min-height: 25px;         
+    padding: 0.25rem 0.5rem;   
+    line-height: 1;            
+    border-radius: 4px;        
+}
+
+.search-input::placeholder {
+    font-size: 12px;           
+    color: #6c757d;           
+}

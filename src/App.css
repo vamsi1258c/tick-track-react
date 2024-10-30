@@ -1,38 +1,51 @@
-.App {
-  text-align: center;
+/* App.css */
+
+/* Sidebar styles */
+.sidebar {
+  background-color: #f8f9fa;
+  height: 100vh;
+  transition: left 0.3s ease, width 0.3s ease; /* Sidebar sliding */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
+/* Toggle button styles
+.toggle-button {
+  position: absolute;
+  top: 10px;
+  left: 0px;
+  z-index: 1100;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 5px;  
+  cursor: pointer;
+} */
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Media query for small screens */
+@media (max-width: 768px) {
+  .sidebar {
+    left: -200px; /* Hide sidebar by default on small screens */
+    width: 200px;
+  }
+
+  .sidebar.open {
+    left: 0; /* Show sidebar when open */
+  }
+
+  .main-content {
+    margin-left: 0 !important; /* Full width for content on small screens */ 
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+/* Styles for all Form.Label elements */
+.form-label {
+  font-size: 0.9rem;                 
+  font-weight: 500;                                   
+  text-transform: none;             
+  margin-bottom: 0.25rem;           
+  display: inline-block;             
+  padding-bottom: 2px;              
+  transition: border-color 0.3s ease;  
 }
 
-.App-link {
-  color: #61dafb;
-}
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+

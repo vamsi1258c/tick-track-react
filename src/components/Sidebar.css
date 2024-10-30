@@ -1,0 +1,59 @@
+.sidebar .nav-link {
+    /* padding: 10px 15px; */
+    color: #333333; /* Default text color */
+}
+
+.sidebar .nav-link:hover {
+    background-color: #f8f9fa; /* Light background on hover */
+    color: #007bff; /* Change text color on hover */
+}
+
+.sidebar .nav-link {
+    padding: 10px 15px;
+    color: #333; /* Default text color */
+}
+
+.sidebar .nav-link:hover {
+    background-color: #f8f9fa; /* Light background on hover */
+    color: #007bff; /* Change text color on hover */
+}
+
+/* Sidebar.css */
+.sidebar {
+    background-color: white; /* Ensure the background is consistent */
+}
+
+.nav-link {
+    padding: 10px 15px; /* Add padding to the links */
+    color: #333; /* Default link color */
+}
+
+.nav-link:hover {
+    background-color: #f8f9fa; /* Light background on hover */
+    color: #007bff; /* Change color on hover */
+}
+
+/* Sidebar.css */
+.sidebar {
+    background-color: white; /* Ensure a consistent background color */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
+}
+
+.nav-link {
+    padding: 10px 15px; /* Ensure padding is applied for spacing */
+    color: #333; /* Default link color */
+}
+
+.nav-link:hover {
+    background-color: #f8f9fa; /* Light background on hover */
+    color: #007bff; /* Change color on hover */
+}
+
+/* Ensure the sidebar icon spacing is not cutting off */
+.flex-column {
+    padding: 0; /* Remove padding on the flex column to avoid space */
+}
+
+
+
+
