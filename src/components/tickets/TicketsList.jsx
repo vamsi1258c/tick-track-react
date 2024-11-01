@@ -358,7 +358,7 @@ const TicketsList = ({ currentUser, userRole }) => {
                                 <th>Category</th>
                                 <th>Status</th>
                                 <th>Priority</th>
-                                <th>Assigned To</th>
+                                <th>Assignee</th>
                                 <th>Actions</th>  
                             </tr>
                         </thead>
