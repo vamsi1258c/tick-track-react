@@ -45,13 +45,13 @@ const Home = () => {
       <Row className="justify-content-center">
         {userRole === "admin" && (
           <Col md={4} className="text-center mb-3">
-            <Button variant="primary" as={Link} to="/manage-users">
+            <Button variant="primary" size='sm' as={Link} to="/manage-users">
               Manage Users
             </Button>
           </Col>
         )}
         <Col md={4} className="text-center mb-3">
-          <Button variant="secondary" as={Link} to="/tickets">
+          <Button variant="secondary" size='sm' as={Link} to="/tickets">
             Manage Tickets
           </Button>
         </Col>

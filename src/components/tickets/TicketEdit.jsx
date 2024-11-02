@@ -348,6 +348,7 @@ const TicketEdit = ({ currentUserId }) => {
                                 </Form.Group>
 
                                 <Form.Group controlId="formAttachments" className="mb-3">
+                                    <Form.Label>Attachments</Form.Label>
                                     <Form.Control
                                         type="file"
                                         multiple

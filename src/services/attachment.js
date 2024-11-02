@@ -122,6 +122,14 @@ export const downloadAttachment = async (ticketId, attachmentId) => {
         case 'application/msword': // .doc
           fileExtension = 'doc';
           break;
+        
+        case 'application/vnd.openxmlformats-officedocument.presentationml.presentation': // .pptx
+          fileExtension = 'pptx';
+          break;
+      
+        case 'application/vnd.ms-powerpoint': // .ppt
+          fileExtension = 'ppt';
+          break;
 
         case 'image/jpeg':
           fileExtension = 'jpg'; // or 'jpeg'
