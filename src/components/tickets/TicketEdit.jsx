@@ -55,7 +55,7 @@ const TicketEdit = ({ currentUserId }) => {
 
                 // Set subcategories based on the current category of the ticket
                 const initialCategory = ticketResponse.data.category || 'service';
-                setSubcategories(getSubcategories(initialCategory)); 
+                setSubcategories(getSubcategories(initialCategory));
                 setTicketData(prevData => ({
                     ...prevData,
                     subcategory: ticketResponse.data.subcategory || '', // Set initial subcategory
@@ -76,7 +76,7 @@ const TicketEdit = ({ currentUserId }) => {
         fetchAllData();
     }, [currentUserId, ticketId]);
 
-   
+
 
     // Handle category change to update subcategories
     const handleCategoryChange = (e) => {
@@ -121,24 +121,31 @@ const TicketEdit = ({ currentUserId }) => {
         setValidationErrors((prev) => ({ ...prev, [name]: '' }));
     };
 
-     // validation error
-     const validateField = (name, value) => {
+    const validateField = (name, value) => {
+        console.log("Inside Validation Field");
+        console.log(value);
         if (!value || value.trim() === '') {
             setValidationErrors((prev) => ({ ...prev, [name]: 'This field is required.' }));
         } else {
-            setValidationErrors((prev) => ({ ...prev, [name]: '' }));  
+            setValidationErrors((prev) => ({ ...prev, [name]: '' }));
         }
     };
 
+    const stripHtmlTags = (input) => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = input;
+        return tempDiv.textContent || tempDiv.innerText || '';
+    };
+
     const validateDescription = () => {
-        const value = ticketData.description;
-        if (value.trim() === '<p><br></p>' || value.trim() === '<p></p>' || value.trim() === ' ') {
+        console.log("Inside Validation Description");
+        if (stripHtmlTags(ticketData.description).trim() === '') {
             setValidationErrors((prev) => ({ ...prev, 'description': 'This field is required.' }));
         }
     };
 
     const handleBlur = (e) => {
-        if (e === 'description'){
+        if (e === 'description') {
             validateDescription();
             return;
         }
@@ -171,6 +178,25 @@ const TicketEdit = ({ currentUserId }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const errors = {};
+        const fieldsToValidate = ['title', 'description', 'status', 'priority', 'category'];
+
+        fieldsToValidate.forEach((field) => {
+
+            const value = field === 'description' ? stripHtmlTags(ticketData[field]) : ticketData[field];
+
+            if (!value || value.trim() === '') {
+                errors[field] = 'This field is required.';
+            }
+        });
+
+        setValidationErrors(errors);
+
+        if (Object.keys(errors).length > 0) {
+            return;
+        }
+
         const updateData = {
             title: ticketData.title,
             description: ticketData.description,
@@ -236,11 +262,10 @@ const TicketEdit = ({ currentUserId }) => {
                                         value={ticketData.title}
                                         onChange={handleChange}
                                         placeholder="Enter ticket title"
-                                        required
                                         size='sm'
                                         onBlur={handleBlur}
                                     />
-                                {validationErrors.title && <div className="text-danger">{validationErrors.title}</div>}
+                                    {validationErrors.title && <div className="text-danger">{validationErrors.title}</div>}
                                 </Form.Group>
 
                                 <Form.Group controlId="formDescription" className="mb-3">
@@ -270,7 +295,6 @@ const TicketEdit = ({ currentUserId }) => {
                                         name="status"
                                         value={ticketData.status}
                                         onChange={handleChange}
-                                        required
                                         size='sm'
                                         onBlur={handleBlur}
                                     >
@@ -289,7 +313,6 @@ const TicketEdit = ({ currentUserId }) => {
                                         name="priority"
                                         value={ticketData.priority}
                                         onChange={handleChange}
-                                        required
                                         size='sm'
                                         onBlur={handleBlur}
                                     >
@@ -324,7 +347,7 @@ const TicketEdit = ({ currentUserId }) => {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         size='sm'
-                                        // disabled={!ticketData.category} // Disable until a category is selected
+                                    // disabled={!ticketData.category} // Disable until a category is selected
                                     >
                                         <option value="">Select a subcategory</option>
                                         {subcategories.map(sub => (

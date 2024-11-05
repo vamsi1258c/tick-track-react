@@ -1,9 +1,8 @@
-// Sidebar.js
 import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaTachometerAlt, FaTicketAlt, FaUserPlus, FaUsers, FaCog } from 'react-icons/fa';
-import './Sidebar.css'; // Custom styles
+import { FaTachometerAlt, FaTicketAlt, FaUsers, FaCog } from 'react-icons/fa';
+import './Sidebar.css';  
 
 const SideBar = ({ isOpen, userRole }) => {
   return (

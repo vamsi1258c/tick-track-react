@@ -15,8 +15,8 @@ const TicketCreate = ({ currentUser }) => {
         priority: 'medium',
         category: 'service',
         subcategory: '',  
-        created_by: 0,
-        assigned_to: 0,
+        created_by: null,
+        assigned_to: 1,
     });
 
     const [attachments, setAttachments] = useState([]);
@@ -128,21 +128,39 @@ const TicketCreate = ({ currentUser }) => {
         );
     };
 
+    const stripHtmlTags = (input) => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = input;
+        return tempDiv.textContent || tempDiv.innerText || '';
+    };
+    
+
     const validateFields = (field) => {
         const errors = {};
-        if (field ==='title' && !ticketData.title) {
-            errors.title = 'Title is required.';
+        if (!field || field === 'title') {
+            if (!ticketData.title || ticketData.title.trim() === '') {
+                errors.title = 'Title is required.';
+            }
         }
-        if (field ==='description' &&!ticketData.description) {
-            errors.description = 'Description is required.';
+        if (!field || field === 'description') {
+            if (!ticketData.description || stripHtmlTags(ticketData.description).trim() === '') {
+                errors.description = 'Description is required.';
+            }
         }
-        if (field ==='property' && !ticketData.priority) {
-            errors.priority = 'Priority is required.';
+        if (!field || field === 'priority') {
+            if (!ticketData.priority) {
+                errors.priority = 'Priority is required.';
+            }
         }
-        if (field ==='category' &&!ticketData.category) {
-            errors.category = 'Category is required.';
+        if (!field || field === 'category') {
+            if (!ticketData.category) {
+                errors.category = 'Category is required.';
+            }
         }
-        setValidationErrors(errors);
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            ...errors
+        }));
         return Object.keys(errors).length === 0;
     };
 
@@ -152,7 +170,9 @@ const TicketCreate = ({ currentUser }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateFields()) return; // Prevent submission if there are validation errors
+        if (!validateFields()) {
+            return;  
+        } 
 
         try {
             const response = await createTicket(ticketData);
@@ -190,7 +210,6 @@ const TicketCreate = ({ currentUser }) => {
                                         value={ticketData.title}
                                         onChange={handleChange}
                                         onBlur={() => handleBlur('title')}
-                                        required
                                         placeholder="Enter ticket title"
                                         size="sm"
                                     />
