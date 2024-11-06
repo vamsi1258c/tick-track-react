@@ -195,7 +195,7 @@ const TicketCreate = ({ currentUser }) => {
         <Container>
             <Row className="justify-content-md-center">
                 <Col xs={12} md={8}>
-                    <Card className="p-4 shadow-sm">
+                    <Card className="p-4 shadow rounded border-0">
                         <Card.Body>
                             <h3 className="mb-4 text-center">Create New Ticket</h3>
                             {error && <Alert variant="danger">{error}</Alert>}
@@ -212,8 +212,9 @@ const TicketCreate = ({ currentUser }) => {
                                         onBlur={() => handleBlur('title')}
                                         placeholder="Enter ticket title"
                                         size="sm"
+                                        className="shadow-sm"
                                     />
-                                    {validationErrors.title && <div className="text-danger">{validationErrors.title}</div>}
+                                    {validationErrors.title && <div className="text-danger small">{validationErrors.title}</div>}
                                 </Form.Group>
 
                                 <Form.Group controlId="formDescription" className="mb-4">
@@ -223,8 +224,9 @@ const TicketCreate = ({ currentUser }) => {
                                         onChange={handleDescriptionChange}
                                         onBlur={() => handleBlur('description')}
                                         placeholder="Enter ticket description"
+                                        className="shadow-sm"
                                     />
-                                    {validationErrors.description && <div className="text-danger">{validationErrors.description}</div>}
+                                    {validationErrors.description && <div className="text-danger small">{validationErrors.description}</div>}
                                 </Form.Group>
 
                                 <Form.Group controlId="formStatus" className="mb-4">
@@ -235,6 +237,7 @@ const TicketCreate = ({ currentUser }) => {
                                         onChange={handleChange}
                                         disabled
                                         size="sm"
+                                        className="shadow-sm"
                                     >
                                         <option value="open">Open</option>
                                         <option value="in_progress">In Progress</option>
@@ -244,20 +247,21 @@ const TicketCreate = ({ currentUser }) => {
                                 </Form.Group>
 
                                 <Form.Group controlId="formPriority" className="mb-4">
-                                    <Form.Label>Priority <span className="text-danger">*</span></Form.Label>
+                                    <Form.Label>Priority <span className="text-danger small">*</span></Form.Label>
                                     <Form.Select
                                         name="priority"
                                         value={ticketData.priority}
                                         onChange={handleChange}
                                         onBlur={() => handleBlur('priority')}
                                         size="sm"
+                                        className="shadow-sm"
                                     >
                                         <option value="low">Low</option>
                                         <option value="medium">Medium</option>
                                         <option value="high">High</option>
                                         <option value="urgent">Urgent</option>
                                     </Form.Select>
-                                    {validationErrors.priority && <div className="text-danger">{validationErrors.priority}</div>}
+                                    {validationErrors.priority && <div className="text-danger small">{validationErrors.priority}</div>}
                                 </Form.Group>
 
                                 <Form.Group controlId="formCategory" className="mb-4">
@@ -268,12 +272,13 @@ const TicketCreate = ({ currentUser }) => {
                                         onChange={handleCategoryChange}
                                         onBlur={() => handleBlur('category')}
                                         size="sm"
+                                        className="shadow-sm"
                                     >
                                         <option value="service">Service</option>
                                         <option value="troubleshooting">Troubleshooting</option>
                                         <option value="maintenance">Maintenance</option>
                                     </Form.Select>
-                                    {validationErrors.category && <div className="text-danger">{validationErrors.category}</div>}
+                                    {validationErrors.category && <div className="text-danger small">{validationErrors.category}</div>}
                                 </Form.Group>
 
                                 <Form.Group controlId="formSubcategory" className="mb-4">
@@ -283,6 +288,7 @@ const TicketCreate = ({ currentUser }) => {
                                         value={ticketData.subcategory}
                                         onChange={handleChange}
                                         size="sm"
+                                        className="shadow-sm"
                                     >
                                         <option value="">Select a subcategory</option>
                                         {subcategories.map(sub => (
@@ -299,7 +305,7 @@ const TicketCreate = ({ currentUser }) => {
                                         options={users}
                                         onChange={handleAssignedToChange}
                                         isClearable
-                                        className='custom-select'
+                                        className='custom-select shadow-sm'
                                         size='sm'
                                     />
                                 </Form.Group>
@@ -311,6 +317,7 @@ const TicketCreate = ({ currentUser }) => {
                                         onChange={handleFileChange}
                                         multiple
                                         size="sm"
+                                        className="shadow-sm"
                                     />
                                     {attachments.length > 0 && (
                                         <div className="mt-2">

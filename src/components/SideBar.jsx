@@ -2,7 +2,7 @@ import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaTachometerAlt, FaTicketAlt, FaUsers, FaCog } from 'react-icons/fa';
-import './Sidebar.css';  
+import './Sidebar.css';
 
 const SideBar = ({ isOpen, userRole }) => {
   return (
@@ -16,27 +16,43 @@ const SideBar = ({ isOpen, userRole }) => {
         overflowX: 'hidden',
         overflowY: 'auto',
         whiteSpace: 'nowrap',
-        paddingTop: '15px'
+        paddingTop: '15px',
       }}
     >
       {isOpen && (
         <Nav className="flex-column" style={{ marginTop: '50px', padding: '0 10px' }}>
-          <Nav.Link as={Link} to="/" className="d-flex align-items-center">
+          <Nav.Link
+            as={Link}
+            to="/"
+            className="d-flex align-items-center sidebar-link"
+          >
             <FaTachometerAlt className="me-2" />
             Dashboard
           </Nav.Link>
-          <Nav.Link as={Link} to="/tickets" className="d-flex align-items-center">
+          <Nav.Link
+            as={Link}
+            to="/tickets"
+            className="d-flex align-items-center sidebar-link"
+          >
             <FaTicketAlt className="me-2" />
             Tickets
           </Nav.Link>
           {userRole === 'admin' && (
-            <Nav.Link as={Link} to="/manage-users" className="d-flex align-items-center">
+            <Nav.Link
+              as={Link}
+              to="/manage-users"
+              className="d-flex align-items-center sidebar-link"
+            >
               <FaUsers className="me-2" />
               Users
             </Nav.Link>
           )}
-
-          <Nav.Link as={Link} to="/settings" className="d-flex align-items-center" style={{ marginTop: 'auto' }}>
+          <Nav.Link
+            as={Link}
+            to="/settings"
+            className="d-flex align-items-center sidebar-link"
+            style={{ marginTop: 'auto' }}
+          >
             <FaCog className="me-2" />
             Settings
           </Nav.Link>

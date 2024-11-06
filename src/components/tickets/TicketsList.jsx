@@ -6,7 +6,7 @@ import { Button, Dropdown, Table, Form, Modal, Spinner, InputGroup, Badge, Row, 
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaSearch, FaAngleUp, FaAngleDown, FaPlus, FaSlidersH } from 'react-icons/fa';
 import { AiOutlineReload, } from 'react-icons/ai';
-import Select from 'react-select'; 
+import Select from 'react-select';
 import './TicketsList.css';
 import TicketViewModal from './TicketDetail';
 
@@ -28,7 +28,7 @@ const TicketsList = ({ currentUser, userRole }) => {
     const [sortConfig, setSortConfig] = useState({ key: 'id', direction: 'desc' });
     const [filtersVisible, setFiltersVisible] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [ticketsPerPage, setTicketsPerPage] = useState(10);  
+    const [ticketsPerPage, setTicketsPerPage] = useState(10);
     const totalPages = Math.ceil(tickets.length / ticketsPerPage);
     const indexOfLastTicket = currentPage * ticketsPerPage;
     const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
@@ -38,10 +38,10 @@ const TicketsList = ({ currentUser, userRole }) => {
     const handlePreviousPage = () => setCurrentPage(currentPage > 1 ? currentPage - 1 : currentPage);
     const handleNextPage = () => setCurrentPage(currentPage < totalPages ? currentPage + 1 : currentPage);
 
-    
+
     const handleTicketsPerPageChange = (number) => {
         setTicketsPerPage(number);
-        setCurrentPage(1); 
+        setCurrentPage(1);
     };
     const navigate = useNavigate();
 
@@ -148,48 +148,48 @@ const TicketsList = ({ currentUser, userRole }) => {
     const renderPriorityBadge = (priority) => {
         switch (priority) {
             case 'high':
-                return <Badge bg="warning">High</Badge>;  
+                return <Badge bg="warning">High</Badge>;
             case 'medium':
-                return <Badge bg="light" style={{ color: '#001f3f' }}>Medium</Badge>; 
+                return <Badge bg="light" style={{ color: '#001f3f' }}>Medium</Badge>;
             case 'low':
-                return <Badge bg="white" style={{ color: '#3D9970' }}>Low</Badge>;  
+                return <Badge bg="white" style={{ color: '#3D9970' }}>Low</Badge>;
             case 'urgent':
-                return <Badge bg="danger">Urgent</Badge>;  
+                return <Badge bg="danger">Urgent</Badge>;
             default:
-                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>N/A</Badge>; 
+                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>N/A</Badge>;
         }
     };
-    
+
     const renderCategoryBadge = (category) => {
         switch (category) {
             case 'service':
-                return <Badge bg="light" style={{ color: '#3D9970' }}>Service</Badge>;  
+                return <Badge bg="light" style={{ color: '#3D9970' }}>Service</Badge>;
             case 'troubleshooting':
-                return <Badge bg="white" style={{ color: '#FF6347' }}>Troubleshooting</Badge>;  
+                return <Badge bg="white" style={{ color: '#FF6347' }}>Troubleshooting</Badge>;
             case 'maintenance':
-                return <Badge bg="light" style={{ color: '#DAA520' }}>Maintenance</Badge>;  
+                return <Badge bg="light" style={{ color: '#DAA520' }}>Maintenance</Badge>;
             default:
-                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>N/A</Badge>;  
+                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>N/A</Badge>;
         }
     };
-    
+
     const renderStatusBadge = (status) => {
         switch (status?.toLowerCase()) {
             case 'open':
-                return <Badge bg="info">Open</Badge>;  
+                return <Badge bg="info">Open</Badge>;
             case 'in_progress':
-                return <Badge bg="primary">In Progress</Badge>;  
+                return <Badge bg="primary">In Progress</Badge>;
             case 'closed':
-                return <Badge bg="secondary">Closed</Badge>;  
+                return <Badge bg="secondary">Closed</Badge>;
             case 'resolved':
-                    return <Badge bg="success">Closed</Badge>;  
+                return <Badge bg="success">Closed</Badge>;
             case 'to_be_approved':
-                    return <Badge bg="muted" style={{ color: '#6A5ACD' }}>ToBeApproved</Badge>; 
+                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>ToBeApproved</Badge>;
             default:
-                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>{status}</Badge>;   
+                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>{status}</Badge>;
         }
     };
-    
+
 
 
     const handleViewTicket = (ticket) => {
@@ -200,7 +200,7 @@ const TicketsList = ({ currentUser, userRole }) => {
 
     const handleDownloadAttachment = async (ticketid, attachmentId) => {
         try {
-            await downloadAttachment(ticketid, attachmentId); 
+            await downloadAttachment(ticketid, attachmentId);
         } catch (error) {
             console.error('Failed to download attachment', error);
         }
@@ -247,14 +247,14 @@ const TicketsList = ({ currentUser, userRole }) => {
                         </Button>
                     </div>
                 </div>
-                
+
                 <Button onClick={toggleFilters} className="mb-3" style={{
-                    padding: '0',  
+                    padding: '0',
                     minWidth: '30px',
                     height: '30px',
-                    border: 'none', 
-                    background: 'none',  
-                    cursor: 'pointer',  
+                    border: 'none',
+                    background: 'none',
+                    cursor: 'pointer',
                     color: 'black'
                 }}><FaSlidersH />
                     {filtersVisible ? <FaAngleUp style={{ fontSize: '0.75rem', color: 'black' }} /> : <FaAngleDown style={{ fontSize: '0.75rem', color: 'black' }} />}
@@ -350,7 +350,7 @@ const TicketsList = ({ currentUser, userRole }) => {
                 </div>
             ) : (
                 <div className="table-responsive">
-                    <Table striped hover responsive className="custom-table">
+                    <Table hover responsive className="custom-table">
                         <thead>
                             <tr>
                                 <th onClick={() => handleSort('id')}>ID {sortConfig.key === 'id' && (sortConfig.direction === 'asc' ? '↑' : '↓')}</th>
@@ -359,7 +359,7 @@ const TicketsList = ({ currentUser, userRole }) => {
                                 <th>Status</th>
                                 <th>Priority</th>
                                 <th>Assignee</th>
-                                <th>Actions</th>  
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -424,12 +424,17 @@ const TicketsList = ({ currentUser, userRole }) => {
 
 
             )}
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+            <Modal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                centered
+                style={{ fontFamily: 'Roboto, sans-serif', fontSize: '0.875rem', color: '#333' }}
+            >
                 <Modal.Header closeButton>
                     <Modal.Title>Delete Ticket</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to delete the ticket?<p> #{ticketToDelete?.id +"-"+ ticketToDelete?.title}</p>
+                    Are you sure you want to delete the ticket?<p> #{ticketToDelete?.id + "-" + ticketToDelete?.title}</p>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" size='sm' onClick={() => setShowDeleteModal(false)}>
@@ -441,83 +446,6 @@ const TicketsList = ({ currentUser, userRole }) => {
                 </Modal.Footer>
             </Modal>
 
-            {/* View Ticket Modal */}
-            {/* <Modal show={showViewModal} onHide={() => setShowViewModal(false)} size="lg">
-                <Modal.Header closeButton>
-                    <Modal.Title>
-                        <div>Ticket#: {selectedTicket?.id}</div>
-                        <div>{selectedTicket?.title}</div>
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedTicket?.description || '') }} /></p>
-                    <p><strong>Category:</strong> {renderCategoryBadge(selectedTicket?.category)}</p>
-                    <p><strong>Status:</strong> {renderStatusBadge(selectedTicket?.status)}</p>
-                    <p><strong>Priority:</strong> {renderPriorityBadge(selectedTicket?.priority)}</p>
-                    <p><strong>Created By:</strong> {selectedTicket?.creator?.username}</p>
-                    <p><strong>Assigned To:</strong> {selectedTicket?.assignee?.username}</p>
-                    <p><strong>Created At:</strong> {new Date(selectedTicket?.created_at).toLocaleString()}</p>
-                    <p><strong>Updated At:</strong> {new Date(selectedTicket?.updated_at).toLocaleString()}</p>
-
-                    <hr />
-
-                    <h5>Comments:</h5>
-                    {selectedTicket?.comments.length > 0 ? (
-                        selectedTicket.comments.map((comment) => (
-                            <div key={comment.id}>
-                                <p><strong>{users.find(user => user.id === comment?.user_id)?.username || 'Unknown User'}:</strong> {comment.content}, at {new Date(comment.created_at).toLocaleString()}</p>
-                            </div>
-                        ))
-                    ) : (
-                        <p>No comments available.</p>
-                    )}
-
-                    <hr />
-
-                    <h5>Activity Logs:</h5>
-                    {selectedTicket?.activity_logs.length > 0 ? (
-                        selectedTicket.activity_logs.map((log) => (
-                            <div key={log.id}>
-                                <p><strong>{users.find(user => user.id === log.user_id).fullname}</strong> {log.action}, at {new Date(log.created_at).toLocaleString()}</p>
-                            </div>
-                        ))
-                    ) : (
-                        <p>No activity logs available.</p>
-                    )}
-
-                    <hr />
-
-                    <h5>Attachments:</h5>
-                    {selectedTicket?.attachments.length > 0 ? (
-                        selectedTicket.attachments.map((attachment) => (
-                            <div key={attachment.id}>
-                                <p>
-
-                                    <button
-                                        onClick={() => handleDownloadAttachment(selectedTicket.id, attachment.id)} // Use button for download
-
-                                        className="attachment-button"
-                                    > <FaDownload style={{ marginRight: '5px' }} />
-                                        {attachment.filename}
-                                    </button>
-
-
-                                </p>
-                            </div>
-                        ))
-                    ) : (
-                        <p>No attachments available.</p>
-                    )}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowViewModal(false)}>
-                        Back
-                    </Button>
-                    <Button variant="primary" onClick={() => navigate('/edit-ticket', { state: { ticketId: selectedTicket.id } })}>
-                        Edit Ticket
-                    </Button>
-                </Modal.Footer>
-            </Modal> */}
             <TicketViewModal
                 show={showViewModal}
                 onClose={() => setShowViewModal(false)}

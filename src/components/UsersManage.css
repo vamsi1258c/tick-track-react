@@ -1,27 +1,73 @@
-.container {
-    max-width: 800px; /* Limit the width of the container for better readability */
-    margin: auto; /* Center the container */
+/* Custom table style */
+.custom-user-table {
+    margin-top: 10px;
+    width: 100%;
+    min-width: 600px;
+    background-color: transparent; 
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.85rem;
+    color: #333; 
+    border-spacing: 0;   
 }
 
-.button-container .btn-sm {
-    margin-left: 0.5rem;  
-} 
-
-.min-width-button {
-    min-width: 120px; /* Minimum width for the Add User button */
+/* Table header */
+.custom-user-table thead {
+    background-color: #f0f2f5;  
+    color: #333;
+    font-weight: 500;
 }
 
-.user-row:hover {
-    background-color: #f1f1f1; /* Highlight row on hover */
+.custom-user-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 1rem;
 }
 
-.action-icon {
-    cursor: pointer;
-    font-size: 1.2rem; /* Slightly larger icons */
-    margin-right: 10px;
-    color: #007bff; /* Default Bootstrap primary color */
+ 
+.custom-user-table tbody tr {
+    transition: background-color 0.3s ease;
 }
 
-.action-icon:hover {
-    color: #0056b3; /* Darker shade on hover */
+.custom-user-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;  
+}
+
+.custom-user-table tbody tr:hover {
+    background-color: #e1e1e1;   
+}
+
+.custom-user-table td {
+    padding: 12px 16px;
+    text-align: left;
+}
+
+ 
+.custom-user-table,
+.custom-user-table th,
+.custom-user-table td {
+    border: none;   
+}
+
+.custom-user-table th,
+.custom-user-table td {
+    box-sizing: border-box;
+}
+
+
+.custom-user-table {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);  
+    border-radius: 8px;  
+    overflow: hidden;  
+}
+
+/* Optional: Responsive table for mobile view */
+@media (max-width: 768px) {
+    .custom-user-table {
+        font-size: 0.75rem;
+    }
+
+    .custom-user-table th,
+    .custom-user-table td {
+        padding: 10px 12px;
+    }
 }

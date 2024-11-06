@@ -1,4 +1,50 @@
-/* App.css */
+/* GLOBAL STYLES */
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* Set the default font for the entire app */
+html {
+    font-family: 'Roboto', sans-serif;  
+    font-size: 0.875rem;
+    color: #333;
+    /* background-color: #f4f6f8; */
+    line-height: 1.6;
+}
+
+/* Modal Titles and Buttons */
+.modal-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #e74c3c; /* Red for attention */
+}
+
+/* Button styles for consistency */
+button {
+    font-family: 'Roboto', sans-serif;
+    /* font-size: 0.875rem;
+    padding: 8px 12px;
+    border-radius: 4px; */
+}
+
+/* Specific button variations */
+button.btn-secondary {
+    background-color: #dfe4ea;
+    color: #34495e;
+}
+
+button.btn-danger {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+/* GLOBAL STYLES END */
 
 /* Sidebar styles */
 .sidebar {
@@ -7,18 +53,7 @@
   transition: left 0.3s ease, width 0.3s ease; /* Sidebar sliding */
 }
 
-/* Toggle button styles
-.toggle-button {
-  position: absolute;
-  top: 10px;
-  left: 0px;
-  z-index: 1100;
-  background: none;
-  border: none;
-  color: #333;
-  font-size: 5px;  
-  cursor: pointer;
-} */
+
 
 /* Media query for small screens */
 @media (max-width: 768px) {
@@ -36,16 +71,38 @@
   }
 }
 
-/* Styles for all Form.Label elements */
+
 .form-label {
   font-size: 0.9rem;                 
   font-weight: 500;                                   
   text-transform: none;             
-  margin-bottom: 0.25rem;           
+  margin-bottom: 2px;           
   display: inline-block;             
-  padding-bottom: 2px;              
+  padding-bottom: 0;              
   transition: border-color 0.3s ease;  
 }
+
+/* .toggle-button{
+  position: 'fixed',
+            top: '10px',
+            left: '0',
+            bottom: '0',
+            zIndex: 1100,
+            background: 'none',
+            border: 'none',
+            color: isSidebarOpen ? '#fff' : '#333',
+            fontSize: '15px',
+            cursor: 'pointer',
+            paddingLeft: '0px'
+} */
+
+
+
+
+
+
+
+
 
 
 

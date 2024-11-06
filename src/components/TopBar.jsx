@@ -16,17 +16,18 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
 
     return (
         <Navbar collapseOnSelect expand="md" className="bg-light sticky-top custom-navbar" style={{ zIndex: 1050 }}>
-            <Container style={{padding:'0px'}}>
-                <Navbar.Brand className="me-auto" href="/" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+            {/* Full width container with flex properties */}
+            <Container fluid className="d-flex justify-content-between align-items-center">
+                <Navbar.Brand href="/" style={{ fontSize: '1.5rem', fontWeight: '600', display: 'flex', alignItems: 'center', paddingLeft: '0' }}>
                     <img
                         src="/logo_1.webp"   
                         alt="TickTrack Logo"
-                        style={{ height: '30px', marginRight: '8px' }}  // Adjust size and spacing as needed
-                    />
-                    TickTrack</Navbar.Brand>
+                        style={{ height: '30px', marginRight: '8px' }} />
+                    TickTrack
+                </Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
-                    <Nav className="me-auto">
+                    <Nav className="me-auto" style={{ marginLeft: '45px' }}>
                         {isAuthenticated && (
                             <Nav.Link as={Link} to="/create-ticket">Create Ticket</Nav.Link>
                         )}
@@ -37,7 +38,6 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
                             <NavDropdown.Divider />
                             <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
                         </NavDropdown>
-
                     </Nav>
                     <Nav className="ms-auto user-menu">
                         {isAuthenticated ? (
@@ -50,22 +50,15 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
                                 id="user-dropdown"
                                 align="end"
                             >
-                                <NavDropdown.Item disabled><FaUserTag /> {userRole}</NavDropdown.Item> {/* Display user's role */}
+                                <NavDropdown.Item disabled><FaUserTag /> {userRole}</NavDropdown.Item>
                                 <NavDropdown.Divider />
-
-                                {/* Link to User Profile */}
                                 <NavDropdown.Item as={Link} to={`/profile/${getLoggedInUserId()}`}>
                                     <FaUser /> View Profile
                                 </NavDropdown.Item>
-
-                                {/* Link to Activity Log */}
                                 <NavDropdown.Item as={Link} to={`/activity/${getLoggedInUserId()}`}>
                                     <FaListAlt /> View Activity Log
                                 </NavDropdown.Item>
-
                                 <NavDropdown.Divider />
-
-                                {/* Sign Out functionality */}
                                 <NavDropdown.Item onClick={handleSignOut}>
                                     <FaSignOutAlt /> Sign Out
                                 </NavDropdown.Item>
@@ -77,7 +70,6 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
                             </>
                         )}
                     </Nav>
-
                 </Navbar.Collapse>
             </Container>
         </Navbar>
@@ -85,5 +77,3 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
 };
 
 export default TopBar;
-
-

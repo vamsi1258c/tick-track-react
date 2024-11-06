@@ -1,6 +1,25 @@
 .footer {
-    /* background-color: hsl(210, 17%, 98%); */
     width: 100%;
     text-align: center;
-    height: 40px;
+    height: 35px;
   }
+
+  .footer {
+    background-color: #ffffff;  
+    color: #2c3e50;  
+  }
+  
+  .footer .text-muted {
+    color: #2c3e50 !important;  
+  }
+  
+    
+  .footer a:hover {
+    color: #2c3e50;  
+    text-decoration: underline;
+  }
+  
+  .footer .container {
+    padding: 0 0;
+  }
+  

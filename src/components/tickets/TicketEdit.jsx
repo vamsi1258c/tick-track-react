@@ -244,7 +244,7 @@ const TicketEdit = ({ currentUserId }) => {
         <Container>
             <Row className="justify-content-md-center">
                 <Col xs={12} md={8}>
-                    <Card className="my-4">
+                    <Card className="p-4 shadow rounded border-0">
                         <Card.Body>
                             <h3 className="text-center">
                                 Update Ticket  <span style={{ fontSize: '0.5em' }}> #{ticketData.id}</span>
@@ -264,8 +264,9 @@ const TicketEdit = ({ currentUserId }) => {
                                         placeholder="Enter ticket title"
                                         size='sm'
                                         onBlur={handleBlur}
+                                        className="shadow-sm"
                                     />
-                                    {validationErrors.title && <div className="text-danger">{validationErrors.title}</div>}
+                                    {validationErrors.title && <div className="text-danger small">{validationErrors.title}</div>}
                                 </Form.Group>
 
                                 <Form.Group controlId="formDescription" className="mb-4">
@@ -276,8 +277,9 @@ const TicketEdit = ({ currentUserId }) => {
                                         placeholder="Enter ticket description"
                                         size='sm'
                                         onBlur={() => handleBlur('description')}
+                                        className="shadow-sm"
                                     />
-                                    {validationErrors.description && <div className="text-danger">{validationErrors.description}</div>}
+                                    {validationErrors.description && <div className="text-danger small">{validationErrors.description}</div>}
                                 </Form.Group>
 
                                 <Form.Group controlId="formStatus" className="mb-4">
@@ -288,6 +290,7 @@ const TicketEdit = ({ currentUserId }) => {
                                         onChange={handleChange}
                                         size='sm'
                                         onBlur={handleBlur}
+                                        className="shadow-sm"
                                     >
                                         <option value="open">Open</option>
                                         <option value="in_progress">In Progress</option>
@@ -295,7 +298,7 @@ const TicketEdit = ({ currentUserId }) => {
                                         <option value="closed">Closed</option>
                                         <option value="to_be_approved">ToBeApproved</option>
                                     </Form.Select>
-                                    {validationErrors.status && <div className="text-danger">{validationErrors.status}</div>}
+                                    {validationErrors.status && <div className="text-danger small">{validationErrors.status}</div>}
                                 </Form.Group>
 
                                 <Form.Group controlId="formPriority" className="mb-4">
@@ -306,13 +309,14 @@ const TicketEdit = ({ currentUserId }) => {
                                         onChange={handleChange}
                                         size='sm'
                                         onBlur={handleBlur}
+                                        className="shadow-sm"
                                     >
                                         <option value="low">Low</option>
                                         <option value="medium">Medium</option>
                                         <option value="high">High</option>
                                         <option value="urgent">Urgent</option>
                                     </Form.Select>
-                                    {validationErrors.priority && <div className="text-danger">{validationErrors.priority}</div>}
+                                    {validationErrors.priority && <div className="text-danger small">{validationErrors.priority}</div>}
                                 </Form.Group>
 
                                 <Form.Group controlId="formCategory" className="mb-4">
@@ -323,6 +327,7 @@ const TicketEdit = ({ currentUserId }) => {
                                         onChange={handleCategoryChange}
                                         size='sm'
                                         onBlur={handleBlur}
+                                        className="shadow-sm"
                                     >
                                         <option value="service">Service</option>
                                         <option value="troubleshooting">Troubleshooting</option>
@@ -338,6 +343,7 @@ const TicketEdit = ({ currentUserId }) => {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         size='sm'
+                                        className="shadow-sm"
                                     >
                                         <option value="">Select a subcategory</option>
                                         {subcategories.map(sub => (
@@ -357,6 +363,7 @@ const TicketEdit = ({ currentUserId }) => {
                                         value={selectedUser}
                                         isSearchable
                                         onBlur={handleBlur}
+                                        className="shadow-sm"
                                     />
                                 </Form.Group>
 
@@ -368,6 +375,7 @@ const TicketEdit = ({ currentUserId }) => {
                                         onChange={handleFileChange}
                                         size='sm'
                                         onBlur={handleBlur}
+                                        className="shadow-sm"
                                     />
                                     {attachments.length > 0 && (
                                         <div className="mt-2">

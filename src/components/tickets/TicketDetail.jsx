@@ -4,6 +4,7 @@ import DOMPurify from 'dompurify';
 import { FaDownload } from 'react-icons/fa';
 import ApprovalModal from './ApprovalModal';
 import { updateTicket } from '../../services/ticket';
+import './TicketDetail.css';
 
 const TicketViewModal = ({
     show,
@@ -23,7 +24,7 @@ const TicketViewModal = ({
     const [showApprovalModal, setShowApprovalModal] = useState(false);
     const [loadingApprovers, setLoadingApprovers] = useState(false);
 
-    
+
     const handleSendForApproval = () => {
         setLoadingApprovers(true);
         console.log(selectedTicket);
@@ -60,17 +61,17 @@ const TicketViewModal = ({
             setShowViewModal(false);
             refreshTickets();
         } catch (error) {
-            alert("Failed to to approve. Please try again. "+error);
+            alert("Failed to to approve. Please try again. " + error);
         }
     };
 
     return (
         <>
-            <Modal show={show} onHide={onClose} size="lg">
+            <Modal show={show} onHide={onClose} size="lg" centered>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
                     <Button variant="close" onClick={onClose} />
                 </div>
-                <h3 className="view-modal-title" >
+                <h3 className="view-modal-title">
                     Review Ticket# {selectedTicket?.id}
                 </h3>
                 <Modal.Header>
@@ -104,7 +105,7 @@ const TicketViewModal = ({
 
                     <hr />
 
-                    <h5>Activity Logs:</h5>
+                    <h5>Activity:</h5>
                     {selectedTicket?.activity_logs.length > 0 ? (
                         selectedTicket.activity_logs.map((log) => (
                             <div key={log.id}>
@@ -163,6 +164,7 @@ const TicketViewModal = ({
                 approvers={users.filter((user) => user.approver === true)}
                 loading={loadingApprovers}
             />
+
         </>
     );
 };

@@ -56,18 +56,23 @@ h2, .view-modal-title {
     width: 100%;
     border-collapse: collapse;
     min-width: 600px;
-    background-color: transparent;  
+    background-color: transparent; 
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.85rem;
+    color: #333; 
 }
 
 .custom-table thead th {
     cursor: pointer;
-    background-color: #f8f9fa;  
+    background-color: #f5f5f5;  
     padding: 10px;
+    font-weight: 600;
 }
 
 .custom-table th, .custom-table td {
     border: none;  
-    padding: 10px;  
+    padding: 0.5rem; 
+    vertical-align: middle; 
 }
 
 .action-buttons {
@@ -81,17 +86,20 @@ h2, .view-modal-title {
     transition: background-color 0.3s;  
 }
 
+.custom-table tbody tr {
+    background-color: transparent;  
+}
+
 .custom-table tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.1);  
+    background-color: #f9f9f9;  
     text-decoration: underline;  
 }
 
-/* Ensuring row clickability */
 .custom-table tbody tr:active {
     background-color: #ececec;  
 }
 
-/* Modal-related z-index */
+
 .modal-backdrop {
     z-index: 1050 !important;
 }
@@ -174,14 +182,14 @@ h2, .view-modal-title {
     }
 
     .custom-table td {
-        display: block; /* Display cells as block elements */
+        display: block;  
         text-align: left;
-        position: relative; /* Position relative for absolutely positioning pseudo-elements */
-        padding-left: 50%; /* Align text to left */
+        position: relative;  
+        padding-left: 50%;  
     }
 
     .custom-table td::before {
-        content: attr(data-label); /* Use data-label for headers */
+        content: attr(data-label);  
         position: absolute; 
         left: 10px; 
         font-weight: bold;

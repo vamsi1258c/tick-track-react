@@ -97,12 +97,12 @@ function App() {
         return 'Settings';
       case '/signup':
         return 'Add Users';
-      case `/profile/${userId}`:  
+      case `/profile/${userId}`:
         return 'User Profile';
-      case `/activity/${userId}`:  
+      case `/activity/${userId}`:
         return 'User Activity Log';
       default:
-        return 'NODISPLAY';  
+        return 'NODISPLAY';
     }
   };
 
@@ -117,7 +117,7 @@ function App() {
               transition: 'left 0.3s ease, width 0.3s ease',
               zIndex: 1000,
               height: '100vh',
-              backgroundColor: '#343a40',
+              backgroundColor: '#2c3e50',
               color: '#fff',
               overflow: 'hidden',
               opacity: isSidebarOpen ? '1' : '0',
@@ -256,6 +256,7 @@ function App() {
           {isSidebarOpen ? <FaAngleLeft /> : <FaAngleRight />}
         </button>
       )}
+
 
       {/* Footer - Sticky */}
       <div

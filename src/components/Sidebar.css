@@ -1,59 +1,59 @@
-.sidebar .nav-link {
-    /* padding: 10px 15px; */
-    color: #333333; /* Default text color */
+.sidebar {
+    background-color: white;
+    box-shadow: none;
+    border-right: none;
+    border-left: none;
+    transition: width 0.3s ease;
+    padding-right: 0;
 }
 
-.sidebar .nav-link:hover {
-    background-color: #f8f9fa; /* Light background on hover */
-    color: #007bff; /* Change text color on hover */
+.sidebar.open {
+    width: 180px;
 }
 
-.sidebar .nav-link {
+.sidebar.closed {
+    width: 0;
+}
+
+.sidebar-link {
     padding: 10px 15px;
-    color: #333; /* Default text color */
+    color: #2c3e50 !important; /* Ensure the link text color is #2c3e50 */
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-.sidebar .nav-link:hover {
-    background-color: #f8f9fa; /* Light background on hover */
-    color: #007bff; /* Change text color on hover */
+.sidebar-link:hover {
+    background-color: #f1f3f5 !important; /* Light gray on hover */
+    color: #2c3e50 !important; /* Ensure the color remains #2c3e50 on hover */
 }
 
-/* Sidebar.css */
-.sidebar {
-    background-color: white; /* Ensure the background is consistent */
+.sidebar-link.active-link {
+    background-color: #3498db !important; /* Sky blue when active */
+    color: white !important; /* White text when active */
+    font-weight: 600;
 }
 
-.nav-link {
-    padding: 10px 15px; /* Add padding to the links */
-    color: #333; /* Default link color */
+.sidebar-link .me-2 {
+    font-size: 18px;
 }
 
-.nav-link:hover {
-    background-color: #f8f9fa; /* Light background on hover */
-    color: #007bff; /* Change color on hover */
-}
-
-/* Sidebar.css */
-.sidebar {
-    background-color: white; /* Ensure a consistent background color */
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
-}
-
-.nav-link {
-    padding: 10px 15px; /* Ensure padding is applied for spacing */
-    color: #333; /* Default link color */
-}
-
-.nav-link:hover {
-    background-color: #f8f9fa; /* Light background on hover */
-    color: #007bff; /* Change color on hover */
-}
-
-/* Ensure the sidebar icon spacing is not cutting off */
 .flex-column {
-    padding: 0; /* Remove padding on the flex column to avoid space */
+    padding: 0;
 }
 
+.sidebar-link:hover {
+    background-color: #f1f3f5 !important;
+    transform: translateX(5px);
+}
 
+.sidebar .nav-link:last-child {
+    margin-top: auto;
+}
 
-
+.sidebar .nav-link svg {
+    font-size: 18px;
+    margin-right: 10px;
+}

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchActivityLogsByUserId, deleteActivityLog } from '../services/activityLog';
-import { FaTrashAlt, FaTimes   } from 'react-icons/fa'; // Importing the delete icon from react-icons
+import { FaTimes } from 'react-icons/fa';
+import { Card, Button } from 'react-bootstrap';
 
 const UserActivityLog = () => {
     const { id } = useParams();
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
     const [activityLogs, setActivityLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -27,10 +28,9 @@ const UserActivityLog = () => {
 
     const formatDate = (dateString) => {
         if (!dateString) {
-            return "Date not available"; // Handle undefined or null dateString
+            return "Date not available";
         }
 
-        // Remove microseconds if present and create a valid Date object
         const cleanedDateString = dateString.split('.')[0];
         const date = new Date(cleanedDateString);
         return isNaN(date.getTime()) ? "Date not available" : date.toLocaleString();
@@ -39,8 +39,8 @@ const UserActivityLog = () => {
     const handleDelete = async (logId) => {
         if (window.confirm("Are you sure you want to delete this activity log?")) {
             try {
-                await deleteActivityLog(logId); // Call the delete API
-                setActivityLogs(activityLogs.filter(log => log.id !== logId)); // Update state to remove the deleted log
+                await deleteActivityLog(logId);
+                setActivityLogs(activityLogs.filter(log => log.id !== logId));
             } catch (error) {
                 setError("Failed to delete activity log");
             }
@@ -48,87 +48,74 @@ const UserActivityLog = () => {
     };
 
     const handleBack = () => {
-        navigate(-1); // Go back to the previous page
+        navigate(-1);
     };
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
 
-    // Inline styles
-    const cardStyle = {
-        border: '1px solid #ccc',
-        padding: '20px',
-        borderRadius: '5px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-        marginBottom: '20px',
-    };
-
-    const buttonStyle = {
-        padding: '8px 12px',
-        fontSize: '14px',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s',
-        minWidth: '100px',
-        backgroundColor: '#6c757d', // Default button color
-        color: 'white',
-        marginTop: '20px', // Add margin for spacing
-    };
-
     return (
         <div style={{ padding: '20px' }}>
-            <h1>User Activity Log</h1>
-            <div style={cardStyle}>
-                {activityLogs.length > 0 ? (
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <tbody>
+            <Card className="mb-4" style={{ maxWidth: '600px', margin: 'auto' }}>
+                <Card.Header>
+                    <h3>Your Activity</h3>
+                </Card.Header>
+                <Card.Body>
+                    {activityLogs.length > 0 ? (
+                        <div>
                             {activityLogs.map((log) => (
-                                <tr key={log.id} style={{ borderBottom: '1px solid #ccc', padding: '10px' }}>
-                                    <td style={{ padding: '10px', flex: 1 }}>
-                                        <p style={{ display: 'flex', alignItems: 'center', margin: 0 }}>
-                                            <span>
-                                                <strong>Action:</strong> {log.action}
-                                            </span>
-                                            <span style={{ marginLeft: '10px', display: 'inline-flex', alignItems: 'center' }}>
-                                                <strong>Date:</strong> {formatDate(log.created_at)}
-                                            </span>
+                                <Card key={log.id} className="mb-3" style={{ position: 'relative' }}>
+                                    <Card.Body>
+                                        <Button
+                                            variant="link"
+                                            onClick={() => handleDelete(log.id)}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '5px',
+                                                right: '5px',
+                                                width: '16px',
+                                                height: '16px',
+                                                padding: '0',
+                                                fontSize: '14px',
+                                                color: '#e74c3c',
+                                                background: 'none',
+                                                border: '1px solid #e74c3c',
+                                                borderRadius: '0',
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                cursor: 'pointer',
+                                                transition: 'color 0.3s ease',
+                                            }}
+                                            title="Delete Activity Log"
+                                        >
+                                            <FaTimes style={{ fontSize: '16px' }} />
+                                        </Button>
+                                        
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <p><strong>Action:</strong> {log.action}</p>
+                                            <p><strong>Date:</strong> {formatDate(log.created_at)}</p>
                                             {log.ticket_id && (
-                                                <span style={{ marginLeft: '10px', display: 'inline-flex', alignItems: 'center' }}>
-                                                    <strong>Ticket ID:</strong> {log.ticket_id}
-                                                </span>
+                                                <p><strong>Ticket ID:</strong> {log.ticket_id}</p>
                                             )}
-                                            <button
-                                                onClick={() => handleDelete(log.id)}
-                                                style={{
-                                                    background: 'none',
-                                                    border: 'none',
-                                                    cursor: 'pointer',
-                                                    color: '#e74c3c',
-                                                    fontSize: '16px',
-                                                    marginLeft: '10px'
-                                                }}
-                                                title="Delete Activity Log"
-                                            >
-                                                <FaTimes  />
-                                            </button>
-                                        </p>
-                                    </td>
-                                </tr>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
                             ))}
-                        </tbody>
-                    </table>
-                ) : (
-                    <p>No activity logs available.</p>
-                )}
-                {/* Move the Back button here to place it at the bottom of the card */}
-                <button
-                    onClick={handleBack}
-                    style={buttonStyle}
-                >
-                    Back
-                </button>
-            </div>
+                        </div>
+                    ) : (
+                        <p>No activity logs available.</p>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '15px' }}>
+                        <Button
+                            variant="secondary"
+                            onClick={handleBack}
+                        >
+                            Back
+                        </Button>
+                    </div>
+                </Card.Body>
+            </Card>
         </div>
     );
 };

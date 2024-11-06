@@ -68,7 +68,7 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
           <Card.Body>
             <h2 className="text-center mb-4">Sign In</h2>
             <Form onSubmit={handleSubmit}>
-              <Form.Group controlId="formBasicEmail" className="mb-3">
+              <Form.Group controlId="formBasicEmail" className="mb-4">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
@@ -82,11 +82,12 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
                   onBlur={() => handleBlur('email')}
                   required
                   size="sm"
+                  className="shadow-sm"
                 />
                 {emailError && <p className="text-danger">{emailError}</p>}
               </Form.Group>
 
-              <Form.Group controlId="formBasicPassword" className="mb-3">
+              <Form.Group controlId="formBasicPassword" className="mb-4">
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"
@@ -100,6 +101,7 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
                   onBlur={() => handleBlur('password')}
                   required
                   size="sm"
+                  className="shadow-sm"
                 />
                 {passwordError && <p className="text-danger">{passwordError}</p>}
               </Form.Group>
