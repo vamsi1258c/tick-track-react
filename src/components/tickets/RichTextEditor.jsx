@@ -10,7 +10,8 @@ const RichTextEditor = ({ value, onChange, placeholder, onBlur }) => {
         marginBottom: '15px',  
         border: '1px solid #ced4da',  
         borderRadius: '4px',  
-        overflowY: 'auto'  
+        overflowY: 'auto',
+        position: 'sticky'
     };
     return (
         <div className="mb-3">
@@ -21,6 +22,7 @@ const RichTextEditor = ({ value, onChange, placeholder, onBlur }) => {
                 placeholder={placeholder}
                 style={editorStyle}
                 onBlur={onBlur}
+                size="sm"
             />
         </div>
     );

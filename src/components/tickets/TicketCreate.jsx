@@ -202,7 +202,7 @@ const TicketCreate = ({ currentUser }) => {
                             {success && <Alert variant="success">Ticket created successfully!</Alert>}
 
                             <Form onSubmit={handleSubmit}>
-                                <Form.Group controlId="formTitle" className="mb-3">
+                                <Form.Group  controlId="formTitle" className="mb-4">
                                     <Form.Label>Title <span className="text-danger">*</span></Form.Label>
                                     <Form.Control
                                         type="text"
@@ -216,7 +216,7 @@ const TicketCreate = ({ currentUser }) => {
                                     {validationErrors.title && <div className="text-danger">{validationErrors.title}</div>}
                                 </Form.Group>
 
-                                <Form.Group controlId="formDescription" className="mb-3">
+                                <Form.Group controlId="formDescription" className="mb-4">
                                     <Form.Label>Description <span className="text-danger">*</span></Form.Label>
                                     <RichTextEditor
                                         value={ticketData.description}
@@ -227,7 +227,7 @@ const TicketCreate = ({ currentUser }) => {
                                     {validationErrors.description && <div className="text-danger">{validationErrors.description}</div>}
                                 </Form.Group>
 
-                                <Form.Group controlId="formStatus" className="mb-3">
+                                <Form.Group controlId="formStatus" className="mb-4">
                                     <Form.Label>Status</Form.Label>
                                     <Form.Select
                                         name="status"
@@ -243,7 +243,7 @@ const TicketCreate = ({ currentUser }) => {
                                     </Form.Select>
                                 </Form.Group>
 
-                                <Form.Group controlId="formPriority" className="mb-3">
+                                <Form.Group controlId="formPriority" className="mb-4">
                                     <Form.Label>Priority <span className="text-danger">*</span></Form.Label>
                                     <Form.Select
                                         name="priority"
@@ -260,7 +260,7 @@ const TicketCreate = ({ currentUser }) => {
                                     {validationErrors.priority && <div className="text-danger">{validationErrors.priority}</div>}
                                 </Form.Group>
 
-                                <Form.Group controlId="formCategory" className="mb-3">
+                                <Form.Group controlId="formCategory" className="mb-4">
                                     <Form.Label>Category <span className="text-danger">*</span></Form.Label>
                                     <Form.Select
                                         name="category"
@@ -276,7 +276,7 @@ const TicketCreate = ({ currentUser }) => {
                                     {validationErrors.category && <div className="text-danger">{validationErrors.category}</div>}
                                 </Form.Group>
 
-                                <Form.Group controlId="formSubcategory" className="mb-3">
+                                <Form.Group controlId="formSubcategory" className="mb-4">
                                     <Form.Label>Subcategory</Form.Label>
                                     <Form.Select
                                         name="subcategory"
@@ -293,17 +293,18 @@ const TicketCreate = ({ currentUser }) => {
                                     </Form.Select>
                                 </Form.Group>
 
-                                <Form.Group controlId="formAssignedTo" className="mb-3">
+                                <Form.Group controlId="formAssignedTo" className="mb-4">
                                     <Form.Label>Assigned To</Form.Label>
                                     <Select
                                         options={users}
                                         onChange={handleAssignedToChange}
                                         isClearable
                                         className='custom-select'
+                                        size='sm'
                                     />
                                 </Form.Group>
 
-                                <Form.Group controlId="formAttachments" className="mb-3">
+                                <Form.Group controlId="formAttachments" className="mb-4">
                                     <Form.Label>Attachments</Form.Label>
                                     <Form.Control
                                         type="file"

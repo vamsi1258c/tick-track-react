@@ -254,7 +254,7 @@ const TicketEdit = ({ currentUserId }) => {
                             {success && <Alert variant="success">Ticket updated successfully!</Alert>}
 
                             <Form onSubmit={handleSubmit}>
-                                <Form.Group controlId="formTitle" className="mb-3">
+                                <Form.Group controlId="formTitle" className="mb-4">
                                     <Form.Label>Title</Form.Label>
                                     <Form.Control
                                         type="text"
@@ -268,17 +268,8 @@ const TicketEdit = ({ currentUserId }) => {
                                     {validationErrors.title && <div className="text-danger">{validationErrors.title}</div>}
                                 </Form.Group>
 
-                                <Form.Group controlId="formDescription" className="mb-3">
+                                <Form.Group controlId="formDescription" className="mb-4">
                                     <Form.Label>Description</Form.Label>
-                                    {/* <Form.Control
-                                        as="textarea"
-                                        rows={3}
-                                        name="description"
-                                        value={ticketData.description}
-                                        onChange={handleChange}
-                                        placeholder="Enter ticket description"
-                                        required
-                                    /> */}
                                     <RichTextEditor
                                         value={ticketData.description}
                                         onChange={handleDescriptionChange}
@@ -289,7 +280,7 @@ const TicketEdit = ({ currentUserId }) => {
                                     {validationErrors.description && <div className="text-danger">{validationErrors.description}</div>}
                                 </Form.Group>
 
-                                <Form.Group controlId="formStatus" className="mb-3">
+                                <Form.Group controlId="formStatus" className="mb-4">
                                     <Form.Label>Status</Form.Label>
                                     <Form.Select
                                         name="status"
@@ -307,7 +298,7 @@ const TicketEdit = ({ currentUserId }) => {
                                     {validationErrors.status && <div className="text-danger">{validationErrors.status}</div>}
                                 </Form.Group>
 
-                                <Form.Group controlId="formPriority" className="mb-3">
+                                <Form.Group controlId="formPriority" className="mb-4">
                                     <Form.Label>Priority</Form.Label>
                                     <Form.Select
                                         name="priority"
@@ -324,7 +315,7 @@ const TicketEdit = ({ currentUserId }) => {
                                     {validationErrors.priority && <div className="text-danger">{validationErrors.priority}</div>}
                                 </Form.Group>
 
-                                <Form.Group controlId="formCategory" className="mb-3">
+                                <Form.Group controlId="formCategory" className="mb-4">
                                     <Form.Label>Category</Form.Label>
                                     <Form.Select
                                         name="category"
@@ -339,7 +330,7 @@ const TicketEdit = ({ currentUserId }) => {
                                     </Form.Select>
                                 </Form.Group>
 
-                                <Form.Group controlId="formSubcategory" className="mb-3">
+                                <Form.Group controlId="formSubcategory" className="mb-4">
                                     <Form.Label>Subcategory</Form.Label>
                                     <Form.Select
                                         name="subcategory"
@@ -347,7 +338,6 @@ const TicketEdit = ({ currentUserId }) => {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         size='sm'
-                                    // disabled={!ticketData.category} // Disable until a category is selected
                                     >
                                         <option value="">Select a subcategory</option>
                                         {subcategories.map(sub => (
@@ -358,7 +348,7 @@ const TicketEdit = ({ currentUserId }) => {
                                     </Form.Select>
                                 </Form.Group>
 
-                                <Form.Group controlId="formAssignedTo" className="mb-3">
+                                <Form.Group controlId="formAssignedTo" className="mb-4">
                                     <Form.Label>Assigned To</Form.Label>
                                     <Select
                                         options={users}
@@ -370,7 +360,7 @@ const TicketEdit = ({ currentUserId }) => {
                                     />
                                 </Form.Group>
 
-                                <Form.Group controlId="formAttachments" className="mb-3">
+                                <Form.Group controlId="formAttachments" className="mb-4">
                                     <Form.Label>Attachments</Form.Label>
                                     <Form.Control
                                         type="file"
