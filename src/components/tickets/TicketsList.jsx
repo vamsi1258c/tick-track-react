@@ -2,18 +2,30 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { fetchTickets, deleteTicket } from '../../services/ticket';
 import { fetchUsers } from '../../services/authService';
 import { downloadAttachment } from '../../services/attachment';
-import { Button, Dropdown, Table, Form, Modal, Spinner, InputGroup, Badge, Row, Col, Pagination } from 'react-bootstrap';
+import { fetchConfigMaster } from '../../services/configMaster';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash, FaSearch, FaAngleUp, FaAngleDown, FaPlus, FaSlidersH } from 'react-icons/fa';
-import { AiOutlineReload, } from 'react-icons/ai';
-import Select from 'react-select';
-import './TicketsList.css';
-import TicketViewModal from './TicketDetail';
+import { FaSearch } from 'react-icons/fa';
+import { renderCategoryBadge, renderStatusBadge, renderPriorityBadge } from '../../utils/renderBadges';
+import {
+    Table, Button, CircularProgress, Pagination, IconButton, Grid, TextField,
+    Autocomplete, InputAdornment, Typography, Box, Dialog, DialogTitle, DialogContent,
+    DialogActions, FormControl, Select, MenuItem, Menu
+} from '@mui/material';
+import {
+    Visibility as VisibilityIcon, Edit as EditIcon, Delete as DeleteIcon, Clear,
+    Refresh as RefreshIcon, Add as AddIcon, Tune as TuneIcon, ExpandLess as ExpandLessIcon,
+    ExpandMore as ExpandMoreIcon, Close as CloseIcon, MoreVert as MoreVertIcon
+} from '@mui/icons-material';
 
+import './TicketsList.css';
+import TicketViewModal from './TicketViewModal';
+import { exportToCSV, exportToExcel } from '../../utils/exportUtils';
+import { useSnackbar } from '../Snackbar';
 
 const TicketsList = ({ currentUser, userRole }) => {
     const [tickets, setTickets] = useState([]);
     const [users, setUsers] = useState([]);
+    const [configs, setConfigs] = useState([]);
     const [filter, setFilter] = useState('all');
     const [ticketToDelete, setTicketToDelete] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -28,22 +40,18 @@ const TicketsList = ({ currentUser, userRole }) => {
     const [sortConfig, setSortConfig] = useState({ key: 'id', direction: 'desc' });
     const [filtersVisible, setFiltersVisible] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [ticketsPerPage, setTicketsPerPage] = useState(10);
+    const [ticketsPerPage, setTicketsPerPage] = useState(7);
     const totalPages = Math.ceil(tickets.length / ticketsPerPage);
     const indexOfLastTicket = currentPage * ticketsPerPage;
     const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
     const currentTickets = tickets.slice(indexOfFirstTicket, indexOfLastTicket);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-    const handlePreviousPage = () => setCurrentPage(currentPage > 1 ? currentPage - 1 : currentPage);
-    const handleNextPage = () => setCurrentPage(currentPage < totalPages ? currentPage + 1 : currentPage);
-
-
-    const handleTicketsPerPageChange = (number) => {
-        setTicketsPerPage(number);
-        setCurrentPage(1);
-    };
     const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
+
+    const exportColumns = ['id', 'title', 'description', 'status', 'priority', 'category', 'subcategory', 'created_at', 'creator', 'updated_at', 'assignee']
 
     const toggleFilters = () => {
         setFiltersVisible(!filtersVisible);
@@ -62,15 +70,18 @@ const TicketsList = ({ currentUser, userRole }) => {
             const responseUsers = await fetchUsers();
             setUsers(responseUsers.data);
 
+            const responseConfig = await fetchConfigMaster();
+            setConfigs(responseConfig.data);
+
+            setTicketsPerPage(7);
+
             let filteredTickets = response.data;
 
             if (userRole === 'admin' || userRole === 'support') {
                 // Admins and support can see all tickets, no filter needed
             } else {
-                // Other users can only see tickets they created
                 filteredTickets = filteredTickets.filter(ticket => ticket.creator?.username === currentUser);
             }
-
 
             if (filter === 'assigned_to_me') {
                 filteredTickets = filteredTickets.filter(ticket => ticket.assignee?.username === currentUser);
@@ -78,7 +89,9 @@ const TicketsList = ({ currentUser, userRole }) => {
                 filteredTickets = filteredTickets.filter(ticket => ticket.creator?.username === currentUser);
             }
             if (userFilter.length > 0) {
-                filteredTickets = filteredTickets.filter(ticket => userFilter.includes(ticket.assignee.username));
+                filteredTickets = filteredTickets.filter(ticket => {
+                    return userFilter.includes(ticket.assignee?.username);
+                });
             }
             if (statusFilter.length > 0) {
                 filteredTickets = filteredTickets.filter(ticket => statusFilter.includes(ticket.status));
@@ -89,7 +102,6 @@ const TicketsList = ({ currentUser, userRole }) => {
             if (categoryFilter.length > 0) {
                 filteredTickets = filteredTickets.filter(ticket => categoryFilter.includes(ticket.category));
             }
-
 
             if (searchText?.trim()) {
                 const searchLower = searchText.toLowerCase().trim();
@@ -116,9 +128,10 @@ const TicketsList = ({ currentUser, userRole }) => {
             setTickets(filteredTickets);
         } catch (error) {
             console.error('Failed to load tickets', error);
+            showSnackbar('Failed to load tickets', 'error');
         }
         setLoading(false);
-    }, [filter, currentUser, priorityFilter, categoryFilter, statusFilter, searchText, sortConfig, userRole, userFilter]);
+    }, [filter, currentUser, priorityFilter, categoryFilter, statusFilter, searchText, sortConfig, userRole, userFilter, showSnackbar]);
 
     useEffect(() => {
         loadTickets();
@@ -130,6 +143,7 @@ const TicketsList = ({ currentUser, userRole }) => {
             loadTickets();
         } catch (error) {
             console.error('Failed to delete ticket', error);
+            showSnackbar('Failed to delete ticket', 'error');
             if (error.response && error.response.status === 401) {
                 navigate('/signin');
             }
@@ -145,55 +159,7 @@ const TicketsList = ({ currentUser, userRole }) => {
         setSortConfig({ key, direction });
     };
 
-    const renderPriorityBadge = (priority) => {
-        switch (priority) {
-            case 'high':
-                return <Badge bg="warning">High</Badge>;
-            case 'medium':
-                return <Badge bg="light" style={{ color: '#001f3f' }}>Medium</Badge>;
-            case 'low':
-                return <Badge bg="white" style={{ color: '#3D9970' }}>Low</Badge>;
-            case 'urgent':
-                return <Badge bg="danger">Urgent</Badge>;
-            default:
-                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>N/A</Badge>;
-        }
-    };
-
-    const renderCategoryBadge = (category) => {
-        switch (category) {
-            case 'service':
-                return <Badge bg="light" style={{ color: '#3D9970' }}>Service</Badge>;
-            case 'troubleshooting':
-                return <Badge bg="white" style={{ color: '#FF6347' }}>Troubleshooting</Badge>;
-            case 'maintenance':
-                return <Badge bg="light" style={{ color: '#DAA520' }}>Maintenance</Badge>;
-            default:
-                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>N/A</Badge>;
-        }
-    };
-
-    const renderStatusBadge = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'open':
-                return <Badge bg="info">Open</Badge>;
-            case 'in_progress':
-                return <Badge bg="primary">In Progress</Badge>;
-            case 'closed':
-                return <Badge bg="secondary">Closed</Badge>;
-            case 'resolved':
-                return <Badge bg="success">Closed</Badge>;
-            case 'to_be_approved':
-                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>ToBeApproved</Badge>;
-            default:
-                return <Badge bg="muted" style={{ color: '#6A5ACD' }}>{status}</Badge>;
-        }
-    };
-
-
-
     const handleViewTicket = (ticket) => {
-        console.log(ticket);
         setSelectedTicket(ticket);
         setShowViewModal(true);
     };
@@ -214,237 +180,379 @@ const TicketsList = ({ currentUser, userRole }) => {
         loadTickets();
     };
 
-    const priorityOptions = [
-        { value: 'low', label: 'Low' },
-        { value: 'medium', label: 'Medium' },
-        { value: 'high', label: 'High' },
-    ];
+    const handleTicketsPerPageChange = (event) => {
+        setTicketsPerPage(event.target.value);
+        setCurrentPage(1);
+    };
 
-    const statusOptions = [
-        { value: 'open', label: 'Open' },
-        { value: 'in_progress', label: 'In Progress' },
-        { value: 'closed', label: 'Closed' },
-        { value: 'resolved', label: 'Resolved' },
-    ];
+    const handleMoreClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
 
-    const categoryOptions = [
-        { value: 'service', label: 'Service' },
-        { value: 'troubleshooting', label: 'Troubleshooting' },
-        { value: 'maintenance', label: 'Maintenance' },
-    ];
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const priorityOptions = configs
+        .filter(config => config.type === 'priority')
+        .map((config) => ({ label: config.label, value: config.value || config.id }));
+
+    const statusOptions = configs
+        .filter(config => config.type === 'status')
+        .map((config) => ({ label: config.label, value: config.value || config.id }));
+
+    const categoryOptions = configs
+        .filter(config => config.type === 'category')
+        .map((config) => ({ label: config.label, value: config.value || config.id }));
 
     return (
         <div className="ticket-list-container">
             <div className="sticky-header">
-                <div className="header-container d-flex justify-content-between align-items-center">
-                    <h2 className="my-2">Tickets</h2>
-                    <div className="button-container d-flex">
-                        <Button variant="secondary" onClick={handleRefresh} className="ml-2 btn-sm">
-                            <AiOutlineReload /> Refresh
-                        </Button>
-                        <Button variant="primary" onClick={handleAddUser} className="btn-sm ml-2">
-                            <FaPlus /> Add
-                        </Button>
-                    </div>
-                </div>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Typography variant="h5" gutterBottom sx={{
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        color: 'primary.main'
+                    }}>
+                        Tickets
+                    </Typography>
 
-                <Button onClick={toggleFilters} className="mb-3" style={{
-                    padding: '0',
-                    minWidth: '30px',
-                    height: '30px',
-                    border: 'none',
-                    background: 'none',
-                    cursor: 'pointer',
-                    color: 'black'
-                }}><FaSlidersH />
-                    {filtersVisible ? <FaAngleUp style={{ fontSize: '0.75rem', color: 'black' }} /> : <FaAngleDown style={{ fontSize: '0.75rem', color: 'black' }} />}
-                </Button>
+                    <Box display="flex">
+                        <Button variant="outlined" onClick={handleRefresh} size="small" sx={{ ml: 2 }}>
+                            <RefreshIcon /> Refresh
+                        </Button>
+                        <Button variant="contained" onClick={handleAddUser} size="small" sx={{ ml: 2 }}>
+                            <AddIcon /> Add
+                        </Button>
+                    </Box>
+                </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                            onClick={toggleFilters}
+                            sx={{
+                                p: 0,
+                                minWidth: '30px',
+                                height: '30px',
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                color: 'black',
+                            }}
+                        >
+                            <TuneIcon />
+                            {filtersVisible ? (
+                                <ExpandLessIcon style={{ fontSize: '0.75rem', color: 'black' }} />
+                            ) : (
+                                <ExpandMoreIcon style={{ fontSize: '0.75rem', color: 'black' }} />
+                            )}
+                        </Button>
+                    </Box>
+
+                    {/* More button with menu */}
+                    <Button
+                        onClick={handleMoreClick}
+                        sx={{
+                            minWidth: '30px',
+                            height: '30px',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            color: 'black',
+                        }}
+                    >
+                        <MoreVertIcon sx={{ fontSize: '1.5rem' }} />
+                    </Button>
+
+                    {/* More menu */}
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleClose}
+                        sx={{ mt: 2 }}
+                    >
+                        <MenuItem onClick={() => {
+                            exportToCSV(tickets, exportColumns, 'tickets');
+                            handleClose();
+                        }}>Export CSV</MenuItem>
+                        <MenuItem onClick={() => {
+                            exportToExcel(tickets, exportColumns, 'tickets');
+                            handleClose();
+                        }}>Export Excel</MenuItem>
+                    </Menu>
+                </Box>
+                
                 <div className="search-filter-container">
                     {filtersVisible && (
-                        <Row>
+                        <Grid container spacing={2} alignItems="center">
                             {/* Search Bar */}
-                            <Col xs={12} sm={6} md={4} className="mb-3">
-                                <InputGroup className="mx-2">
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Search by id, title or description"
-                                        value={searchText}
-                                        onChange={(e) => setSearchText(e.target.value.trim())}
-                                        className="search-input"
-                                    />
-                                    <Button variant="outline-secondary">
-                                        <FaSearch />
-                                    </Button>
-                                </InputGroup>
-                            </Col>
+                            <Grid item xs={12} sm={6} md={4}>
+                                <TextField
+                                    fullWidth
+                                    size="small"
+                                    variant="outlined"
+                                    placeholder="Search by id, title, or description"
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value.trim())}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                {/* Clear button */}
+                                                {searchText && (
+                                                    <IconButton onClick={() => setSearchText('')} edge="end">
+                                                        <Clear />
+                                                    </IconButton>
+                                                )}
+                                                {/* Search button */}
+                                                <IconButton>
+                                                    <FaSearch />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
 
                             {/* Tickets Filter */}
-                            <Col xs={12} sm={6} md={4} className="mb-3">
-                                <Select
-                                    className="mx-2 select-filter" // Apply consistent style class
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Autocomplete
+                                    fullWidth
+                                    size="small"
                                     options={[
-                                        { value: 'assigned_to_me', label: 'Assigned to Me' },
-                                        { value: 'created_by_me', label: 'Created by Me' },
+                                        { label: 'Assigned to Me', value: 'assigned_to_me' },
+                                        { label: 'Created by Me', value: 'created_by_me' },
                                     ]}
-                                    onChange={(option) => {
-                                        setFilter(option ? option.value : 'all');
-                                    }}
-                                    placeholder="Filter by Me"
-                                    isClearable
+                                    onChange={(event, newValue) => setFilter(newValue ? newValue.value : 'all')}
+                                    renderInput={(params) => <TextField {...params} label="Filter by Me" variant="outlined"
+                                    />}
+                                    isOptionEqualToValue={(option, value) => option.value === value.value}
                                 />
-                            </Col>
+                            </Grid>
 
-                            {/* Assignee Filter */}
-                            <Col xs={12} md={4} className="mb-3">
-                                <Select
-                                    className="mx-2 select-filter"
-                                    options={users.map(user => ({ value: user.username, label: user.username }))}
-                                    isMulti
-                                    onChange={(selectedOptions) => setUserFilter(selectedOptions.map(option => option.value))}
-                                    placeholder="Filter by Assignee"
-                                    isClearable
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Autocomplete
+                                    multiple
+                                    fullWidth
+                                    size="small"
+                                    options={users.map((user) => ({ label: user.username, value: user.username }))}
+                                    onChange={(event, newValue) => setUserFilter(newValue.map((option) => option.value))}
+                                    renderInput={(params) => <TextField {...params} label="Filter by Assignee" variant="outlined" size="small" />}
+                                    isOptionEqualToValue={(option, value) => option.value === value}
                                 />
-                            </Col>
+                            </Grid>
 
                             {/* Priorities Filter */}
-                            <Col xs={12} sm={6} md={4} className="mb-3">
-                                <Select
-                                    className="mx-2 select-filter"
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Autocomplete
+                                    multiple
+                                    size="small"
+                                    fullWidth
                                     options={priorityOptions}
-                                    isMulti
-                                    onChange={(selectedOptions) => setPriorityFilter(selectedOptions.map(option => option.value))}
-                                    placeholder="Select Priorities"
-                                    isClearable
+                                    onChange={(event, newValue) => setPriorityFilter(newValue.map((option) => option.value))}
+                                    renderInput={(params) => <TextField {...params} label="Select Priorities" variant="outlined" />}
+                                    isOptionEqualToValue={(option, value) => option.value === value.value}
                                 />
-                            </Col>
+                            </Grid>
 
                             {/* Statuses Filter */}
-                            <Col xs={12} sm={6} md={4} className="mb-3">
-                                <Select
-                                    className="mx-2 select-filter"
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Autocomplete
+                                    multiple
+                                    size="small"
+                                    fullWidth
                                     options={statusOptions}
-                                    isMulti
-                                    onChange={(selectedOptions) => setStatusFilter(selectedOptions.map(option => option.value))}
-                                    placeholder="Select Statuses"
-                                    isClearable
+                                    onChange={(event, newValue) => setStatusFilter(newValue.map((option) => option.value))}
+                                    renderInput={(params) => <TextField {...params} label="Select Statuses" variant="outlined" />}
+                                    isOptionEqualToValue={(option, value) => option.value === value.value}
                                 />
-                            </Col>
+                            </Grid>
 
                             {/* Dummy Category Filter */}
-                            <Col xs={12} sm={6} md={4} className="mb-3">
-                                <Select
-                                    className="mx-2 select-filter"
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Autocomplete
+                                    multiple
+                                    size="small"
+                                    fullWidth
                                     options={categoryOptions}
-                                    isMulti
-                                    onChange={(selectedOptions) => setCategoryFilter(selectedOptions.map(option => option.value))}
-                                    placeholder="Select Category"
-                                    isClearable
+                                    onChange={(event, newValue) => setCategoryFilter(newValue.map((option) => option.value))}
+                                    renderInput={(params) => <TextField {...params} label="Select Category" variant="outlined" />}
+                                    isOptionEqualToValue={(option, value) => option.value === value.value}
                                 />
-                            </Col>
-                        </Row>)}
+                            </Grid>
+                        </Grid>
+                    )}
                 </div>
             </div>
-            {loading ? (
-                <div className="d-flex justify-content-center">
-                    <Spinner animation="border" />
-                </div>
-            ) : (
-                <div className="table-responsive">
-                    <Table hover responsive className="custom-table">
-                        <thead>
-                            <tr>
-                                <th onClick={() => handleSort('id')}>ID {sortConfig.key === 'id' && (sortConfig.direction === 'asc' ? '↑' : '↓')}</th>
-                                <th onClick={() => handleSort('title')}>Title {sortConfig.key === 'title' && (sortConfig.direction === 'asc' ? '↑' : '↓')}</th>
-                                <th>Category</th>
-                                <th>Status</th>
-                                <th>Priority</th>
-                                <th>Assignee</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentTickets.length > 0 ? currentTickets.map(ticket => (
-                                <tr key={ticket.id} onClick={() => handleViewTicket(ticket)}>
-                                    <td>{ticket.id}</td>
-                                    <td>{ticket.title}</td>
-                                    <td>{renderCategoryBadge(ticket.category)}</td>
-                                    <td>{renderStatusBadge(ticket.status)}</td>
-                                    <td>{renderPriorityBadge(ticket.priority)}</td>
-                                    <td>{ticket.assignee?.username}</td>
-                                    <td className="action-buttons">
-                                        <Button variant="light" size="sm" onClick={(e) => { e.stopPropagation(); navigate('/edit-ticket', { state: { ticketId: ticket.id } }); }}>
-                                            <FaEdit />
-                                        </Button>
-                                        {ticket.creator?.username === currentUser && (
-                                            <Button variant="light" size="sm" onClick={(e) => { e.stopPropagation(); setTicketToDelete(ticket); setShowDeleteModal(true); }}>
-                                                <FaTrash />
-                                            </Button>
-                                        )}
-                                    </td>
-                                </tr>
-                            )) : (
-                                <tr>
-                                    <td colSpan="7" className="text-center">No tickets found</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </Table>
-
-                    {/* Pagination Section at the Top */}
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                        <Pagination className="m-0 pagination" size="sm">
-                            <Pagination.Prev onClick={handlePreviousPage} disabled={currentPage === 1} />
-                            {[...Array(totalPages)].map((_, index) => (
-                                <Pagination.Item
-                                    key={index}
-                                    active={index + 1 === currentPage}
-                                    onClick={() => handlePageChange(index + 1)}>
-                                    {index + 1}
-                                </Pagination.Item>
-                            ))}
-                            <Pagination.Next onClick={handleNextPage} disabled={currentPage === totalPages} />
-                        </Pagination>
-
-                        {/* Dropdown for Tickets Per Page */}
-                        <Dropdown>
-                            <Dropdown.Toggle variant="secondary" id="dropdown-basic" size='sm'>
-                                Tickets per page: {ticketsPerPage}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                {[5, 10, 20, 50].map(number => (
-                                    <Dropdown.Item key={number} onClick={() => handleTicketsPerPageChange(number)}>
-                                        {number}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
+            <div>
+                {loading ? (
+                    <div className="loading-container">
+                        <CircularProgress size={24} />
                     </div>
+                ) : (
+                    <>
+                        <Table className="tickets-table">
+                            <thead>
+                                <tr>
+                                    <th onClick={() => handleSort('id')}>
+                                        ID {sortConfig.key === 'id' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                                    </th>
+                                    <th onClick={() => handleSort('title')}>
+                                        Title {sortConfig.key === 'title' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                                    </th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Assignee</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {currentTickets.length > 0 ? (
+                                    currentTickets.map((ticket) => (
+                                        <tr key={ticket.id} onClick={() => handleViewTicket(ticket)}>
+                                            <td>{ticket.id}</td>
+                                            <td className="truncate">{ticket.title}</td>
+                                            <td>{renderCategoryBadge(ticket.category)}</td>
+                                            <td>{renderStatusBadge(ticket.status)}</td>
+                                            <td>{renderPriorityBadge(ticket.priority)}</td>
+                                            <td>{ticket.assignee?.username}</td>
+                                            <td>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate('/view-ticket', { state: { ticketId: ticket.id } });
+                                                    }}
+                                                    className="action-icon"
+                                                >
+                                                    <VisibilityIcon sx={{ fontSize: 15 }} />
+                                                </IconButton>
 
-                </div>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate('/edit-ticket', { state: { ticketId: ticket.id } });
+                                                    }}
+                                                    className="action-icon"
+                                                >
+                                                    <EditIcon sx={{ fontSize: 15 }} />
+                                                </IconButton>
+                                                {ticket.creator?.username === currentUser && (
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setTicketToDelete(ticket);
+                                                            setShowDeleteModal(true);
+                                                        }}
+                                                        className="action-icon"
+                                                    >
+                                                        <DeleteIcon sx={{ fontSize: 15 }} />
+                                                    </IconButton>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="7" className="no-tickets">
+                                            No tickets found
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </Table>
 
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+                            {/* Pagination Section */}
+                            <div className="pagination-container">
+                                <Pagination
+                                    count={totalPages}
+                                    page={currentPage}
+                                    onChange={(_, page) => handlePageChange(page)}
+                                    siblingCount={1}
+                                    boundaryCount={1}
+                                    size="small"
+                                />
+                            </div>
 
-            )}
-            <Modal
-                show={showDeleteModal}
-                onHide={() => setShowDeleteModal(false)}
-                centered
-                style={{ fontFamily: 'Roboto, sans-serif', fontSize: '0.875rem', color: '#333' }}
+                            {/* Tickets Per Page Control */}
+                            <FormControl size="small" sx={{ minWidth: 80, ml: 2 }}>
+                                <Select
+                                    value={ticketsPerPage}
+                                    onChange={handleTicketsPerPageChange}
+                                    displayEmpty
+                                    variant="standard"
+                                    sx={{
+                                        border: 'none',
+                                        boxShadow: 'none',
+                                        '& fieldset': { border: 'none' },
+                                    }}
+                                >
+                                    {[5, 7, 10, 15, 20, 30, 40, 50].map((num) => (
+                                        <MenuItem key={num} value={num}>
+                                            {num}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            {/* Page Info */}
+                            <Typography variant="body2" sx={{ ml: 2 }}>
+                                Page {currentPage} of {totalPages}
+                            </Typography>
+                        </Box>
+
+                    </>
+                )}
+            </div>
+            <Dialog
+                open={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                fullWidth
+                maxWidth="xs"
+                sx={{
+                    '& .MuiDialog-paper': {
+                        fontFamily: 'Roboto, sans-serif',
+                        fontSize: '0.875rem',
+                        color: '#333',
+                    },
+                }}
             >
-                <Modal.Header closeButton>
-                    <Modal.Title>Delete Ticket</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Are you sure you want to delete the ticket?<p> #{ticketToDelete?.id + "-" + ticketToDelete?.title}</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" size='sm' onClick={() => setShowDeleteModal(false)}>
+                <DialogTitle>
+                    Delete Ticket
+                    <IconButton
+                        aria-label="close"
+                        onClick={() => setShowDeleteModal(false)}
+                        sx={{ position: 'absolute', right: 8, top: 8 }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+
+                <DialogContent dividers>
+                    <Typography variant="body1">
+                        Are you sure you want to delete the ticket?
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        #{ticketToDelete?.id} - {ticketToDelete?.title}
+                    </Typography>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button variant="outlined" size="small" onClick={() => setShowDeleteModal(false)} color="secondary">
                         Cancel
                     </Button>
-                    <Button variant="danger" size='sm' onClick={() => handleDelete(ticketToDelete?.id)}>
+                    <Button
+                        variant="contained"
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(ticketToDelete?.id)}
+                    >
                         Delete
                     </Button>
-                </Modal.Footer>
-            </Modal>
+                </DialogActions>
+            </Dialog>
 
             <TicketViewModal
                 show={showViewModal}

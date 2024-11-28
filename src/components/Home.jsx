@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Grid, Button, Typography, Paper, List, ListItem, ListItemText } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { fetchActivityLogsByUserId } from '../services/activityLog';
 
@@ -22,7 +22,6 @@ const Home = () => {
     fetchActivity();
   }, [userId]);
 
-
   const formatDate = (dateString) => {
     if (!dateString) {
       return "Date not available"; 
@@ -33,46 +32,57 @@ const Home = () => {
     const date = new Date(cleanedDateString);
     return isNaN(date.getTime()) ? "Date not available" : date.toLocaleString();
   };
-  return (
-    <Container className="mt-5">
-      <Row className="text-center mb-4">
-        <Col>
-          <h1>Welcome to TickTrack</h1>
-          <p>Your one-stop solution for tickets tracking and more!</p>
-        </Col>
-      </Row>
 
-      <Row className="justify-content-center">
+  return (
+    <Container sx={{ marginTop: 5 }}>
+      <Grid container justifyContent="center" alignItems="center" direction="column" sx={{ marginBottom: 4 }}>
+        <Grid item>
+          <Typography variant="h3" align="center">
+            Welcome to TickTrack
+          </Typography>
+          <Typography variant="h6" align="center" sx={{ marginTop: 1 }}>
+            Your one-stop solution for tickets tracking and more!
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Grid container justifyContent="center" spacing={2}>
         {userRole === "admin" && (
-          <Col md={4} className="text-center mb-3">
-            <Button variant="primary" size='sm' as={Link} to="/manage-users">
+          <Grid item md={4} xs={12}>
+            <Button variant="contained" size="small" component={Link} to="/manage-users" fullWidth>
               Manage Users
             </Button>
-          </Col>
+          </Grid>
         )}
-        <Col md={4} className="text-center mb-3">
-          <Button variant="secondary" size='sm' as={Link} to="/tickets">
+        <Grid item md={4} xs={12}>
+          <Button variant="outlined" size="small" component={Link} to="/tickets" fullWidth>
             Manage Tickets
           </Button>
-        </Col>
-      </Row>
+        </Grid>
+      </Grid>
 
-      <Row className="mt-5">
-        <Col>
-          <h3>Recent Activity</h3>
-          <ul>
-            {recentActivity.length > 0 ? (
-              recentActivity.slice().reverse().map((log, index) => (
-                <li key={index}>
-                  {log.action} - {formatDate(log.created_at)}
-                </li>
-              ))
-            ) : (
-              <li>No recent activity available.</li>
-            )}
-          </ul>
-        </Col>
-      </Row>
+      <Grid container sx={{ marginTop: 5 }}>
+        <Grid item xs={12}>
+          <Paper elevation={3} sx={{ padding: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Recent Activity
+            </Typography>
+            <List>
+              {recentActivity.length > 0 ? (
+                recentActivity.slice().reverse().map((log, index) => (
+                  <ListItem key={index}>
+                    <ListItemText primary={`${log.action} - ${formatDate(log.created_at)}`} />
+                  </ListItem>
+                ))
+              ) : (
+                <ListItem>
+                  <ListItemText primary="No recent activity available." />
+                </ListItem>
+              )}
+            </List>
+          </Paper>
+        </Grid>
+      </Grid>
     </Container>
   );
 };

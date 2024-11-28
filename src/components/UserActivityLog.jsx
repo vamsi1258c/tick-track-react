@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchActivityLogsByUserId, deleteActivityLog } from '../services/activityLog';
-import { FaTimes } from 'react-icons/fa';
-import { Card, Button } from 'react-bootstrap';
+import { Delete as DeleteIcon } from '@mui/icons-material';
+import { Card, Button, IconButton, Typography, CardContent } from '@mui/material';
 
 const UserActivityLog = () => {
     const { id } = useParams();
@@ -40,7 +40,7 @@ const UserActivityLog = () => {
         if (window.confirm("Are you sure you want to delete this activity log?")) {
             try {
                 await deleteActivityLog(logId);
-                setActivityLogs(activityLogs.filter(log => log.id !== logId));
+                setActivityLogs((prevLogs) => prevLogs.filter(log => log.id !== logId));
             } catch (error) {
                 setError("Failed to delete activity log");
             }
@@ -51,70 +51,71 @@ const UserActivityLog = () => {
         navigate(-1);
     };
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
+    if (loading) return <Typography variant="body1">Loading...</Typography>;
+    if (error) return <Typography variant="body1">{error}</Typography>;
 
     return (
         <div style={{ padding: '20px' }}>
-            <Card className="mb-4" style={{ maxWidth: '600px', margin: 'auto' }}>
-                <Card.Header>
-                    <h3>Your Activity</h3>
-                </Card.Header>
-                <Card.Body>
+            <Card sx={{ maxWidth: 600, margin: 'auto', mb: 4 }}>
+                <CardContent>
+                    <Typography variant="h5" sx={{ marginBottom: '16px' }}>
+                        Your Activity
+                    </Typography>
                     {activityLogs.length > 0 ? (
                         <div>
-                            {activityLogs.map((log) => (
-                                <Card key={log.id} className="mb-3" style={{ position: 'relative' }}>
-                                    <Card.Body>
-                                        <Button
-                                            variant="link"
+                            {[...activityLogs].reverse().map((log) => (
+                                <Card key={log.id} sx={{ mb: 3, position: 'relative' }}>
+                                    <CardContent>
+                                        <IconButton
                                             onClick={() => handleDelete(log.id)}
-                                            style={{
+                                            sx={{
                                                 position: 'absolute',
-                                                top: '5px',
-                                                right: '5px',
-                                                width: '16px',
-                                                height: '16px',
-                                                padding: '0',
-                                                fontSize: '14px',
-                                                color: '#e74c3c',
+                                                top: 5,
+                                                right: 5,
+                                                width: 16,
+                                                height: 16,
+                                                padding: 0,
+                                                fontSize: 14,
+                                                // color: '#e74c3c',
                                                 background: 'none',
-                                                border: '1px solid #e74c3c',
-                                                borderRadius: '0',
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
+                                                border: '1px solid ',
+                                                borderRadius: 0,
                                                 cursor: 'pointer',
-                                                transition: 'color 0.3s ease',
                                             }}
                                             title="Delete Activity Log"
                                         >
-                                            <FaTimes style={{ fontSize: '16px' }} />
-                                        </Button>
-                                        
+                                            <DeleteIcon style={{ fontSize: '16px' }} />
+                                        </IconButton>
+
                                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <p><strong>Action:</strong> {log.action}</p>
-                                            <p><strong>Date:</strong> {formatDate(log.created_at)}</p>
+                                            <Typography variant="body1">
+                                                <strong>Action:</strong> {log.action}
+                                            </Typography>
+                                            <Typography variant="body1">
+                                                <strong>Date:</strong> {formatDate(log.created_at)}
+                                            </Typography>
                                             {log.ticket_id && (
-                                                <p><strong>Ticket ID:</strong> {log.ticket_id}</p>
+                                                <Typography variant="body1">
+                                                    <strong>Ticket ID:</strong> {log.ticket_id}
+                                                </Typography>
                                             )}
                                         </div>
-                                    </Card.Body>
+                                    </CardContent>
                                 </Card>
                             ))}
                         </div>
                     ) : (
-                        <p>No activity logs available.</p>
+                        <Typography variant="body1">No activity logs available.</Typography>
                     )}
                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '15px' }}>
                         <Button
-                            variant="secondary"
+                            variant="outlined"
                             onClick={handleBack}
                         >
                             Back
                         </Button>
                     </div>
-                </Card.Body>
+                </CardContent>
             </Card>
         </div>
     );

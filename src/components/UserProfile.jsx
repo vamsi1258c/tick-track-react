@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Button, Card } from 'react-bootstrap';
+import { Button, Card, Typography, CardContent, CardHeader } from '@mui/material';
+import { Edit as EditIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import api from '../services/api';
 
 const UserProfile = () => {
@@ -36,54 +37,64 @@ const UserProfile = () => {
 
     const isEditing = location.state && location.state.user; // Check if editing
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
+    if (loading) return <Typography>Loading...</Typography>;
+    if (error) return <Typography>{error}</Typography>;
 
     return (
         <div style={{ padding: '20px' }}>
-            <Card className="mb-4" style={{ maxWidth: '800px', margin: 'auto' }}>
-                <Card.Header>
-                    <h3>User Profile</h3>
-                </Card.Header>
-                <Card.Body>
+            <Card sx={{ maxWidth: 800, margin: 'auto', mb: 4 }}>
+                <CardHeader
+                    title={<Typography variant="h5">User Profile</Typography>}
+                />
+                <CardContent>
                     {user && (
                         <div>
-                            <div className="mb-3">
+                            <Typography variant="body1" sx={{ mb: 2 }}>
                                 <strong>Username:</strong> {user.username}
-                            </div>
-                            <div className="mb-3">
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
                                 <strong>Full Name:</strong> {user.fullname || "N/A"}
-                            </div>
-                            <div className="mb-3">
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
                                 <strong>Designation:</strong> {user.designation || "N/A"}
-                            </div>
-                            <div className="mb-3">
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
                                 <strong>Role:</strong> {user.role}
-                            </div>
-                            <div className="mb-3">
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
                                 <strong>Tickets Created:</strong> {user.tickets_created.length}
-                            </div>
-                            <div className="mb-3">
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
                                 <strong>Tickets Assigned:</strong> {user.tickets_assigned.length}
-                            </div>
-                            <div className="mb-3">
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
                                 <strong>Tickets Approved:</strong> {user.tickets_approved.length}
-                            </div>
+                            </Typography>
 
-                            <div className="d-flex justify-content-start gap-3 mt-4">
+                            <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
                                 {user.role === 'admin' && (
-                                    <Button variant="primary" size="sm" onClick={handleEditProfile}>
+                                    <Button
+                                        variant="contained"
+                                        size="small"
+                                        onClick={handleEditProfile}
+                                        startIcon={<EditIcon />}
+                                    >
                                         Edit Profile
                                     </Button>
                                 )}
-                                <Button variant="secondary" size="sm" onClick={handleBack}>
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={handleBack}
+                                    startIcon={<ArrowBackIcon />}
+                                >
                                     Back
                                 </Button>
                             </div>
                         </div>
                     )}
-                    {isEditing && <p>Editing user details...</p>} {/* Optional editing message */}
-                </Card.Body>
+                    {isEditing && <Typography>Editing user details...</Typography>} {/* Optional editing message */}
+                </CardContent>
             </Card>
         </div>
     );

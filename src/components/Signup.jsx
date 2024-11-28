@@ -1,7 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Card, Container, Spinner, Row, Col } from 'react-bootstrap';
+import {
+  Container,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Typography,
+  CircularProgress,
+  Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormHelperText,
+  FormControlLabel,
+  Grid,
+  CardHeader
+} from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { registerUser, updateUser } from '../services/authService';
+import { useSnackbar } from './Snackbar';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
@@ -22,6 +40,9 @@ const Signup = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isEditing = location.state && location.state.user;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const { showSnackbar } = useSnackbar();
+
 
   useEffect(() => {
     if (isEditing) {
@@ -56,14 +77,23 @@ const Signup = () => {
     setRoleError('');
     setDesignationError('');
     setPasswordError('');
+    setConfirmPasswordError('');
 
     if (!username || username.trim() === '') {
       setUsernameError('Username is required.');
+      isValid = false;
+    } else if (!emailRegex.test(username)) {
+      setUsernameError('Invalid email format.');
       isValid = false;
     }
 
     if ((!password || password.trim() === '') && !isEditing) {
       setPasswordError('Password is required.');
+      isValid = false;
+    }
+
+    if ((!confirmPassword || confirmPassword.trim() === '') && !isEditing) {
+      setConfirmPasswordError('Confirm password is required.');
       isValid = false;
     }
 
@@ -83,57 +113,6 @@ const Signup = () => {
     }
 
     return isValid;
-  };
-
-  const handleUsernameBlur = () => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!username || username.trim() === '') {
-      setUsernameError('Username is required.');
-    } else if (!emailPattern.test(username)) {
-      setUsernameError('Please enter a valid email address.');
-    } else {
-      setUsernameError('');
-    }
-  };
-
-  const handlePasswordBlur = () => {
-    if ((!password || password.trim() === '') && !isEditing) {
-      setPasswordError('Password is required.');
-    } else {
-      setPasswordError('');
-    }
-  };
-
-  const handleConfirmPasswordBlur = () => {
-    if (password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match.');
-    } else {
-      setConfirmPasswordError('');
-    }
-  };
-
-  const handleFullnameBlur = () => {
-    if (!fullname || fullname.trim() === '') {
-      setFullnameError('Full name is required.');
-    } else {
-      setFullnameError('');
-    }
-  };
-
-  const handleRoleBlur = () => {
-    if (!role) {
-      setRoleError('Role is required.');
-    } else {
-      setRoleError('');
-    }
-  };
-
-  const handleDesignationBlur = () => {
-    if (!designation || designation.trim() === '') {
-      setDesignationError('Designation is required.');
-    } else {
-      setDesignationError('');
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -166,170 +145,191 @@ const Signup = () => {
 
       if (isEditing) {
         await updateUser(location.state.user.id, payload);
+        showSnackbar('Updated user '+username);
       } else {
         await registerUser(payload);
+        showSnackbar('Created user '+username);
       }
       navigate('/manage-users');
     } catch (err) {
       setError(err.message);
+      showSnackbar('Failed to create/update user '+username, 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container >
-      <Row className="justify-content-md-center">
-        <Col md={6}>
-          <Card className="p-4 shadow rounded border-0">
-            <Card.Body>
-              <h3 className="text-center">{isEditing ? 'Edit User' : 'Add User'}</h3>
-              {error && <p className="text-danger text-center">{error}</p>}
+    <Container maxWidth="md">
+      <Card variant="contained" sx={{ mt: 0, p: '3px 4px', borderRadius: 1 }}>
+        <CardHeader
+          title={isEditing ? 'Edit User' : 'Add User'}
+          titleTypographyProps={{
+            align: 'center',
+            variant: 'h5',
+            fontWeight: 'bold',
+            color: 'primary.main',
+          }}
+          sx={{ p: 0.3, bgcolor: '#f5f5f5', textAlign: 'center' }}
+        />
+        <CardContent>
+          {error && <Typography color="error" align="center">{error}</Typography>}
 
-              <Form onSubmit={handleSubmit} style={{ fontSize: '0.9rem' }}>
-                <Form.Group controlId="formBasicUsername" className="mb-4">
-                  <Form.Label>Username <span style={{ color: 'red' }}>*</span></Form.Label>
-                  <Form.Control
-                    size="sm"
-                    type="text"
-                    placeholder="Enter email address"
-                    value={username}
-                    onChange={(e) => {
-                      setUsername(e.target.value);
-                      setUsernameError('');
-                    }}
-                    onBlur={handleUsernameBlur}
-                    readOnly={isEditing}
-                    className="shadow-sm"
-                  />
-                  {usernameError && <p className="text-danger">{usernameError}</p>}
-                </Form.Group>
+          <form onSubmit={handleSubmit}>
+            {/* Full Name and Username in one row */}
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Username"
+                  fullWidth
+                  margin="normal"
+                  size="small"
+                  value={username}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    setUsernameError('');
+                  }}
+                  onBlur={() => !username && setUsernameError('Username is required.')}
+                  helperText={usernameError}
+                  error={Boolean(usernameError)}
+                  disabled={isEditing}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Full Name"
+                  fullWidth
+                  margin="normal"
+                  size="small"
+                  value={fullname}
+                  onChange={(e) => {
+                    setFullname(e.target.value);
+                    setFullnameError('');
+                  }}
+                  onBlur={() => !fullname && setFullnameError('Full name is required.')}
+                  helperText={fullnameError}
+                  error={Boolean(fullnameError)}
+                />
+              </Grid>
+            </Grid>
 
-                <Form.Group controlId="formBasicPassword" className="mb-4">
-                  <Form.Label>{isEditing ? 'New Password (optional)' : 'Password'} <span style={{ color: 'red' }}>*</span></Form.Label>
-                  <Form.Control
-                    size="sm"
-                    type="password"
-                    placeholder={isEditing ? 'Enter new password (optional)' : 'Password'}
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      setPasswordError('');
-                    }}
-                    onBlur={handlePasswordBlur}
-                    className="shadow-sm"
-                  />
-                  {passwordError && <p className="text-danger">{passwordError}</p>}
-                </Form.Group>
+            {/* Password and Confirm Password in one row */}
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label={isEditing ? 'New Password (optional)' : 'Password'}
+                  type="password"
+                  fullWidth
+                  margin="normal"
+                  size="small"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordError('');
+                  }}
+                  onBlur={() => password && setPasswordError(validatePassword(password))}
+                  helperText={passwordError}
+                  error={Boolean(passwordError)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Confirm Password"
+                  type="password"
+                  fullWidth
+                  margin="normal"
+                  size="small"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setConfirmPasswordError('');
+                  }}
+                  onBlur={() =>
+                    confirmPassword && setConfirmPasswordError(password !== confirmPassword ? 'Passwords do not match.' : '')
+                  }
+                  helperText={confirmPasswordError}
+                  error={Boolean(confirmPasswordError)}
+                />
+              </Grid>
+            </Grid>
 
-                <Form.Group controlId="formConfirmPassword" className="mb-4">
-                  <Form.Label>Confirm Password <span style={{ color: 'red' }}>*</span></Form.Label>
-                  <Form.Control
-                    size="sm"
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => {
-                      setConfirmPassword(e.target.value);
-                      setConfirmPasswordError('');
-                    }}
-                    onBlur={handleConfirmPasswordBlur}
-                    className="shadow-sm"
-                  />
-                  {confirmPasswordError && <p className="text-danger">{confirmPasswordError}</p>}
-                </Form.Group>
-
-                <Form.Group controlId="formBasicFullname" className="mb-4">
-                  <Form.Label>Full Name <span style={{ color: 'red' }}>*</span></Form.Label>
-                  <Form.Control
-                    size="sm"
-                    type="text"
-                    placeholder="Enter Full Name"
-                    value={fullname}
-                    onChange={(e) => {
-                      setFullname(e.target.value);
-                      setFullnameError('');
-                    }}
-                    onBlur={handleFullnameBlur}
-                    className="shadow-sm"
-                  />
-                  {fullnameError && <p className="text-danger">{fullnameError}</p>}
-                </Form.Group>
-
-                <Form.Group controlId="formBasicRole" className="mb-4">
-                  <Form.Label>Role <span style={{ color: 'red' }}>*</span></Form.Label>
-                  <Form.Control
-                    size="sm"
-                    as="select"
+            {/* Role and Designation in one row */}
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth margin="normal" error={Boolean(roleError)}>
+                  <InputLabel>Role</InputLabel>
+                  <Select
                     value={role}
                     onChange={(e) => {
                       setRole(e.target.value);
                       setRoleError('');
                     }}
-                    onBlur={handleRoleBlur}
-                    className="shadow-sm"
+                    onBlur={() => !role && setRoleError('Role is required.')}
+                    label="Role"
+                    size="small"
+                    sx={{ height: '40px' }}
                   >
-                    <option value="">Select Role</option>
-                    <option value="admin">Admin</option>
-                    <option value="support">Support</option>
-                    <option value="user">User</option>
-                  </Form.Control>
-                  {roleError && <p className="text-danger">{roleError}</p>}
-                </Form.Group>
+                    <MenuItem value="">Select Role</MenuItem>
+                    <MenuItem value="admin">Admin</MenuItem>
+                    <MenuItem value="support">Support</MenuItem>
+                    <MenuItem value="user">User</MenuItem>
+                  </Select>
+                  <FormHelperText>{roleError}</FormHelperText>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Designation"
+                  fullWidth
+                  margin="normal"
+                  size="small"
+                  value={designation}
+                  onChange={(e) => {
+                    setDesignation(e.target.value);
+                    setDesignationError('');
+                  }}
+                  onBlur={() => !designation && setDesignationError('Designation is required.')}
+                  helperText={designationError}
+                  error={Boolean(designationError)}
+                />
+              </Grid>
+            </Grid>
 
-                <Form.Group controlId="formBasicDesignation" className="mb-4">
-                  <Form.Label>Designation <span style={{ color: 'red' }}>*</span></Form.Label>
-                  <Form.Control
-                    size="sm"
-                    type="text"
-                    placeholder="Enter Designation"
-                    value={designation}
-                    onChange={(e) => {
-                      setDesignation(e.target.value);
-                      setDesignationError('');
-                    }}
-                    onBlur={handleDesignationBlur}
-                    className="shadow-sm"
-                  />
-                  {designationError && <p className="text-danger">{designationError}</p>}
-                </Form.Group>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={approver}
+                  onChange={(e) => setApprover(e.target.checked)}
+                  sx={{ '&.Mui-checked': { color: 'primary.main' } }}
+                />
+              }
+              label="Is Approver?"
+              sx={{ mt: 1, mb: 2 }}
+            />
 
-                <Form.Group controlId="formBasicApprover" className="mb-4 d-flex align-items-center">
-                  <Form.Label className="me-2 mb-0">Approver</Form.Label>
-                  <Form.Check
-                    type="checkbox"
-                    checked={approver}
-                    onChange={(e) => setApprover(e.target.checked)}
-                    className="shadow-sm"
-                    style={{
-                      marginTop: '0.2rem', // Aligns checkbox with label
-                    }}
-                  />
-                </Form.Group>
-
-                <Button variant="primary" type="submit" size="sm" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                      />{' '}
-                      Loading...
-                    </>
-                  ) : isEditing ? 'Update User' : 'Add User'}
+            <Grid container justifyContent="left" spacing={2}>
+              <Grid item>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  startIcon={loading && <CircularProgress size={20} />}
+                >
+                  {isEditing ? 'Update' : 'Submit'}
                 </Button>
-                <Button variant="secondary" className="ms-2" onClick={() => navigate(-1)} size="sm">Cancel</Button>
-
-              </Form>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
+              </Grid>
+              <Grid item>
+                <Button variant="outlined" onClick={() => navigate('/manage-users')}>
+                  Cancel
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </CardContent>
+      </Card>
     </Container>
+
   );
 };
 

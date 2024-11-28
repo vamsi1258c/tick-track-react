@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Spinner, Modal, Button, Form } from 'react-bootstrap';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    Modal, Button, TextField, CircularProgress, Box, Typography,
+    IconButton, Paper, Tooltip
+} from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon, Add, Refresh, Close } from '@mui/icons-material';
 import { fetchUsers, deleteUser } from '../services/authService';
-import { FaTrash, FaEdit, FaPlus } from 'react-icons/fa';
-import { AiOutlineReload, AiOutlineClose } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
-import { Pagination } from './Pagination';
+import { CustomPagination } from './Pagination';
 import { UserDetails } from './UserDetails';
-import './UsersManage.css';
+import { useSnackbar } from './Snackbar';
 
 const UsersManage = () => {
     const [users, setUsers] = useState([]);
@@ -22,27 +25,30 @@ const UsersManage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 7;
     const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
 
-    useEffect(() => {
-        loadUsers();
-    }, []);
-
-    useEffect(() => {
-        // Whenever the search term changes, reset to page 1
-        setCurrentPage(1);
-    }, [searchTerm]);
-
-    const loadUsers = async () => {
+    const loadUsers = useCallback(async () => {
         try {
             setIsLoading(true);
             const response = await fetchUsers();
             setUsers(response.data);
         } catch (err) {
             setError('Failed to load users.');
+            showSnackbar('Failed to load users.', 'error');
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [showSnackbar]);
+
+    useEffect(() => {
+        loadUsers();
+    }, [loadUsers]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
+
+    
 
     const handleRowClick = (user) => {
         setSelectedUser(user);
@@ -67,10 +73,10 @@ const UsersManage = () => {
     const confirmDelete = async () => {
         try {
             await deleteUser(userIdToDelete);
-            const updatedUsers = users.filter(user => user.id !== userIdToDelete);
-            setUsers(updatedUsers);
+            setUsers(users.filter(user => user.id !== userIdToDelete));
         } catch (err) {
-            setError(`User ${userIdToDelete} cannot be deleted. Please delete the dependent tickets first.`);
+            setError(`User ${userIdToDelete} cannot be deleted.`);
+            showSnackbar(`User ${userIdToDelete} cannot be deleted.`, 'error');
         }
         handleDeleteModalClose();
     };
@@ -88,347 +94,161 @@ const UsersManage = () => {
         setError('');
     };
 
-    // Search functionality: filter users based on search term
     const filteredUsers = users.filter(user => {
-        const username = user.username.toLowerCase();
-        const fullname = user.fullname.toLowerCase();
         const term = searchTerm.toLowerCase().trim();
-
-        // Check if either username or fullname matches the search term
-        return username.includes(term) || fullname.includes(term);
+        return user.username.toLowerCase().includes(term) || user.fullname.toLowerCase().includes(term);
     });
 
-    // Sorting functionality
     const sortUsers = (users) => {
         return [...users].sort((a, b) => {
-            const aValue = a[sortKey];
-            const bValue = b[sortKey];
+            const aValue = a[sortKey] ?? '';
+            const bValue = b[sortKey] ?? '';
 
-            if (aValue < bValue) {
-                return sortDirection === 'asc' ? -1 : 1;
+            if (typeof aValue === 'number' && typeof bValue === 'number') {
+                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
             }
-            if (aValue > bValue) {
-                return sortDirection === 'asc' ? 1 : -1;
-            }
-            return 0;
+
+            const aString = String(aValue);
+            const bString = String(bValue);
+
+            return sortDirection === 'asc'
+                ? aString.localeCompare(bString)
+                : bString.localeCompare(aString);
         });
     };
 
-    const clearSearch = () => {
-        setSearchTerm('');
+    const headerMap = {
+        'ID': 'id',
+        'Full Name': 'fullname',
+        'Email': 'username',
+        'Role': 'role'
     };
 
-
     const handleSort = (key) => {
-        const newDirection = sortKey === key && sortDirection === 'asc' ? 'desc' : 'asc';
-        setSortKey(key);
+        const mappedKey = headerMap[key] || key;
+        const newDirection = sortKey === mappedKey && sortDirection === 'asc' ? 'desc' : 'asc';
+        setSortKey(mappedKey);
         setSortDirection(newDirection);
     };
 
     const sortedUsers = sortUsers(filteredUsers);
-
-    // Calculate total pages based on filtered and sorted users
     const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
-
-    // Get the users for the current page
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentUsers = sortedUsers.slice(startIndex, startIndex + itemsPerPage);
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
+    const currentUsers = sortedUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
-        <div>
-            <div className="header-container d-flex justify-content-between align-items-center">
-                <h2>Manage Users</h2>
-
-                <div className="button-container d-flex">
-                    <Button variant="secondary" onClick={handleRefresh} className="ml-2 btn-sm">
-                        <AiOutlineReload /> Refresh
+        <Box p={2}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography variant="h5" color="primary" fontWeight='bold'>Manage Users</Typography>
+                <Box>
+                    <Button variant="outlined" onClick={handleRefresh} sx={{ mr: 1 }}>
+                        <Refresh /> Refresh
                     </Button>
-
-                    <Button variant="primary" onClick={handleAddUser} className="ml-2 btn-sm">
-                        <FaPlus /> Add
+                    <Button variant="contained" onClick={handleAddUser}>
+                        <Add /> Add
                     </Button>
-                </div>
-            </div>
+                </Box>
+            </Box>
 
-            <div className="search-bar-container position-relative">
-                <Form.Control
-                    type="text"
-                    placeholder="Search by name or email"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="ml-2 mb-3 shadow-sm"
-                />
-                {searchTerm && (
-                    <Button
-                        variant="link"
-                        className="clear-search-button position-absolute"
-                        style={{ top: '50%', right: '10px', transform: 'translateY(-50%)' }}
-                        onClick={clearSearch}
-                    >
-                        <AiOutlineClose />
-                    </Button>
-                )}
-            </div>
+            <TextField
+                variant="outlined"
+                placeholder="Search by name or email"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                fullWidth
+                size="small"
+                InputProps={{
+                    endAdornment: searchTerm && (
+                        <IconButton onClick={() => setSearchTerm('')}>
+                            <Close />
+                        </IconButton>
+                    ),
+                }}
+                sx={{ mb: 2 }}
+            />
 
             {isLoading ? (
-                <div className="text-center">
-                    <Spinner animation="border" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </Spinner>
-                </div>
+                <Box display="flex" justifyContent="center">
+                    <CircularProgress />
+                </Box>
             ) : (
                 <>
-                    {error && <p className="text-danger text-center">{error}</p>}
-                    <Table bordered hover className="custom-user-table">
-                        <thead>
-                            <tr>
-                                <th onClick={() => handleSort('id')} style={{ cursor: 'pointer' }}>
-                                    ID {sortKey === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}
-                                </th>
-                                <th onClick={() => handleSort('fullname')} style={{ cursor: 'pointer' }}>
-                                    Full Name {sortKey === 'fullname' && (sortDirection === 'asc' ? '↑' : '↓')}
-                                </th>
-                                <th onClick={() => handleSort('username')} style={{ cursor: 'pointer' }}>
-                                    Email {sortKey === 'username' && (sortDirection === 'asc' ? '↑' : '↓')}
-                                </th>
-                                <th onClick={() => handleSort('role')} style={{ cursor: 'pointer' }}>
-                                    Role {sortKey === 'role' && (sortDirection === 'asc' ? '↑' : '↓')}
-                                </th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentUsers.map((user) => (
-                                <tr key={user.id} style={{ cursor: 'pointer' }} onClick={() => handleRowClick(user)}>
-                                    <td>{user.id}</td>
-                                    <td>{user.fullname}</td>
-                                    <td>{user.username}</td>
-                                    <td>{user.role}</td>
-                                    <td>
-                                        <FaEdit
-                                            style={{ cursor: 'pointer', fontSize: '1rem', marginRight: '10px' }}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleEdit(user);
+                    {error && <Typography color="error" textAlign="center">{error}</Typography>}
+                    <TableContainer component={Paper} sx={{ padding: 0, margin: 0 }}>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    {Object.keys(headerMap).map((header) => (
+                                        <TableCell
+                                            key={header}
+                                            onClick={() => handleSort(headerMap[header])}
+                                            sx={{
+                                                cursor: 'pointer',
+                                                fontWeight: 'bold',
+                                                padding: '3px' , 
+                                                paddingLeft: '16px'
                                             }}
-                                        />
-                                        <FaTrash
-                                            style={{ cursor: 'pointer', fontSize: '1rem' }}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteModalOpen(user.id);
-                                            }}
-                                        />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-                    <Pagination
+                                        >
+                                            {header}
+                                            {sortKey === headerMap[header] && (
+                                                sortDirection === 'asc' ? ' ↑' : ' ↓'
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                    <TableCell sx={{ padding: '3px', paddingLeft: '16px' }}>Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+
+                            <TableBody>
+                                {currentUsers.map(user => (
+                                    <TableRow hover key={user.id} onClick={() => handleRowClick(user)} sx={{ height: '40px' }}>  {/* Reduced row height */}
+                                        <TableCell sx={{ padding: '3px', paddingLeft: '16px'}}>{user.id}</TableCell>
+                                        <TableCell sx={{ padding: '3px', paddingLeft: '16px' }}>{user.fullname}</TableCell>
+                                        <TableCell sx={{ padding: '3px', paddingLeft: '16px' }}>{user.username}</TableCell>
+                                        <TableCell sx={{ padding: '3px', paddingLeft: '16px' }}>{user.role}</TableCell>
+                                        <TableCell sx={{ padding: '3px', paddingLeft: '16px'}}>
+                                            <Tooltip title="Edit">
+                                                <IconButton onClick={(e) => { e.stopPropagation(); handleEdit(user); }} sx={{ padding: '4px' }}>
+                                                    <EditIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Delete">
+                                                <IconButton onClick={(e) => { e.stopPropagation(); handleDeleteModalOpen(user.id); }} sx={{ padding: '4px' }}>
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+
+
+                    <CustomPagination
                         currentPage={currentPage}
                         totalPages={totalPages}
-                        onPageChange={handlePageChange}
+                        onPageChange={(page) => setCurrentPage(page)}
                     />
 
-{/*
-                    <Modal show={showModal} onHide={handleClose} size="lg">
-                        <Modal.Header closeButton>
-                            <Modal.Title>User Details</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            {selectedUser && (
-                                <div>
-                                    <p><strong>Name:</strong> {selectedUser.fullname}</p>
-                                    <p><strong>Email:</strong> {selectedUser.username}</p>
-                                    <p><strong>Role:</strong> {selectedUser.role}</p>
-
-                                  
-                                    <p><strong>Designation:</strong> {selectedUser.designation || "Not specified"}</p>
-                                    <p><strong>Approver:</strong> {selectedUser.approver ? "Yes" : "No"}</p>
-
-                                    <hr />
-
-                                    <h5>Tickets Created:</h5>
-                                    {selectedUser.tickets_created && selectedUser.tickets_created.length > 0 ? (
-                                        <>
-                                            <Table striped bordered hover>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Title</th>
-                                                        <th>Description</th>
-                                                        <th>Status</th>
-                                                        <th>Priority</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {selectedUser.tickets_created.map((ticket) => (
-                                                        <tr key={ticket.id}>
-                                                            <td><strong>{ticket.title}</strong></td>
-                                                            <td><div dangerouslySetInnerHTML={{ __html: ticket.description }} /></td>
-                                                            <td>{ticket.status}</td>
-                                                            <td>{ticket.priority}</td>
-                                                            <td>
-                                                                <FaEdit
-                                                                    style={{ cursor: 'pointer', fontSize: '1rem' }}
-                                                                    onClick={() => navigate(`/edit-ticket`, { state: { ticketId: ticket.id } })}
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </Table>
-                                        </>
-
-                                    ) : (
-                                        <p>No tickets created.</p>
-                                    )}
-
-                                    <h5>Tickets Assigned:</h5>
-                                    {selectedUser.tickets_assigned && selectedUser.tickets_assigned.length > 0 ? (
-                                        <Table striped bordered hover>
-                                            <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Description</th>
-                                                    <th>Status</th>
-                                                    <th>Priority</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {selectedUser.tickets_assigned.map((ticket) => (
-                                                    <tr key={ticket.id}>
-                                                        <td><strong>{ticket.title}</strong></td>
-                                                        <td>{ticket.description}</td>
-                                                        <td>{ticket.status}</td>
-                                                        <td>{ticket.priority}</td>
-                                                        <td>
-                                                            <FaEdit
-                                                                style={{ cursor: 'pointer', fontSize: '1rem' }}
-                                                                onClick={() => navigate(`/edit-ticket`, { state: { ticketId: ticket.id } })}
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    ) : (
-                                        <p>No tickets assigned.</p>
-                                    )}
-
-                                    
-                                    {selectedUser.approver && (
-                                        <>
-                                            <h5>Tickets Approved:</h5>
-                                            {selectedUser.tickets_approved && selectedUser.tickets_approved.length > 0 ? (
-                                                <Table striped bordered hover>
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Title</th>
-                                                            <th>Description</th>
-                                                            <th>Status</th>
-                                                            <th>Priority</th>
-                                                            <th>Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {selectedUser.tickets_approved.map((ticket) => (
-                                                            <tr key={ticket.id}>
-                                                                <td><strong>{ticket.title}</strong></td>
-                                                                <td>{ticket.description}</td>
-                                                                <td>{ticket.status}</td>
-                                                                <td>{ticket.priority}</td>
-                                                                <td>
-                                                                    <FaEdit
-                                                                        style={{ cursor: 'pointer', fontSize: '1rem' }}
-                                                                        onClick={() => navigate(`/edit-ticket`, { state: { ticketId: ticket.id } })}
-                                                                    />
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </Table>
-                                            ) : (
-                                                <p>No tickets approved.</p>
-                                            )}
-                                        </>
-                                    )}
-
-                                    <h5>Comments:</h5>
-                                    {selectedUser.comments && selectedUser.comments.length > 0 ? (
-                                        <ul>
-                                            {selectedUser.comments.map((comment) => (
-                                                <li key={comment.id}>
-                                                    <p style={{ fontSize: '0.75rem' }}>{comment.content} (Created At: {new Date(comment.created_at).toLocaleString()})</p>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p style={{ fontSize: '0.75rem' }}>No comments available.</p>
-                                    )}
-
-                                    <h5>Attachments:</h5>
-                                    {selectedUser.attachments && selectedUser.attachments.length > 0 ? (
-                                        <ul>
-                                            {selectedUser.attachments.map((attachment) => (
-                                                <li key={attachment.id}>
-                                                    <i className="fa fa-download" aria-hidden="true" style={{ marginRight: '5px' }}></i>
-                                                    {attachment.filename} (Uploaded At: {new Date(attachment.uploaded_at).toLocaleString()})
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p style={{ fontSize: '0.75rem' }}>No attachments available.</p>
-                                    )}
-
-                                    <h5>Activity Logs:</h5>
-                                    {selectedUser.activity_logs && selectedUser.activity_logs.length > 0 ? (
-                                        <ul>
-                                            {selectedUser.activity_logs.map((log) => (
-                                                <li key={log.id}>
-                                                    <p style={{ fontSize: '0.75rem' }}><strong>{log.action}</strong> - {new Date(log.created_at).toLocaleString()}</p>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p style={{ fontSize: '0.75rem' }}>No activity logs available.</p>
-                                    )}
-                                </div>
-                            )}
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={handleClose}>Close</Button>
-                        </Modal.Footer>
-                    </Modal>
-
-                    */}
                     <UserDetails
                         showModal={showModal}
                         selectedUser={selectedUser}
                         handleClose={handleClose}
                     />
 
-
-                    {/* Delete Confirmation Modal */}
-                    <Modal show={showDeleteModal} onHide={handleDeleteModalClose}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Confirm Deletion</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            Are you sure you want to delete this user? This action cannot be undone.
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" size='sm' onClick={handleDeleteModalClose}>Cancel</Button>
-                            <Button variant="danger" size='sm' onClick={confirmDelete}>Delete</Button>
-                        </Modal.Footer>
+                    <Modal open={showDeleteModal} onClose={handleDeleteModalClose}>
+                        <Box sx={{ p: 4, bgcolor: 'background.paper', mx: 'auto', my: '20%', maxWidth: 400 }}>
+                            <Typography variant="h6">Confirm Deletion</Typography>
+                            <Typography>Are you sure you want to delete this user?</Typography>
+                            <Box mt={2} display="flex" justifyContent="flex-end">
+                                <Button onClick={handleDeleteModalClose} sx={{ mr: 2 }}>Cancel</Button>
+                                <Button variant="contained" color="error" onClick={confirmDelete}>Delete</Button>
+                            </Box>
+                        </Box>
                     </Modal>
                 </>
             )}
-        </div>
+        </Box>
     );
 };
 

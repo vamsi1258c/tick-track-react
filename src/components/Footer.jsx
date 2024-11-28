@@ -1,13 +1,20 @@
 import React from 'react';
-import './Footer.css'; // Custom footer styles
+import { Box, Typography } from '@mui/material';
 
 const Footer = () => {
   return (
-    <footer className="footer bg-light text-center py-3">
-      <div className="container">
-        <span className="text-muted">© 2024 TickTrack - All Rights Reserved</span>
-      </div>
-    </footer>
+    <Box
+      sx={{
+        backgroundColor: '#fffffc',
+        padding: '16px 0',
+        textAlign: 'center',
+        width: '100%',
+      }}
+    >
+      <Typography variant="body2" color="text.secondary">
+        © 2024 TickTrack - All Rights Reserved
+      </Typography>
+    </Box>
   );
 };
 

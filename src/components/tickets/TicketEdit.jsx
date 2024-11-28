@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Container, Row, Col, Alert, Spinner, Card } from 'react-bootstrap';
+import {
+    Container, Autocomplete,  Card, Grid, CardContent, CardHeader,
+    Typography, TextField, Button, IconButton,  Box, Alert, 
+} from '@mui/material';
+import { Upload as UploadIcon, Close as CloseIcon } from '@mui/icons-material';
+import { Spinner } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Select from 'react-select';
 import { fetchTicket, updateTicket } from '../../services/ticket';
 import { fetchUsers } from '../../services/authService';
 import { uploadAttachment } from '../../services/attachment';
-import { fetchComments, createComment } from '../../services/comment'; // New service imports for comments
+import { fetchConfigMaster } from '../../services/configMaster';
+import { fetchComments, createComment } from '../../services/comment';
 import AttachmentsView from './AttachmentsView';
 import RichTextEditor from './RichTextEditor';
+import { useSnackbar } from '../Snackbar';
 
 const TicketEdit = ({ currentUserId }) => {
     const location = useLocation();
@@ -20,9 +26,10 @@ const TicketEdit = ({ currentUserId }) => {
         status: 'open',
         priority: 'medium',
         category: 'service',
-        subcategory: 'All',
+        subcategory: 'customer_service',
         created_by: 0,
         assigned_to: 0,
+        approved_by: 0
     });
 
     const [showAttachments, setShowAttachments] = useState(false);
@@ -31,86 +38,83 @@ const TicketEdit = ({ currentUserId }) => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [subcategories, setSubcategories] = useState([]);
+    // const [subcategories, setSubcategories] = useState([]);
     const navigate = useNavigate();
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [assignedToUser, setAssignedToUser] = useState(null);
+    const [approvedByUser, setApprovedByUser] = useState(null);
+    const [touchedFields, setTouchedFields] = useState({});
+    const [resetTrigger, setResetTrigger] = useState(false);
+    const [configs, setConfigs] = useState([]);
+    // const [currentSubcat, setCurrentSubcat] = useState([]);
 
     // New state variables for comments
-    const [comments, setComments] = useState([]);
+    // const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
+    const { showSnackbar } = useSnackbar();
 
     useEffect(() => {
         const fetchAllData = async () => {
             try {
                 setIsLoading(true);
-                const [userResponse, ticketResponse, commentsResponse] = await Promise.all([
+                const [userResponse, ticketResponse] = await Promise.all([
                     fetchUsers(),
                     fetchTicket(ticketId),
-                    fetchComments(ticketId)
+                    fetchComments(ticketId),
+                    fetchConfigMaster()
                 ]);
 
                 const userOptions = userResponse.data.map(user => ({ value: user.id, label: user.username }));
                 setUsers(userOptions);
-                setTicketData(ticketResponse.data);
+
+                let ticketDataTemp = {
+                    ...ticketResponse.data,
+                    assigned_to: ticketResponse.data.assignee ? ticketResponse.data.assignee.id : null,
+                    approved_by: ticketResponse.data.approver ? ticketResponse.data.approver.id : null
+                };
+
+                setTicketData(ticketDataTemp);
+
+                const responseConfig = await fetchConfigMaster();
+                setConfigs(responseConfig.data);
 
                 // Set subcategories based on the current category of the ticket
-                const initialCategory = ticketResponse.data.category || 'service';
-                setSubcategories(getSubcategories(initialCategory));
-                setTicketData(prevData => ({
-                    ...prevData,
-                    subcategory: ticketResponse.data.subcategory || '', // Set initial subcategory
-                }));
+                // const initialCategory = ticketResponse.data.category || 'service';
+                // setSubcategories(getSubcategories(initialCategory));
 
                 const assignee = ticketResponse.data.assignee?.username;
-                const defaultUser = userOptions.find(user => user.label === assignee);
-                setSelectedUser(defaultUser || null);
-                setComments(commentsResponse.data);
+                const assigneeOption = userOptions.find(user => user.label === assignee);
+                setAssignedToUser(assigneeOption || null);
+                const approver = ticketResponse.data.approver?.username;
+                const approverOption = userOptions.find(user => user.label === approver);
+                setApprovedByUser(approverOption || null);
+                // setComments(commentsResponse.data);
             } catch (error) {
                 console.error(error);
                 setError('Failed to fetch ticket, users, or comments.');
+                showSnackbar('Failed to fetch ticket, users, or comments.');
             } finally {
                 setIsLoading(false);
-
             }
         };
         fetchAllData();
-    }, [currentUserId, ticketId]);
+    }, [currentUserId, ticketId, resetTrigger, showSnackbar]);
 
-
-
+   
     // Handle category change to update subcategories
     const handleCategoryChange = (e) => {
         const selectedCategory = e.target.value;
         setTicketData(prevData => ({
             ...prevData,
             category: selectedCategory,
-            subcategory: '', // Reset subcategory when category changes
         }));
-        setSubcategories(getSubcategories(selectedCategory)); // Update subcategories based on selected category
     };
 
     // Function to get subcategories based on selected category
-    const getSubcategories = (category) => {
-        switch (category) {
-            case 'service':
-                return [
-                    { value: 'technical_support', label: 'Technical Support' },
-                    { value: 'customer_service', label: 'Customer Service' },
-                ];
-            case 'troubleshooting':
-                return [
-                    { value: 'software_issue', label: 'Software Issue' },
-                    { value: 'hardware_issue', label: 'Hardware Issue' },
-                ];
-            case 'maintenance':
-                return [
-                    { value: 'scheduled', label: 'Scheduled Maintenance' },
-                    { value: 'unscheduled', label: 'Unscheduled Maintenance' },
-                ];
-            default:
-                return [];
-        }
-    };
+    // const getSubcategories = (category) => {
+    //     return configs
+    //         .filter(config => config.parent === category)
+    //         .map((config) => ({ label: config.label, value: config.value || config.id }));
+    // };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -119,11 +123,10 @@ const TicketEdit = ({ currentUserId }) => {
             [name]: value,
         });
         setValidationErrors((prev) => ({ ...prev, [name]: '' }));
+        setTouchedFields(prev => ({ ...prev, [name]: true }));
     };
 
     const validateField = (name, value) => {
-        console.log("Inside Validation Field");
-        console.log(value);
         if (!value || value.trim() === '') {
             setValidationErrors((prev) => ({ ...prev, [name]: 'This field is required.' }));
         } else {
@@ -138,7 +141,6 @@ const TicketEdit = ({ currentUserId }) => {
     };
 
     const validateDescription = () => {
-        console.log("Inside Validation Description");
         if (stripHtmlTags(ticketData.description).trim() === '') {
             setValidationErrors((prev) => ({ ...prev, 'description': 'This field is required.' }));
         }
@@ -158,10 +160,18 @@ const TicketEdit = ({ currentUserId }) => {
     };
 
     const handleAssignedToChange = (selectedOption) => {
-        setSelectedUser(selectedOption);
+        setAssignedToUser(selectedOption);
         setTicketData((prevData) => ({
             ...prevData,
             assigned_to: selectedOption ? selectedOption.value : 0,
+        }));
+    };
+
+    const handleApprovedByChange = (selectedOption) => {
+        setApprovedByUser(selectedOption);  
+        setTicketData((prevData) => ({
+            ...prevData,
+            approved_by: selectedOption ? selectedOption.value : 0, 
         }));
     };
 
@@ -169,6 +179,10 @@ const TicketEdit = ({ currentUserId }) => {
         const files = Array.from(e.target.files);
         setAttachments(prevAttachments => [...prevAttachments, ...files]);
     };
+
+    const handleReset = () => {
+        setResetTrigger((prev) => !prev);
+    }
 
     const removeFile = (index) => {
         setAttachments(prevAttachments =>
@@ -183,7 +197,6 @@ const TicketEdit = ({ currentUserId }) => {
         const fieldsToValidate = ['title', 'description', 'status', 'priority', 'category'];
 
         fieldsToValidate.forEach((field) => {
-
             const value = field === 'description' ? stripHtmlTags(ticketData[field]) : ticketData[field];
 
             if (!value || value.trim() === '') {
@@ -204,6 +217,8 @@ const TicketEdit = ({ currentUserId }) => {
             priority: ticketData.priority,
             category: ticketData.category,
             assigned_to: ticketData.assigned_to,
+            subcategory: ticketData.subcategory,
+            approved_by: ticketData.approved_by
         };
         try {
             // First, update the ticket
@@ -216,17 +231,18 @@ const TicketEdit = ({ currentUserId }) => {
                     }));
                 }
 
-
                 if (newComment.trim()) {
                     await createComment(ticketId, { content: newComment, ticket_id: ticketId, user_id: currentUserId });
                 }
 
                 setSuccess(true);
                 navigate('/tickets');
+                showSnackbar('Updated ticket #'+ticketId);
             }
         } catch (error) {
             console.error(error);
             setError('Failed to update the ticket. Please try again.');
+            showSnackbar('Failed to update ticket #'+ticketId, 'error');
         }
     };
 
@@ -240,204 +256,230 @@ const TicketEdit = ({ currentUserId }) => {
         );
     }
 
+    const priorityOptions = configs
+        .filter(config => config.type === 'priority')
+        .map((config) => ({ label: config.label, value: config.value || config.id }));
+
+    const statusOptions = configs
+        .filter(config => config.type === 'status')
+        .map((config) => ({ label: config.label, value: config.value || config.id }));
+
+    const categoryOptions = configs
+        .filter(config => config.type === 'category')
+        .map((config) => ({ label: config.label, value: config.value || config.id }));
+
+    const subcategoryOptions = configs
+        .filter(config => config.type === 'subcategory' && config.parent === ticketData.category)
+        .map((config) => ({ label: config.label, value: config.value || config.id }));
+    
     return (
-        <Container>
-            <Row className="justify-content-md-center">
-                <Col xs={12} md={8}>
-                    <Card className="p-4 shadow rounded border-0">
-                        <Card.Body>
-                            <h3 className="text-center">
-                                Update Ticket  <span style={{ fontSize: '0.5em' }}> #{ticketData.id}</span>
-                            </h3>
+        <Container maxWidth="md">
+            <Card variant="contained" sx={{ mt: 0, p: 1, pt:0, borderRadius: 1 }}>
+                <CardHeader
+                    title={
+                        <>
+                            Update Ticket <span style={{ fontSize: '0.8em' }}>#{ticketData.id}</span>
+                        </>
+                    }
+                    titleTypographyProps={{
+                        align: 'center',
+                        variant: 'h5',
+                        fontWeight: 'bold',
+                        color: 'primary.main',
+                    }}
+                    sx={{ p: 0.2, bgcolor: '#f5f5f5' }}
+                />
+                <CardContent sx={{ p: 1 }}>
+                    {error && <Alert severity="error">{error}</Alert>}
+                    {success && <Alert severity="success">Ticket updated successfully!</Alert>}
 
-                            {error && <Alert variant="danger">{error}</Alert>}
-                            {success && <Alert variant="success">Ticket updated successfully!</Alert>}
+                    <form onSubmit={handleSubmit}>
+                        <Grid container spacing={1}>
+                            {/* Title */}
+                            <Grid item xs={12}>
+                                <TextField
+                                    name="title"
+                                    value={ticketData.title}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    placeholder="Enter ticket title"
+                                    fullWidth
+                                    size="small"
+                                    error={!!validationErrors.title}
+                                    helperText={validationErrors.title}
+                                    sx={{
+                                        '& .MuiInputBase-input': {
+                                          fontWeight: 500,  
+                                        },
+                                        mb: 0.5
+                                      }}
+                                />
+                            </Grid>
 
-                            <Form onSubmit={handleSubmit}>
-                                <Form.Group controlId="formTitle" className="mb-4">
-                                    <Form.Label>Title</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="title"
-                                        value={ticketData.title}
-                                        onChange={handleChange}
-                                        placeholder="Enter ticket title"
-                                        size='sm'
-                                        onBlur={handleBlur}
-                                        className="shadow-sm"
-                                    />
-                                    {validationErrors.title && <div className="text-danger small">{validationErrors.title}</div>}
-                                </Form.Group>
+                            {/* Description */}
+                            <Grid item xs={12}>
+                                <RichTextEditor
+                                    value={ticketData.description}
+                                    onChange={handleDescriptionChange}
+                                    placeholder="Description"
+                                />
+                                {touchedFields.description && validationErrors.description && (
+                                    <Typography color="error">{validationErrors.description}</Typography>
+                                )}
+                            </Grid>
 
-                                <Form.Group controlId="formDescription" className="mb-4">
-                                    <Form.Label>Description</Form.Label>
-                                    <RichTextEditor
-                                        value={ticketData.description}
-                                        onChange={handleDescriptionChange}
-                                        placeholder="Enter ticket description"
-                                        size='sm'
-                                        onBlur={() => handleBlur('description')}
-                                        className="shadow-sm"
-                                    />
-                                    {validationErrors.description && <div className="text-danger small">{validationErrors.description}</div>}
-                                </Form.Group>
+                            {/* Dropdowns */}
+                            <Grid item xs={12}>
+                                <Grid container spacing={1} mb={2} wrap="wrap" alignItems="center">
+                                    {/* Status */}
+                                    <Grid item xs={6} sm={3}>
+                                        <Autocomplete
+                                            value={statusOptions.find((option) => option.value === ticketData.status)}
+                                            onChange={(event, newValue) => handleChange({ target: { name: 'status', value: newValue?.value } })}
+                                            options={statusOptions}
+                                            getOptionLabel={(option) => option.label}
+                                            renderInput={(params) => <TextField {...params} label="Status" size="small" />}
+                                        />
+                                    </Grid>
 
-                                <Form.Group controlId="formStatus" className="mb-4">
-                                    <Form.Label>Status</Form.Label>
-                                    <Form.Select
-                                        name="status"
-                                        value={ticketData.status}
-                                        onChange={handleChange}
-                                        size='sm'
-                                        onBlur={handleBlur}
-                                        className="shadow-sm"
-                                    >
-                                        <option value="open">Open</option>
-                                        <option value="in_progress">In Progress</option>
-                                        <option value="resolved">Resolved</option>
-                                        <option value="closed">Closed</option>
-                                        <option value="to_be_approved">ToBeApproved</option>
-                                    </Form.Select>
-                                    {validationErrors.status && <div className="text-danger small">{validationErrors.status}</div>}
-                                </Form.Group>
+                                    {/* Priority */}
+                                    <Grid item xs={6} sm={3}>
+                                        <Autocomplete
+                                            value={priorityOptions.find((option) => option.value === ticketData.priority)}
+                                            onChange={(event, newValue) => handleChange({ target: { name: 'priority', value: newValue?.value } })}
+                                            options={priorityOptions}
+                                            getOptionLabel={(option) => option.label}
+                                            renderInput={(params) => <TextField {...params} label="Priority" size="small" />}
+                                        />
+                                    </Grid>
 
-                                <Form.Group controlId="formPriority" className="mb-4">
-                                    <Form.Label>Priority</Form.Label>
-                                    <Form.Select
-                                        name="priority"
-                                        value={ticketData.priority}
-                                        onChange={handleChange}
-                                        size='sm'
-                                        onBlur={handleBlur}
-                                        className="shadow-sm"
-                                    >
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                        <option value="urgent">Urgent</option>
-                                    </Form.Select>
-                                    {validationErrors.priority && <div className="text-danger small">{validationErrors.priority}</div>}
-                                </Form.Group>
+                                    {/* Category */}
+                                    <Grid item xs={6} sm={3}>
+                                        <Autocomplete
+                                            value={categoryOptions.find((option) => option.value === ticketData.category)}
+                                            onChange={(event, newValue) => handleCategoryChange({ target: { name: 'category', value: newValue?.value } })}
+                                            options={categoryOptions}
+                                            getOptionLabel={(option) => option.label}
+                                            renderInput={(params) => <TextField {...params} label="Category" size="small" />}
+                                        />
+                                    </Grid>
 
-                                <Form.Group controlId="formCategory" className="mb-4">
-                                    <Form.Label>Category</Form.Label>
-                                    <Form.Select
-                                        name="category"
-                                        value={ticketData.category}
-                                        onChange={handleCategoryChange}
-                                        size='sm'
-                                        onBlur={handleBlur}
-                                        className="shadow-sm"
-                                    >
-                                        <option value="service">Service</option>
-                                        <option value="troubleshooting">Troubleshooting</option>
-                                        <option value="maintenance">Maintenance</option>
-                                    </Form.Select>
-                                </Form.Group>
+                                    {/* Subcategory */}
+                                    <Grid item xs={6} sm={3}>
+                                        <Autocomplete
+                                            value={subcategoryOptions.find((option) => option.value === ticketData.subcategory)}
+                                            onChange={(event, newValue) => handleChange({ target: { name: 'subcategory', value: newValue?.value } })}
+                                            options={subcategoryOptions}
+                                            getOptionLabel={(option) => option.label}
+                                            renderInput={(params) => <TextField {...params} label="Subcategory" size="small" />}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
 
-                                <Form.Group controlId="formSubcategory" className="mb-4">
-                                    <Form.Label>Subcategory</Form.Label>
-                                    <Form.Select
-                                        name="subcategory"
-                                        value={ticketData.subcategory}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        size='sm'
-                                        className="shadow-sm"
-                                    >
-                                        <option value="">Select a subcategory</option>
-                                        {subcategories.map(sub => (
-                                            <option key={sub.value} value={sub.value}>
-                                                {sub.label}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                </Form.Group>
+                            {/* Assignee and Approver */}
+                            <Grid item xs={12}>
+                                <Grid container spacing={1}>
+                                    <Grid item xs={6}>
+                                        <Autocomplete
+                                            options={users}
+                                            getOptionLabel={(option) => option.label || ''}
+                                            onChange={(_, newValue) => handleAssignedToChange(newValue)}
+                                            value={assignedToUser}
+                                            renderInput={(params) => <TextField {...params} label="Assignee" size="small" fullWidth />}
+                                        />
+                                    </Grid>
 
-                                <Form.Group controlId="formAssignedTo" className="mb-4">
-                                    <Form.Label>Assigned To</Form.Label>
-                                    <Select
-                                        options={users}
-                                        onChange={handleAssignedToChange}
-                                        placeholder="Select a user"
-                                        value={selectedUser}
-                                        isSearchable
-                                        onBlur={handleBlur}
-                                        className="shadow-sm"
-                                    />
-                                </Form.Group>
+                                    <Grid item xs={6}>
+                                        <Autocomplete
+                                            options={users}
+                                            getOptionLabel={(option) => option.label || ''}
+                                            onChange={(_, newValue) => handleApprovedByChange(newValue)}
+                                            value={approvedByUser}
+                                            renderInput={(params) => <TextField {...params} label="Approver" size="small" fullWidth />}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
 
-                                <Form.Group controlId="formAttachments" className="mb-4">
-                                    <Form.Label>Attachments</Form.Label>
-                                    <Form.Control
-                                        type="file"
-                                        multiple
-                                        onChange={handleFileChange}
-                                        size='sm'
-                                        onBlur={handleBlur}
-                                        className="shadow-sm"
-                                    />
-                                    {attachments.length > 0 && (
-                                        <div className="mt-2">
-                                            <ul>
-                                                {attachments.map((file, index) => (
-                                                    <li key={index} className="d-flex justify-content-between align-items-center">
-                                                        {file.name}
-                                                        <Button variant="link" onClick={() => removeFile(index)}>&times;</Button>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-                                    <Button variant="link" className="mt-3" onClick={() => setShowAttachments(true)}>
-                                        View Uploaded
+                            {/* Comments and Attachments */}
+                            <Grid item xs={12}>
+                                <Grid container spacing={1} alignItems="flex-start">
+                                    {/* Comments */}
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="Add a comment"
+                                            value={newComment}
+                                            onChange={(e) => setNewComment(e.target.value)}
+                                            multiline
+                                            rows={2}
+                                            fullWidth
+                                            size="small"
+                                        />
+                                    </Grid>
+
+                                    {/* Attachments */}
+                                    <Grid item xs={12} sm={6}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Button variant="outlined" component="label" size="small">
+                                                <UploadIcon fontSize="small" />
+                                                Attach
+                                                <input type="file" multiple hidden onChange={handleFileChange} />
+                                            </Button>
+                                            <Button variant="text" onClick={() => setShowAttachments(true)} size="small">
+                                                View Uploaded
+                                            </Button>
+
+                                            {/* Display Attachments */}
+                                            {attachments.length > 0 && (
+                                                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                                                    {attachments.map((file, index) => (
+                                                        <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: '#f9f9f9', p: '1px 6px', borderRadius: 1 }}>
+                                                            <Typography variant="body2" sx={{ fontSize: '0.7rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
+                                                                {file.name}
+                                                            </Typography>
+                                                            <IconButton onClick={() => removeFile(index)} color="error" size="small">
+                                                                <CloseIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Box>
+                                                    ))}
+                                                </Box>
+                                            )}
+                                        </Box>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+
+                            {/* Buttons Section */}
+                            <Grid item xs={12} sx={{ mt: 1 }} container spacing={1}>
+                                <Grid item>
+                                    <Button type="submit" variant="contained" size="small" color="primary">
+                                        Save
                                     </Button>
-                                </Form.Group>
+                                </Grid>
+                                <Grid item>
+                                    <Button variant="outlined" size="small" onClick={handleReset}>
+                                        Reset
+                                    </Button>
+                                </Grid>
+                                <Grid item>
+                                    <Button variant="outlined" size="small" color="secondary" onClick={() => navigate(-1)}>
+                                        Cancel
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </form>
 
-                                {/* Comments Section */}
-                                <Form.Group controlId="formComments" className="mb-3">
-                                    <Form.Label>Comments</Form.Label>
-
-                                    {comments.length > 0 ? (
-                                        <ul>
-                                            {comments.map((comment) => (
-
-                                                <li key={comment.id}>
-                                                    <strong>{comment?.user?.username}:</strong> {comment.content}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p>No comments yet.</p>
-                                    )}
-
-                                    <Form.Control
-                                        as="textarea"
-                                        rows={3}
-                                        value={newComment}
-                                        onChange={(e) => setNewComment(e.target.value)}
-                                        placeholder="Add a comment"
-                                        size='sm'
-                                    />
-                                </Form.Group>
-
-                                <Button variant="primary" type="submit" className="mt-3" size="sm">
-                                    Update Ticket
-                                </Button>
-                                <Button variant="secondary" className="mt-3 ms-2" onClick={() => navigate(-1)} size="sm">
-                                    Cancel
-                                </Button>
-                            </Form>
-                            <AttachmentsView
-                                ticketId={ticketId}
-                                show={showAttachments}
-                                handleClose={() => setShowAttachments(false)}
-                            />
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+                    {/* Attachments View Modal */}
+                    <AttachmentsView ticketId={ticketId} show={showAttachments} handleClose={() => setShowAttachments(false)} />
+                </CardContent>
+            </Card>
         </Container>
+
+
+
+
     );
 };
 

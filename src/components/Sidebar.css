@@ -1,59 +1,26 @@
-.sidebar {
-    background-color: white;
-    box-shadow: none;
-    border-right: none;
-    border-left: none;
-    transition: width 0.3s ease;
-    padding-right: 0;
-}
-
-.sidebar.open {
-    width: 180px;
-}
-
-.sidebar.closed {
-    width: 0;
-}
-
+/* General sidebar link styles */
 .sidebar-link {
-    padding: 10px 15px;
-    color: #2c3e50 !important; /* Ensure the link text color is #2c3e50 */
-    font-size: 16px;
-    font-weight: 500;
+    padding-left: 16px;
+    color: #333;
+    text-decoration: none;  /* Remove default underline */
     display: flex;
     align-items: center;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.sidebar-link:hover {
-    background-color: #f1f3f5 !important; /* Light gray on hover */
-    color: #2c3e50 !important; /* Ensure the color remains #2c3e50 on hover */
-}
-
-.sidebar-link.active-link {
-    background-color: #3498db !important; /* Sky blue when active */
-    color: white !important; /* White text when active */
-    font-weight: 600;
-}
-
-.sidebar-link .me-2 {
-    font-size: 18px;
-}
-
-.flex-column {
-    padding: 0;
-}
-
-.sidebar-link:hover {
-    background-color: #f1f3f5 !important;
-    transform: translateX(5px);
-}
-
-.sidebar .nav-link:last-child {
-    margin-top: auto;
-}
-
-.sidebar .nav-link svg {
-    font-size: 18px;
-    margin-right: 10px;
-}
+    padding: 10px 0;
+    position: relative;
+    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;  /* Smooth transition for color and bg */
+  }
+  
+  /* Active link styles */
+  .sidebar-link.active .sidebar-text {
+    font-weight: 700;   
+    color: #1976d2;   
+  }
+  
+.sidebar-link .MuiListItemIcon-root {
+    min-width: 30px;  
+    margin-right: 8px;  
+    margin-left: 8px;  
+  }
+  
+  
+  

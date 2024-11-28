@@ -22,7 +22,6 @@ export const setAuthToken = (token) => {
 
 export const getUserIdFromToken = (token) => {
     if (!token) {
-        console.log("no token");
         return null;
     }
     try {
@@ -50,7 +49,7 @@ export const refreshTokenFun = async () => {
 };
 
 
-// Add a response interceptor to handle 401 errors (unauthorized)
+// Interceptor to handle errors 
 api.interceptors.response.use(
   response => response,
   async (error) => {
@@ -64,25 +63,18 @@ api.interceptors.response.use(
         // Refresh token has failed, handle the failure (redirect to login)
         localStorage.removeItem('authToken');
         localStorage.removeItem('refreshToken');
-        window.location.href = '/signin'; // Redirect to login page
-
-        return Promise.reject({
-          message: 'Session expired. Please log in again.',
-          status: 401
-        });
+        window.location.href = '/session-expired'; 
       }
 
       // Prevent retrying the refresh token on login
       if (originalRequest.url === '/login' ) {
-        console.log("INSIDE LOGIN BLOCK");
-        console.log(originalRequest.url === '/signin' );
          return Promise.reject({
           message: 'Invalid credentials. Please try again.',
           status: 401
         });
       }
       
-      originalRequest._retry = true; // Mark this request as being retried
+      originalRequest._retry = true;  
        
       try {
         // Attempt to refresh the token
@@ -113,7 +105,33 @@ api.interceptors.response.use(
       }
     }
 
-    // If the error is not 401, just reject the promise with the error
+    // Handle 422 Unprocessable Entity
+    if (error.response && error.response.status === 422) {
+      return Promise.reject({
+        message: 'Validation error. Please check your input.',
+        details: error.response.data.errors || [],
+        status: 422,
+      });
+    }
+
+    // Handle 403 Forbidden
+    if (error.response && error.response.status === 403) {
+      window.location.href = '/unauthorized';
+      return Promise.reject({
+        message: 'You are not authorized to access this resource.',
+        status: 403,
+      });
+    }
+
+    // Handle 404 Not Found
+    if (error.response && error.response.status === 404) {
+      return Promise.reject({
+        message: 'The requested resource was not found.',
+        status: 404,
+      });
+    }
+
+    // If none of the above, just reject the promise with the error
     return Promise.reject(error);
   }
 );

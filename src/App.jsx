@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row } from 'react-bootstrap';
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom'; // Import Navigate for redirection
+import { Box, Grid, IconButton } from '@mui/material';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import SideBar from './components/SideBar';
 import TopBar from './components/TopBar';
 import Footer from './components/Footer';
@@ -8,11 +8,13 @@ import Home from './components/Home';
 import Signup from './components/Signup';
 import Settings from './components/Settings';
 import Signin from './components/Signin';
+import SessionExpired from './components/SessionExpired';
 import UsersManage from './components/UsersManage';
 import TicketCreate from './components/tickets/TicketCreate';
 import TicketEdit from './components/tickets/TicketEdit';
+import TicketView from './components/tickets/TicketView';
 import TicketsList from './components/tickets/TicketsList';
-import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+import { ChevronLeft, ChevronRight } from '@mui/icons-material'; 
 import './App.css';
 import { logoutUser } from './services/authService';
 import api, { setAuthToken } from './services/api';
@@ -20,21 +22,29 @@ import Dashboard from './components/Dashboard';
 import UserProfile from './components/UserProfile';
 import UserActivityLog from './components/UserActivityLog';
 import Breadcrumb from './components/Breadcrumb';
+import useIdleTimeout from './hooks/useIdleTimeout';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Initially set to false
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
   const [userId, setUserId] = useState('');
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleSessionTimeout = () => {
+    window.location.href = '/session-expired';
+  };
+
+  // Trigger session timeout after 30 minutes of inactivity
+  useIdleTimeout(handleSessionTimeout, 1800000);
+
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     setUserRole(localStorage.getItem('userRole'));
-    setUserName(localStorage.getItem('userName'))
-    setUserId(localStorage.getItem('userId'))
+    setUserName(localStorage.getItem('userName'));
+    setUserId(localStorage.getItem('userId'));
 
     if (token) {
       setAuthToken(token);
@@ -74,13 +84,12 @@ function App() {
     setIsSidebarOpen((prev) => !prev);
   };
 
-  const hideNavAndSidebar = location.pathname === '/signin';
+  const hideNavAndSidebar = location.pathname === '/signin' || location.pathname === '/session-expired';
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  // Function to determine the breadcrumb title based on the current route
   const getBreadcrumbTitle = () => {
     switch (location.pathname) {
       case '/':
@@ -89,6 +98,8 @@ function App() {
         return 'Create Ticket';
       case '/edit-ticket':
         return 'Edit Ticket';
+      case '/view-ticket':
+        return 'View Ticket';
       case '/tickets':
         return 'Tickets View';
       case '/manage-users':
@@ -107,29 +118,31 @@ function App() {
   };
 
   return (
-    <Container fluid style={{ height: '100vh', padding: 0 }}>
-      <Row style={{ height: '100%', margin: 0 }}>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Grid container sx={{ flexGrow: 1 }}>
         {!hideNavAndSidebar && (
-          <div
-            style={{
+          <Box
+            sx={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
               position: 'fixed',
-              width: isSidebarOpen ? '200px' : '0px',
+              width: isSidebarOpen ? '200px' : '20px',
               transition: 'left 0.3s ease, width 0.3s ease',
               zIndex: 1000,
               height: '100vh',
-              backgroundColor: '#2c3e50',
               color: '#fff',
-              overflow: 'hidden',
-              opacity: isSidebarOpen ? '1' : '0',
+              overflow: 'auto',
+              opacity: isSidebarOpen ? 1 : 0,
             }}
           >
             <SideBar isOpen={isSidebarOpen} userRole={userRole} />
-          </div>
+          </Box>
         )}
 
-        <div
-          style={{
-            marginLeft: isSidebarOpen && !hideNavAndSidebar ? '200px' : '0',
+        <Box
+          sx={{
+            marginLeft: isSidebarOpen && !hideNavAndSidebar ? '200px' : '20px',
             transition: 'margin-left 0.3s ease',
             padding: 0,
             height: '100vh',
@@ -139,52 +152,35 @@ function App() {
           }}
         >
           {!hideNavAndSidebar && (
-            <div
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                zIndex: 1050,
-                width: '100%',
-                height: '45px'
-              }}
-            >
+            <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1050, width: '100%', height: '45px' }}>
               <TopBar isAuthenticated={isAuthenticated} onSignOut={handleSignOut} userName={userName} userRole={userRole} />
-            </div>
+            </Box>
           )}
 
-          <div
-            style={{
-              position: 'fixed',
-              top: '45px',
-              left: isSidebarOpen && !hideNavAndSidebar ? '200px' : '0',
-              width: isSidebarOpen && !hideNavAndSidebar ? 'calc(100% - 200px)' : '100%',
-              zIndex: 1030,
-              marginTop: '0px'
-            }}
-          >
+          <Box sx={{
+            position: 'fixed',
+            top: '45px',
+            left: isSidebarOpen && !hideNavAndSidebar ? '200px' : '5px',
+            width: isSidebarOpen && !hideNavAndSidebar ? 'calc(100% - 200px)' : '100%',
+            zIndex: 1030,
+            marginTop: 0,
+            marginLeft: isSidebarOpen ? '0px' : '20px',
+            marginBottom: 8,
+          }}>
             <Breadcrumb title={getBreadcrumbTitle()} />
-          </div>
+          </Box>
 
-          <div
-            style={{
-              flex: '1 0 auto',
-              padding: '10px 10px 20px 10px',
-              marginTop: !hideNavAndSidebar ? '65px' : '0',
-              marginBottom: '60px',
-              paddingBottom: '60px',
-              overflowY: 'auto',
-            }}
-          >
+          <Box sx={{
+            flex: '1 0 auto',
+            padding: '10px 10px 5px 10px',
+            marginTop: !hideNavAndSidebar ? '65px' : '0',
+            marginBottom: 0,
+          }}>
             <Routes>
               {/* Protected Routes */}
               <Route
                 path="/"
-                element={isAuthenticated ? <Dashboard /> : (
-                  console.log("Redirecting to signin due to not authenticated"),
-                  <Navigate to="/signin" replace />
-                )}
+                element={isAuthenticated ? <Dashboard /> : <Navigate to="/signin" replace />}
               />
               <Route
                 path="/create-ticket"
@@ -195,17 +191,20 @@ function App() {
                 element={isAuthenticated ? <TicketEdit currentUserId={userId} userRole={userRole} /> : <Navigate to="/signin" replace />}
               />
               <Route
+                path="/view-ticket"
+                element={isAuthenticated ? <TicketView currentUser={userName} userRole={userRole} /> : <Navigate to="/signin" replace />}
+              />
+              <Route
                 path="/tickets"
                 element={isAuthenticated ? <TicketsList currentUser={userName} userRole={userRole} /> : <Navigate to="/signin" replace />}
               />
               <Route
                 path="/manage-users"
-                element={
-                  isAuthenticated
-                    ? userRole === 'admin'
-                      ? <UsersManage currentUser={userName} userRole={userRole} />
-                      : <Home />
-                    : <Navigate to="/signin" state={{ from: location }} replace />
+                element={isAuthenticated
+                  ? userRole === 'admin'
+                    ? <UsersManage currentUser={userName} userRole={userRole} />
+                    : <Home />
+                  : <Navigate to="/signin" state={{ from: location }} replace />
                 }
               />
               <Route
@@ -217,29 +216,30 @@ function App() {
               {/* Public Routes */}
               <Route path="/signin" element={<Signin setIsAuthenticated={setIsAuthenticated} onLoginSuccess={handleLoginSuccess} />} />
 
+              <Route path="/session-expired" element={<SessionExpired />} />
 
-              {/* User Profile Route - New */}
+              {/* User Profile Route */}
               <Route
                 path="/profile/:id"
                 element={isAuthenticated ? <UserProfile /> : <Navigate to="/signin" replace />}
               />
 
-              {/* User Activity Log Route - New */}
+              {/* User Activity Log Route */}
               <Route
                 path="/activity/:id"
                 element={isAuthenticated ? <UserActivityLog /> : <Navigate to="/signin" replace />}
               />
             </Routes>
-          </div>
-        </div>
-      </Row>
+          </Box>
+          <Footer sx={{ marginTop: 'auto' }} />
+        </Box>
+      </Grid>
 
       {/* Sidebar Toggle Button */}
       {!hideNavAndSidebar && (
-        <button
+        <IconButton
           onClick={toggleSidebar}
-          className="btn toggle-button"
-          style={{
+          sx={{
             position: 'fixed',
             top: '10px',
             left: '0',
@@ -247,29 +247,17 @@ function App() {
             zIndex: 1100,
             background: 'none',
             border: 'none',
-            color: isSidebarOpen ? '#fff' : '#333',
+            color: 'primary.main',
             fontSize: '15px',
             cursor: 'pointer',
-            paddingLeft: '0px'
+            paddingLeft: '0px',
           }}
         >
-          {isSidebarOpen ? <FaAngleLeft /> : <FaAngleRight />}
-        </button>
+          {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
+        </IconButton>
       )}
 
-
-      {/* Footer - Sticky */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          width: '100%',
-          zIndex: 1000,
-        }}
-      >
-        <Footer />
-      </div>
-    </Container>
+    </Box>
   );
 }
 

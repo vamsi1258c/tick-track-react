@@ -1,162 +1,204 @@
-import { Modal, Button, Tabs, Tab, Table } from 'react-bootstrap';
-import { FaEdit } from 'react-icons/fa';
+import { Grid, Avatar, Dialog, DialogActions, DialogContent, DialogTitle, Button, Accordion, AccordionSummary, AccordionDetails, Table, TableHead, TableBody, TableRow, TableCell, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import './UserDetails.css'; 
+import { ExpandMore as ExpandMoreIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
+import './UserDetails.css';
 
 export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    return (
-        <Modal show={showModal} onHide={handleClose} size="lg">
-            <Modal.Header closeButton>
-                <Modal.Title>User Details</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                {selectedUser && (
-                    <div>
-                        <p><strong>Name:</strong> {selectedUser.fullname}</p>
-                        <p><strong>Email:</strong> {selectedUser.username}</p>
-                        <p><strong>Role:</strong> {selectedUser.role}</p>
-                        <p><strong>Designation:</strong> {selectedUser.designation || "Not specified"}</p>
-                        <p><strong>Approver:</strong> {selectedUser.approver ? "Yes" : "No"}</p>
-                        <hr />
+  // const handleViewClick = (ticketId) => {
+  //   navigate(`/view-ticket`, { state: { ticketId } });
+  // };
 
-                        {/* Tickets Section */}
-                        <h5>Tickets</h5>
-                        <Tabs defaultActiveKey="created" id="user-details-tabs" className="mb-3">
-                            {/* Tickets Created */}
-                            <Tab eventKey="created" title="Created">
-                                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                                    {selectedUser.tickets_created && selectedUser.tickets_created.length > 0 ? (
-                                        <Table bordered hover responsive className="user-tickets-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Status</th>
-                                                    <th>Priority</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {selectedUser.tickets_created.map((ticket) => (
-                                                    <tr key={ticket.id}>
-                                                        <td><strong>{ticket.title}</strong></td>
-                                                        <td>{ticket.status}</td>
-                                                        <td>{ticket.priority}</td>
-                                                        <td>
-                                                            <FaEdit
-                                                                style={{ cursor: 'pointer', fontSize: '1rem' }}
-                                                                onClick={() => navigate(`/edit-ticket`, { state: { ticketId: ticket.id } })}
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    ) : (
-                                        <p>No tickets created.</p>
-                                    )}
-                                </div>
-                            </Tab>
+  return (
+    <Dialog open={showModal} onClose={handleClose} maxWidth="md" fullWidth>
+      <DialogTitle sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>User Details</DialogTitle>
+      <DialogContent>
+        {selectedUser && (
+          <div>
+            <Paper sx={{ padding: 3, marginBottom: 3, backgroundColor: '#f9f9f9', borderRadius: 2, boxShadow: 3 }}>
+              <Grid container spacing={2} alignItems="center">
+                {/* Avatar */}
+                <Grid item xs={12} sm={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Avatar
+                    alt={selectedUser.fullname}
+                    src={selectedUser.avatar || "/default-avatar.png"}
+                    sx={{ width: 100, height: 100 }}
+                  />
+                </Grid>
 
-                            {/* Tickets Assigned */}
-                            <Tab eventKey="assigned" title="Assigned To">
-                                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                                    {selectedUser.tickets_assigned && selectedUser.tickets_assigned.length > 0 ? (
-                                        <Table bordered hover responsive className="user-tickets-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Status</th>
-                                                    <th>Priority</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {selectedUser.tickets_assigned.map((ticket) => (
-                                                    <tr key={ticket.id}>
-                                                        <td><strong>{ticket.title}</strong></td>
-                                                        <td>{ticket.status}</td>
-                                                        <td>{ticket.priority}</td>
-                                                        <td>
-                                                            <FaEdit
-                                                                style={{ cursor: 'pointer', fontSize: '1rem' }}
-                                                                onClick={() => navigate(`/edit-ticket`, { state: { ticketId: ticket.id } })}
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    ) : (
-                                        <p>No tickets assigned.</p>
-                                    )}
-                                </div>
-                            </Tab>
+                {/* User Info */}
+                <Grid item xs={12} sm={9}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                    {selectedUser.fullname}
+                  </Typography>
+                  <Typography variant="body1" sx={{ marginBottom: 0.5 }}><strong>Email:</strong> {selectedUser.username}</Typography>
+                  <Typography variant="body1" sx={{ marginBottom: 0.5 }}><strong>Role:</strong> {selectedUser.role}</Typography>
+                  <Typography variant="body1" sx={{ marginBottom: 0.5 }}><strong>Designation:</strong> {selectedUser.designation || "Not specified"}</Typography>
+                  <Typography variant="body1" sx={{ marginBottom: 0.5 }}><strong>Approver:</strong> {selectedUser.approver ? "Yes" : "No"}</Typography>
+                </Grid>
+              </Grid>
+            </Paper>
 
-                            {/* Tickets Approved (only visible if user is an approver) */}
-                            {selectedUser.approver && (
-                                <Tab eventKey="approved" title="Approved">
-                                    <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                                        {selectedUser.tickets_approved && selectedUser.tickets_approved.length > 0 ? (
-                                            <Table bordered hover responsive className="user-tickets-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Title</th>
-                                                        <th>Status</th>
-                                                        <th>Priority</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {selectedUser.tickets_approved.map((ticket) => (
-                                                        <tr key={ticket.id}>
-                                                            <td>{ticket.title}</td>
-                                                            <td>{ticket.status}</td>
-                                                            <td>{ticket.priority}</td>
-                                                            <td>
-                                                                <FaEdit
-                                                                    style={{ cursor: 'pointer', fontSize: '1rem' }}
-                                                                    onClick={() => navigate(`/edit-ticket`, { state: { ticketId: ticket.id } })}
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </Table>
-                                        ) : (
-                                            <p>No tickets approved.</p>
-                                        )}
-                                    </div>
-                                </Tab>
-                            )}
-                        </Tabs>
+            {/* Tickets Section */}
+            <Accordion defaultExpanded>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} id="created-tickets-header">
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Tickets Created</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  {selectedUser.tickets_created && selectedUser.tickets_created.length > 0 ? (
+                    <Table sx={{ minWidth: 650 }}>
+                      <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 'bold' }}>Title</TableCell>
+                          <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                          <TableCell sx={{ fontWeight: 'bold' }}>Priority</TableCell>
+                          <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {selectedUser.tickets_created.map((ticket) => (
+                          <TableRow key={ticket.id} sx={{ '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' } }}>
+                            <TableCell>{ticket.title}</TableCell>
+                            <TableCell>{ticket.status}</TableCell>
+                            <TableCell>{ticket.priority}</TableCell>
+                            <TableCell>
+                              <VisibilityIcon
+                                sx={{
+                                  cursor: 'pointer',
+                                  fontSize: '1rem',
+                                  color: '#3f51b5',
+                                }}
+                                onClick={() => navigate(`/view-ticket`, { state: { ticketId: ticket.id } })}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <Typography>No tickets created.</Typography>
+                  )}
+                </div>
+              </AccordionDetails>
+            </Accordion>
 
-                        <hr />
+            {/* Tickets Assigned */}
+            <Accordion defaultExpanded>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} id="assigned-tickets-header">
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Tickets Assigned To</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  {selectedUser.tickets_assigned && selectedUser.tickets_assigned.length > 0 ? (
+                    <Table sx={{ minWidth: 650 }}>
+                      <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 'bold' }}>Title</TableCell>
+                          <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                          <TableCell sx={{ fontWeight: 'bold' }}>Priority</TableCell>
+                          <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {selectedUser.tickets_assigned.map((ticket) => (
+                          <TableRow key={ticket.id} sx={{ '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' } }}>
+                            <TableCell>{ticket.title}</TableCell>
+                            <TableCell>{ticket.status}</TableCell>
+                            <TableCell>{ticket.priority}</TableCell>
+                            <TableCell>
+                            <VisibilityIcon
+                                sx={{
+                                  cursor: 'pointer',
+                                  fontSize: '1rem',
+                                  color: '#3f51b5',
+                                }}
+                                onClick={() => navigate(`/view-ticket`, { state: { ticketId: ticket.id } })}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <Typography>No tickets assigned.</Typography>
+                  )}
+                </div>
+              </AccordionDetails>
+            </Accordion>
 
-                        {/* Activity Logs Section */}
-                        <h5>Activity:</h5>
-                        {selectedUser.activity_logs && selectedUser.activity_logs.length > 0 ? (
-                            <ul>
-                                {selectedUser.activity_logs.map((log) => (
-                                    <li key={log.id}>
-                                        <p style={{ fontSize: '0.75rem' }}>
-                                            <strong>{log.action}</strong> at {new Date(log.created_at).toLocaleString()}
-                                        </p>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p style={{ fontSize: '0.75rem' }}>No activity logs available.</p>
-                        )}
-                    </div>
-                )}
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>Close</Button>
-            </Modal.Footer>
-        </Modal>
-    );
+            {/* Tickets Approved (only visible if user is an approver) */}
+            {selectedUser.approver && (
+              <Accordion defaultExpanded>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} id="approved-tickets-header">
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Tickets Approved</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                    {selectedUser.tickets_approved && selectedUser.tickets_approved.length > 0 ? (
+                      <Table sx={{ minWidth: 650 }}>
+                        <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Title</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Priority</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {selectedUser.tickets_approved.map((ticket) => (
+                            <TableRow key={ticket.id} sx={{ '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' } }}>
+                              <TableCell>{ticket.title}</TableCell>
+                              <TableCell>{ticket.status}</TableCell>
+                              <TableCell>{ticket.priority}</TableCell>
+                              <TableCell>
+                              <VisibilityIcon
+                                sx={{
+                                  cursor: 'pointer',
+                                  fontSize: '1rem',
+                                  color: '#3f51b5',
+                                }}
+                                onClick={() => navigate(`/view-ticket`, { state: { ticketId: ticket.id } })}
+                              />
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    ) : (
+                      <Typography>No tickets approved.</Typography>
+                    )}
+                  </div>
+                </AccordionDetails>
+              </Accordion>
+            )}
+
+            {/* Activity Logs Section */}
+            <Paper sx={{ padding: 3, marginTop: 3, backgroundColor: '#f9f9f9' }}>
+              <Typography variant="h6" sx={{ marginBottom: 1 }}>Activity:</Typography>
+              {selectedUser.activity_logs && selectedUser.activity_logs.length > 0 ? (
+                <ul>
+                  {selectedUser.activity_logs.map((log) => (
+                    <li key={log.id}>
+                      <Typography variant="body2">
+                        <strong>{log.action}</strong> at {new Date(log.created_at).toLocaleString()}
+                      </Typography>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <Typography variant="body2">No activity logs available.</Typography>
+              )}
+            </Paper>
+          </div>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} color="secondary" variant="contained">Close</Button>
+      </DialogActions>
+    </Dialog>
+  );
 };
 
 export default UserDetails;

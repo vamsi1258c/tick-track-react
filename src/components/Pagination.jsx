@@ -1,37 +1,25 @@
 import React from 'react';
+import { Pagination, Box } from '@mui/material';
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-    const pageNumbers = [];
+const CustomPagination = ({ currentPage, totalPages, onPageChange }) => {
+  const handlePageChange = (event, value) => {
+    onPageChange(value);
+  };
 
-    for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-    }
-
-    return (
-        <div className="pagination-container">
-            <nav>
-                <ul className="pagination">
-                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                        <button className="page-link" onClick={() => onPageChange(currentPage - 1)}>
-                            Previous
-                        </button>
-                    </li>
-                    {pageNumbers.map((number) => (
-                        <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
-                            <button className="page-link" onClick={() => onPageChange(number)}>
-                                {number}
-                            </button>
-                        </li>
-                    ))}
-                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                        <button className="page-link" onClick={() => onPageChange(currentPage + 1)}>
-                            Next
-                        </button>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    );
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 2 }}>
+      <Pagination
+        count={totalPages}
+        page={currentPage}
+        onChange={handlePageChange}
+        siblingCount={1}
+        boundaryCount={1}
+        variant="outlined"
+        shape="rounded"
+        color="primary"
+      />
+    </Box>
+  );
 };
 
-export { Pagination };
+export { CustomPagination };

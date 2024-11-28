@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Button, Container, Card } from 'react-bootstrap';
+import { Container, Card, TextField, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/authService';
 
@@ -60,63 +60,63 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
 
   return (
     <>
-      <div style={{ width: '100%', textAlign: 'center', padding: '1rem', fontSize: '2rem', fontWeight: 'bold'}}>
+      <Typography variant="h4" align="center" gutterBottom style={{ padding: '1rem', fontWeight: 'bold' }}>
         TickTrack
-      </div>
-      <Container className="d-flex justify-content-center align-items-center" style={{ overflow: 'hidden', minHeight: '70vh', padding: 0 }}>
-        <Card style={{ width: '100%', maxWidth: '400px' }} className="p-4 shadow-sm">
-          <Card.Body>
-            <h2 className="text-center mb-4">Sign In</h2>
-            <Form onSubmit={handleSubmit}>
-              <Form.Group controlId="formBasicEmail" className="mb-4">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Enter email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setEmailError('');  
-                    setError('');
-                  }}
-                  onBlur={() => handleBlur('email')}
-                  required
-                  size="sm"
-                  className="shadow-sm"
-                />
-                {emailError && <p className="text-danger">{emailError}</p>}
-              </Form.Group>
-
-              <Form.Group controlId="formBasicPassword" className="mb-4">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setPasswordError(''); 
-                    setError('');
-                  }}
-                  onBlur={() => handleBlur('password')}
-                  required
-                  size="sm"
-                  className="shadow-sm"
-                />
-                {passwordError && <p className="text-danger">{passwordError}</p>}
-              </Form.Group>
-
-              {error && <p className="text-danger text-center">{error}</p>}
-
-              <Button variant="primary" type="submit" className="w-100 mt-4" size="sm">
-                Sign In
-              </Button>
-            </Form>
-          </Card.Body>
+      </Typography>
+      <Container maxWidth="xs" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh' }}>
+        <Card variant="outlined" style={{ padding: '2rem', width: '100%' }}>
+          <Typography variant="h5" align="center" gutterBottom>
+            Sign In
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Email"
+              type="email"
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              size="small"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setEmailError('');
+                setError('');
+              }}
+              onBlur={() => handleBlur('email')}
+              error={Boolean(emailError)}
+              helperText={emailError}
+            />
+            <TextField
+              label="Password"
+              type="password"
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              size="small"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordError('');
+                setError('');
+              }}
+              onBlur={() => handleBlur('password')}
+              error={Boolean(passwordError)}
+              helperText={passwordError}
+            />
+            {error && (
+              <Typography color="error" align="center" variant="body2" style={{ marginTop: '1rem' }}>
+                {error}
+              </Typography>
+            )}
+            <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: '1.5rem' }}>
+              Sign In
+            </Button>
+          </form>
         </Card>
       </Container>
     </>
   );
 };
+
 
 export default Signin;

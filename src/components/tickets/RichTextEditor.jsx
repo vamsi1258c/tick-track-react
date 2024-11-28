@@ -1,29 +1,38 @@
-// RichTextEditor.js
-import React from 'react';
+import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Import Quill styles
+import 'react-quill/dist/quill.snow.css'; 
+import Box from '@mui/material/Box';
 
 const RichTextEditor = ({ value, onChange, placeholder, onBlur }) => {
+    const [isFocused, setIsFocused] = useState(false);
 
-    const editorStyle = { 
-        marginBottom: '15px',  
-        border: '1px solid #ced4da',  
-        borderRadius: '4px',  
-        overflowY: 'auto',
-    };  
+    const handleFocus = () => setIsFocused(true);
+    const handleBlur = (event) => {
+        setIsFocused(false);
+        if (onBlur) onBlur(event);
+    };
+
     return (
-        <div className="mb-3">
+        <Box
+            sx={{
+                marginBottom: '15px',
+                border: `solid ${isFocused ? '1px #1976d2' : '0.8px #ced4da'}`,
+                borderRadius: '4px',
+                overflowY: 'auto',
+                transition: 'border-color 0.3s',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}
+        >
             <ReactQuill
                 theme="snow"
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                style={editorStyle}
-                onBlur={onBlur}
-                size="sm"
-                className="shadow-sm"
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                style={{ borderRadius: '4px' }}
             />
-        </div>
+        </Box>
     );
 };
 

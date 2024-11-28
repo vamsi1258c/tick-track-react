@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, ListGroup, Spinner, Alert } from 'react-bootstrap';
+import { Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, ListItemText, IconButton, CircularProgress, Alert, Box } from '@mui/material';
 import { fetchAttachments, deleteAttachment, downloadAttachment } from '../../services/attachment'; // Import the download function
-import { BsTrash } from 'react-icons/bs'; 
-import { FaDownload } from 'react-icons/fa';
-import './AttachmentsView.css'; 
+import { Delete as DeleteIcon, FileDownload as DownloadIcon } from '@mui/icons-material';
+import { useSnackbar } from '../Snackbar';
 
 const AttachmentsView = ({ ticketId, show, handleClose }) => {
     const [attachments, setAttachments] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+
+    const { showSnackbar } = useSnackbar();
 
     useEffect(() => {
         const loadAttachments = async () => {
@@ -19,6 +20,7 @@ const AttachmentsView = ({ ticketId, show, handleClose }) => {
                     setAttachments(response.data);
                 } catch (err) {
                     setError('Failed to fetch attachments.');
+                    showSnackbar('Failed to fetch attachments.');
                 } finally {
                     setIsLoading(false);
                 }
@@ -26,7 +28,7 @@ const AttachmentsView = ({ ticketId, show, handleClose }) => {
         };
 
         loadAttachments();
-    }, [ticketId, show]);
+    }, [ticketId, show, showSnackbar]);
 
     const handleDelete = async (attachmentId) => {
         if (window.confirm("Are you sure you want to delete this attachment?")) {
@@ -44,55 +46,54 @@ const AttachmentsView = ({ ticketId, show, handleClose }) => {
             await downloadAttachment(ticketId, attachmentId); 
         } catch (err) {
             alert("Failed to download attachment. Please try again.");
+            showSnackbar("Failed to download attachment. Please try again.");
         }
     };
 
     return (
-        <Modal show={show} onHide={handleClose} centered>
-            <Modal.Header closeButton>
-                <Modal.Title>Attachments</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
+        <Dialog open={show} onClose={handleClose} maxWidth="xs" fullWidth>
+            <DialogTitle>Attachments</DialogTitle>
+            <DialogContent>
                 {isLoading ? (
-                    <div className="text-center">
-                        <Spinner animation="border" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </Spinner>
-                    </div>
+                    <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                        <CircularProgress />
+                    </Box>
                 ) : error ? (
-                    <Alert variant="danger">{error}</Alert>
+                    <Alert severity="error">{error}</Alert>
                 ) : attachments.length === 0 ? (
                     <p>No attachments found for this ticket.</p>
                 ) : (
-                    <ListGroup variant="flush">
-                        {attachments.map((attachment, index) => (
-                            <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
-                                <div 
-                                    onClick={() => handleDownload(attachment.id)} 
-                                    className="attachment-link"
-                                >
-                                    <strong> <FaDownload />{attachment.filename}</strong>
-                                    <br />
-                                    <small className="text-muted">Uploaded: {new Date(attachment.uploaded_at).toLocaleString()}</small>
-                                </div>
-                                <BsTrash
-                                    role="button"
-                                    size={20}
-                                    onClick={() => handleDelete(attachment.id)}
-                                    style={{ color: 'red', cursor: 'pointer' }}
-                                    title="Delete attachment"
+                    <List>
+                        {attachments.map((attachment) => (
+                            <ListItem key={attachment.id} secondaryAction={
+                                <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(attachment.id)}>
+                                    <DeleteIcon style={{ color: 'red' }} />
+                                </IconButton>
+                            }>
+                                <ListItemText
+                                    primary={
+                                        <Box display="flex" alignItems="center" onClick={() => handleDownload(attachment.id)} sx={{ cursor: 'pointer' }}>
+                                            <DownloadIcon sx={{ marginRight: 1 }} />
+                                             {attachment.filename} 
+                                        </Box>
+                                    }
+                                    secondary={
+                                        <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
+                                            Uploaded: {new Date(attachment.uploaded_at).toLocaleString()}
+                                        </Box>
+                                    }
                                 />
-                            </ListGroup.Item>
+                            </ListItem>
                         ))}
-                    </ListGroup>
+                    </List>
                 )}
-            </Modal.Body>
-            <Modal.Footer>
+            </DialogContent>
+            <DialogActions>
                 <button className="btn btn-secondary" onClick={handleClose}>
                     Close
                 </button>
-            </Modal.Footer>
-        </Modal>
+            </DialogActions>
+        </Dialog>
     );
 };
 
