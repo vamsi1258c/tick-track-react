@@ -18,7 +18,9 @@ export const fetchComment = async (commentId) => {
     return response;
   } catch (error) {
     console.log('Error fetching comment:', error);
-    throw error.response?.data || 'An error occurred while fetching the comment';
+    throw (
+      error.response?.data || 'An error occurred while fetching the comment'
+    );
   }
 };
 
@@ -26,11 +28,16 @@ export const fetchComment = async (commentId) => {
 export const createComment = async (ticketId, commentData) => {
   try {
     console.log(commentData);
-    const response = await api.post(`/ticket/${ticketId}/comments`, commentData);
+    const response = await api.post(
+      `/ticket/${ticketId}/comments`,
+      commentData
+    );
     return response;
   } catch (error) {
     console.log('Error creating comment:', error);
-    throw error.response?.data || 'An error occurred while creating the comment';
+    throw (
+      error.response?.data || 'An error occurred while creating the comment'
+    );
   }
 };
 
@@ -41,7 +48,9 @@ export const updateComment = async (commentId, commentData) => {
     return response;
   } catch (error) {
     console.log('Error updating comment:', error);
-    throw error.response?.data || 'An error occurred while updating the comment';
+    throw (
+      error.response?.data || 'An error occurred while updating the comment'
+    );
   }
 };
 
@@ -52,6 +61,8 @@ export const deleteComment = async (commentId) => {
     return response;
   } catch (error) {
     console.log('Error deleting comment:', error);
-    throw error.response?.data || 'An error occurred while deleting the comment';
+    throw (
+      error.response?.data || 'An error occurred while deleting the comment'
+    );
   }
 };

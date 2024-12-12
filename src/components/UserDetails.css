@@ -1,39 +1,40 @@
 .user-tickets-table {
-    font-family: Arial, sans-serif;
-    font-size: 0.875rem;
-    border-collapse: collapse;
-    width: 100%;
+  font-family: Arial, sans-serif;
+  font-size: 0.875rem;
+  border-collapse: collapse;
+  width: 100%;
 }
 
-.user-tickets-table th, .user-tickets-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border: 1px solid #e1e1e1;
+.user-tickets-table th,
+.user-tickets-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border: 1px solid #e1e1e1;
 }
 
 .user-tickets-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
+  background-color: #f4f4f4;
+  font-weight: bold;
 }
 
 .user-tickets-table tr:hover {
-    background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
 
 .user-tickets-table td {
-    background-color: #ffffff;
+  background-color: #ffffff;
 }
 
 .user-tickets-table .actions {
-    text-align: center;
+  text-align: center;
 }
 
 .user-tickets-table .actions svg {
-    cursor: pointer;
-    font-size: 1rem;
-    transition: transform 0.2s;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.2s;
 }
 
 .user-tickets-table .actions svg:hover {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }

@@ -1,26 +1,25 @@
 /* General sidebar link styles */
 .sidebar-link {
-    padding-left: 16px;
-    color: #333;
-    text-decoration: none;  /* Remove default underline */
-    display: flex;
-    align-items: center;
-    padding: 10px 0;
-    position: relative;
-    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;  /* Smooth transition for color and bg */
-  }
-  
-  /* Active link styles */
-  .sidebar-link.active .sidebar-text {
-    font-weight: 700;   
-    color: #1976d2;   
-  }
-  
+  padding-left: 16px;
+  color: #333;
+  text-decoration: none; /* Remove default underline */
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  position: relative;
+  transition:
+    color 0.3s ease-in-out,
+    background-color 0.3s ease-in-out; /* Smooth transition for color and bg */
+}
+
+/* Active link styles */
+.sidebar-link.active .sidebar-text {
+  font-weight: 700;
+  color: #1976d2;
+}
+
 .sidebar-link .MuiListItemIcon-root {
-    min-width: 30px;  
-    margin-right: 8px;  
-    margin-left: 8px;  
-  }
-  
-  
-  
+  min-width: 30px;
+  margin-right: 8px;
+  margin-left: 8px;
+}

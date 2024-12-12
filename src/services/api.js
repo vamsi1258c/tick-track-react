@@ -1,10 +1,11 @@
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
-
+// local backend: 'http://localhost:5000'
+// deployed backend: 'http://13.60.229.218:5000'
 // Create an instance of axios
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+  baseURL: process.env.REACT_APP_API_URL || 'http://13.60.229.218:5000',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,7 +13,6 @@ const api = axios.create({
 
 // Function to set JWT token in Authorization header
 export const setAuthToken = (token) => {
- 
   if (token) {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   } else {
@@ -21,64 +21,71 @@ export const setAuthToken = (token) => {
 };
 
 export const getUserIdFromToken = (token) => {
-    if (!token) {
-        return null;
-    }
-    try {
-        const decoded = jwtDecode(token);
-        return decoded.sub;  
-    } catch (error) {
-        console.error("Token decoding error:", error);
-        return null;
-    }
+  if (!token) {
+    return null;
+  }
+  try {
+    const decoded = jwtDecode(token);
+    return decoded.sub;
+  } catch (error) {
+    console.error('Token decoding error:', error);
+    return null;
+  }
 };
 
 export const refreshTokenFun = async () => {
   try {
-    const refreshToken = localStorage.getItem('refreshToken'); 
-    const response = await api.post('/refresh', {}, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${refreshToken}`
-      }});
-  
+    const refreshToken = localStorage.getItem('refreshToken');
+    const response = await api.post(
+      '/refresh',
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${refreshToken}`,
+        },
+      }
+    );
+
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
 
-
-// Interceptor to handle errors 
+// Interceptor to handle errors
 api.interceptors.response.use(
-  response => response,
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
-   
-    // Handle 401 errors
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
 
+    // Handle 401 errors
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
       // Prevent retrying the refresh token request itself to avoid a loop
-      if (originalRequest.url === '/refresh' ) {
+      if (originalRequest.url === '/refresh') {
         // Refresh token has failed, handle the failure (redirect to login)
         localStorage.removeItem('authToken');
         localStorage.removeItem('refreshToken');
-        window.location.href = '/session-expired'; 
+        window.location.href = '/session-expired';
       }
 
       // Prevent retrying the refresh token on login
-      if (originalRequest.url === '/login' ) {
-         return Promise.reject({
+      if (originalRequest.url === '/login') {
+        return Promise.reject({
           message: 'Invalid credentials. Please try again.',
-          status: 401
+          status: 401,
         });
       }
-      
-      originalRequest._retry = true;  
-       
+
+      originalRequest._retry = true;
+
       try {
         // Attempt to refresh the token
-        const refreshResponse = await refreshTokenFun();  
+        const refreshResponse = await refreshTokenFun();
         const newToken = refreshResponse.access_token;
 
         // Set the new token in the headers of the original request
@@ -88,19 +95,18 @@ api.interceptors.response.use(
 
         // Retry the original request with the new token
         return api(originalRequest);
-
       } catch (refreshError) {
         localStorage.removeItem('authToken');
         setAuthToken();
         if (api.defaults.authFailureCallback) {
           api.defaults.authFailureCallback();
         }
-        window.location.href = '/signin'; 
+        window.location.href = '/signin';
 
         // Return a custom error message if the refresh also fails
         return Promise.reject({
           message: 'Session expired. Please log in again.',
-          status: 401
+          status: 401,
         });
       }
     }
@@ -136,5 +142,4 @@ api.interceptors.response.use(
   }
 );
 
-  
 export default api;

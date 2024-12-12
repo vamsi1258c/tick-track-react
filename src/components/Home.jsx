@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Grid, Button, Typography, Paper, List, ListItem, ListItemText } from '@mui/material';
+import {
+  Container,
+  Grid,
+  Button,
+  Typography,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+} from '@mui/material';
 import { Link } from 'react-router-dom';
 import { fetchActivityLogsByUserId } from '../services/activityLog';
 
 const Home = () => {
   const [recentActivity, setRecentActivity] = useState([]);
-  const userRole = localStorage.getItem("userRole");
-  const userId = localStorage.getItem("userId");
+  const userRole = localStorage.getItem('userRole');
+  const userId = localStorage.getItem('userId');
   console.log(userId);
 
   useEffect(() => {
@@ -15,7 +24,7 @@ const Home = () => {
         const response = await fetchActivityLogsByUserId(userId);
         setRecentActivity(response.data.slice(-5));
       } catch (error) {
-        console.error("Failed to fetch recent activity logs", error);
+        console.error('Failed to fetch recent activity logs', error);
       }
     };
 
@@ -24,18 +33,24 @@ const Home = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) {
-      return "Date not available"; 
+      return 'Date not available';
     }
 
     // Remove microseconds if present and create a valid Date object
     const cleanedDateString = dateString.split('.')[0];
     const date = new Date(cleanedDateString);
-    return isNaN(date.getTime()) ? "Date not available" : date.toLocaleString();
+    return isNaN(date.getTime()) ? 'Date not available' : date.toLocaleString();
   };
 
   return (
     <Container sx={{ marginTop: 5 }}>
-      <Grid container justifyContent="center" alignItems="center" direction="column" sx={{ marginBottom: 4 }}>
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        direction="column"
+        sx={{ marginBottom: 4 }}
+      >
         <Grid item>
           <Typography variant="h3" align="center">
             Welcome to TickTrack
@@ -47,15 +62,27 @@ const Home = () => {
       </Grid>
 
       <Grid container justifyContent="center" spacing={2}>
-        {userRole === "admin" && (
+        {userRole === 'admin' && (
           <Grid item md={4} xs={12}>
-            <Button variant="contained" size="small" component={Link} to="/manage-users" fullWidth>
+            <Button
+              variant="contained"
+              size="small"
+              component={Link}
+              to="/manage-users"
+              fullWidth
+            >
               Manage Users
             </Button>
           </Grid>
         )}
         <Grid item md={4} xs={12}>
-          <Button variant="outlined" size="small" component={Link} to="/tickets" fullWidth>
+          <Button
+            variant="outlined"
+            size="small"
+            component={Link}
+            to="/tickets"
+            fullWidth
+          >
             Manage Tickets
           </Button>
         </Grid>
@@ -69,11 +96,16 @@ const Home = () => {
             </Typography>
             <List>
               {recentActivity.length > 0 ? (
-                recentActivity.slice().reverse().map((log, index) => (
-                  <ListItem key={index}>
-                    <ListItemText primary={`${log.action} - ${formatDate(log.created_at)}`} />
-                  </ListItem>
-                ))
+                recentActivity
+                  .slice()
+                  .reverse()
+                  .map((log, index) => (
+                    <ListItem key={index}>
+                      <ListItemText
+                        primary={`${log.action} - ${formatDate(log.created_at)}`}
+                      />
+                    </ListItem>
+                  ))
               ) : (
                 <ListItem>
                   <ListItemText primary="No recent activity available." />
