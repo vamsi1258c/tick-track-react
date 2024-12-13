@@ -10,8 +10,8 @@ import {
   Grid,
   Card,
   CardContent,
-  Chip,
-} from '@mui/material';
+  Chip
+} from '@mui/material'
 import {
   Close as CloseIcon,
   Person as PersonIcon,
@@ -25,10 +25,10 @@ import {
   OpenInFull as OpenInFullIcon,
   Edit as EditIcon,
   Visibility as VisibilityIcon,
-  ArrowBack as ArrowBackIcon,
-} from '@mui/icons-material';
-import DOMPurify from 'dompurify';
-import './TicketDetail.css';
+  ArrowBack as ArrowBackIcon
+} from '@mui/icons-material'
+import DOMPurify from 'dompurify'
+import './TicketDetail.css'
 
 const TicketViewModal = ({
   show,
@@ -40,13 +40,13 @@ const TicketViewModal = ({
   renderPriorityBadge,
   navigate,
   currentUser,
-  refreshTickets,
+  refreshTickets
 }) => {
   function toTitleCase(text) {
     return text
       ?.split('_')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
+      .join(' ')
   }
 
   return (
@@ -58,7 +58,7 @@ const TicketViewModal = ({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            position: 'relative',
+            position: 'relative'
           }}
         >
           <Typography
@@ -67,7 +67,7 @@ const TicketViewModal = ({
               textAlign: 'center',
               fontWeight: 'bold',
               color: 'primary.main',
-              fontSize: '1rem',
+              fontSize: '1rem'
             }}
           >
             Review Ticket #{selectedTicket?.id}
@@ -81,7 +81,7 @@ const TicketViewModal = ({
           <IconButton
             onClick={() =>
               navigate('/view-ticket', {
-                state: { ticketId: selectedTicket.id },
+                state: { ticketId: selectedTicket.id }
               })
             }
             sx={{
@@ -91,8 +91,8 @@ const TicketViewModal = ({
               backgroundColor: 'transparent',
               borderRadius: '50%',
               '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)',
-              },
+                backgroundColor: 'rgba(0, 0, 0, 0.1)'
+              }
             }}
           >
             <OpenInFullIcon fontSize="small" sx={{ color: 'primary.main' }} />
@@ -116,7 +116,7 @@ const TicketViewModal = ({
                   dangerouslySetInnerHTML={{
                     __html: DOMPurify.sanitize(
                       selectedTicket?.description || ''
-                    ),
+                    )
                   }}
                 />
               </Box>
@@ -155,7 +155,7 @@ const TicketViewModal = ({
                           fontSize: '0.7rem',
                           height: '20px',
                           fontWeight: 550,
-                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
                         }}
                       />
                     )}
@@ -276,7 +276,7 @@ const TicketViewModal = ({
               sx={{ mr: 1, px: 2, py: 0.6, fontSize: '0.75rem' }}
               onClick={() =>
                 navigate('/view-ticket', {
-                  state: { ticketId: selectedTicket.id },
+                  state: { ticketId: selectedTicket.id }
                 })
               }
             >
@@ -290,7 +290,7 @@ const TicketViewModal = ({
               sx={{ mr: 1, px: 2, py: 0.6, fontSize: '0.75rem' }}
               onClick={() =>
                 navigate('/edit-ticket', {
-                  state: { ticketId: selectedTicket.id },
+                  state: { ticketId: selectedTicket.id }
                 })
               }
             >
@@ -302,7 +302,7 @@ const TicketViewModal = ({
         </Box>
       </Paper>
     </Dialog>
-  );
-};
+  )
+}
 
-export default TicketViewModal;
+export default TicketViewModal

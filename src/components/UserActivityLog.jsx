@@ -1,69 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import {
   fetchActivityLogsByUserId,
-  deleteActivityLog,
-} from '../services/activityLog';
-import { Delete as DeleteIcon } from '@mui/icons-material';
+  deleteActivityLog
+} from '../services/activityLog'
+import { Delete as DeleteIcon } from '@mui/icons-material'
 import {
   Card,
   Button,
   IconButton,
   Typography,
-  CardContent,
-} from '@mui/material';
+  CardContent
+} from '@mui/material'
 
 const UserActivityLog = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [activityLogs, setActivityLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [activityLogs, setActivityLogs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchActivityLogs = async () => {
       try {
-        const response = await fetchActivityLogsByUserId(id);
-        setActivityLogs(response.data);
-        setLoading(false);
+        const response = await fetchActivityLogsByUserId(id)
+        setActivityLogs(response.data)
+        setLoading(false)
       } catch (error) {
-        setError('No activity logs available.');
-        setLoading(false);
+        setError('No activity logs available.')
+        setLoading(false)
       }
-    };
+    }
 
-    fetchActivityLogs();
-  }, [id]);
+    fetchActivityLogs()
+  }, [id])
 
   const formatDate = (dateString) => {
     if (!dateString) {
-      return 'Date not available';
+      return 'Date not available'
     }
 
-    const cleanedDateString = dateString.split('.')[0];
-    const date = new Date(cleanedDateString);
-    return isNaN(date.getTime()) ? 'Date not available' : date.toLocaleString();
-  };
+    const cleanedDateString = dateString.split('.')[0]
+    const date = new Date(cleanedDateString)
+    return isNaN(date.getTime()) ? 'Date not available' : date.toLocaleString()
+  }
 
   const handleDelete = async (logId) => {
     if (window.confirm('Are you sure you want to delete this activity log?')) {
       try {
-        await deleteActivityLog(logId);
+        await deleteActivityLog(logId)
         setActivityLogs((prevLogs) =>
           prevLogs.filter((log) => log.id !== logId)
-        );
+        )
       } catch (error) {
-        setError('Failed to delete activity log');
+        setError('Failed to delete activity log')
       }
     }
-  };
+  }
 
   const handleBack = () => {
-    navigate(-1);
-  };
+    navigate(-1)
+  }
 
-  if (loading) return <Typography variant="body1">Loading...</Typography>;
-  if (error) return <Typography variant="body1">{error}</Typography>;
+  if (loading) return <Typography variant="body1">Loading...</Typography>
+  if (error) return <Typography variant="body1">{error}</Typography>
 
   return (
     <div style={{ padding: '20px' }}>
@@ -91,7 +91,7 @@ const UserActivityLog = () => {
                         background: 'none',
                         border: '1px solid ',
                         borderRadius: 0,
-                        cursor: 'pointer',
+                        cursor: 'pointer'
                       }}
                       title="Delete Activity Log"
                     >
@@ -122,7 +122,7 @@ const UserActivityLog = () => {
             style={{
               display: 'flex',
               justifyContent: 'flex-end',
-              marginTop: '15px',
+              marginTop: '15px'
             }}
           >
             <Button variant="outlined" onClick={handleBack}>
@@ -132,7 +132,7 @@ const UserActivityLog = () => {
         </CardContent>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default UserActivityLog;
+export default UserActivityLog

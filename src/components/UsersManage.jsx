@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   Table,
   TableBody,
@@ -14,149 +14,149 @@ import {
   Typography,
   IconButton,
   Paper,
-  Tooltip,
-} from '@mui/material';
+  Tooltip
+} from '@mui/material'
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Add,
   Refresh,
-  Close,
-} from '@mui/icons-material';
-import { fetchUsers, deleteUser } from '../services/authService';
-import { useNavigate } from 'react-router-dom';
-import { CustomPagination } from './Pagination';
-import { UserDetails } from './UserDetails';
-import { useSnackbar } from './Snackbar';
+  Close
+} from '@mui/icons-material'
+import { fetchUsers, deleteUser } from '../services/authService'
+import { useNavigate } from 'react-router-dom'
+import { CustomPagination } from './Pagination'
+import { UserDetails } from './UserDetails'
+import { useSnackbar } from './Snackbar'
 
 const UsersManage = () => {
-  const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [userIdToDelete, setUserIdToDelete] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortKey, setSortKey] = useState('id');
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
-  const navigate = useNavigate();
-  const { showSnackbar } = useSnackbar();
+  const [users, setUsers] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [showModal, setShowModal] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [userIdToDelete, setUserIdToDelete] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortKey, setSortKey] = useState('id')
+  const [sortDirection, setSortDirection] = useState('asc')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 7
+  const navigate = useNavigate()
+  const { showSnackbar } = useSnackbar()
 
   const loadUsers = useCallback(async () => {
     try {
-      setIsLoading(true);
-      const response = await fetchUsers();
-      setUsers(response.data);
+      setIsLoading(true)
+      const response = await fetchUsers()
+      setUsers(response.data)
     } catch (err) {
-      setError('Failed to load users.');
-      showSnackbar('Failed to load users.', 'error');
+      setError('Failed to load users.')
+      showSnackbar('Failed to load users.', 'error')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [showSnackbar]);
+  }, [showSnackbar])
 
   useEffect(() => {
-    loadUsers();
-  }, [loadUsers]);
+    loadUsers()
+  }, [loadUsers])
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
+    setCurrentPage(1)
+  }, [searchTerm])
 
   const handleRowClick = (user) => {
-    setSelectedUser(user);
-    setShowModal(true);
-  };
+    setSelectedUser(user)
+    setShowModal(true)
+  }
 
   const handleClose = () => {
-    setShowModal(false);
-    setSelectedUser(null);
-  };
+    setShowModal(false)
+    setSelectedUser(null)
+  }
 
   const handleDeleteModalOpen = (userId) => {
-    setUserIdToDelete(userId);
-    setShowDeleteModal(true);
-  };
+    setUserIdToDelete(userId)
+    setShowDeleteModal(true)
+  }
 
   const handleDeleteModalClose = () => {
-    setShowDeleteModal(false);
-    setUserIdToDelete(null);
-  };
+    setShowDeleteModal(false)
+    setUserIdToDelete(null)
+  }
 
   const confirmDelete = async () => {
     try {
-      await deleteUser(userIdToDelete);
-      setUsers(users.filter((user) => user.id !== userIdToDelete));
+      await deleteUser(userIdToDelete)
+      setUsers(users.filter((user) => user.id !== userIdToDelete))
     } catch (err) {
-      setError(`User ${userIdToDelete} cannot be deleted.`);
-      showSnackbar(`User ${userIdToDelete} cannot be deleted.`, 'error');
+      setError(`User ${userIdToDelete} cannot be deleted.`)
+      showSnackbar(`User ${userIdToDelete} cannot be deleted.`, 'error')
     }
-    handleDeleteModalClose();
-  };
+    handleDeleteModalClose()
+  }
 
   const handleEdit = (user) => {
-    navigate(`/signup`, { state: { user } });
-  };
+    navigate(`/signup`, { state: { user } })
+  }
 
   const handleAddUser = () => {
-    navigate('/signup');
-  };
+    navigate('/signup')
+  }
 
   const handleRefresh = () => {
-    loadUsers();
-    setError('');
-  };
+    loadUsers()
+    setError('')
+  }
 
   const filteredUsers = users.filter((user) => {
-    const term = searchTerm.toLowerCase().trim();
+    const term = searchTerm.toLowerCase().trim()
     return (
       user.username.toLowerCase().includes(term) ||
       user.fullname.toLowerCase().includes(term)
-    );
-  });
+    )
+  })
 
   const sortUsers = (users) => {
     return [...users].sort((a, b) => {
-      const aValue = a[sortKey] ?? '';
-      const bValue = b[sortKey] ?? '';
+      const aValue = a[sortKey] ?? ''
+      const bValue = b[sortKey] ?? ''
 
       if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
       }
 
-      const aString = String(aValue);
-      const bString = String(bValue);
+      const aString = String(aValue)
+      const bString = String(bValue)
 
       return sortDirection === 'asc'
         ? aString.localeCompare(bString)
-        : bString.localeCompare(aString);
-    });
-  };
+        : bString.localeCompare(aString)
+    })
+  }
 
   const headerMap = {
     ID: 'id',
     'Full Name': 'fullname',
     Email: 'username',
-    Role: 'role',
-  };
+    Role: 'role'
+  }
 
   const handleSort = (key) => {
-    const mappedKey = headerMap[key] || key;
+    const mappedKey = headerMap[key] || key
     const newDirection =
-      sortKey === mappedKey && sortDirection === 'asc' ? 'desc' : 'asc';
-    setSortKey(mappedKey);
-    setSortDirection(newDirection);
-  };
+      sortKey === mappedKey && sortDirection === 'asc' ? 'desc' : 'asc'
+    setSortKey(mappedKey)
+    setSortDirection(newDirection)
+  }
 
-  const sortedUsers = sortUsers(filteredUsers);
-  const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
+  const sortedUsers = sortUsers(filteredUsers)
+  const totalPages = Math.ceil(sortedUsers.length / itemsPerPage)
   const currentUsers = sortedUsers.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
-  );
+  )
 
   return (
     <Box p={2}>
@@ -191,7 +191,7 @@ const UsersManage = () => {
             <IconButton onClick={() => setSearchTerm('')}>
               <Close />
             </IconButton>
-          ),
+          )
         }}
         sx={{ mb: 2 }}
       />
@@ -219,7 +219,7 @@ const UsersManage = () => {
                         cursor: 'pointer',
                         fontWeight: 'bold',
                         padding: '3px',
-                        paddingLeft: '16px',
+                        paddingLeft: '16px'
                       }}
                     >
                       {header}
@@ -259,8 +259,8 @@ const UsersManage = () => {
                       <Tooltip title="Edit">
                         <IconButton
                           onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(user);
+                            e.stopPropagation()
+                            handleEdit(user)
                           }}
                           sx={{ padding: '4px' }}
                         >
@@ -270,8 +270,8 @@ const UsersManage = () => {
                       <Tooltip title="Delete">
                         <IconButton
                           onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteModalOpen(user.id);
+                            e.stopPropagation()
+                            handleDeleteModalOpen(user.id)
                           }}
                           sx={{ padding: '4px' }}
                         >
@@ -304,7 +304,7 @@ const UsersManage = () => {
                 bgcolor: 'background.paper',
                 mx: 'auto',
                 my: '20%',
-                maxWidth: 400,
+                maxWidth: 400
               }}
             >
               <Typography variant="h6">Confirm Deletion</Typography>
@@ -328,7 +328,7 @@ const UsersManage = () => {
         </>
       )}
     </Box>
-  );
-};
+  )
+}
 
-export default UsersManage;
+export default UsersManage

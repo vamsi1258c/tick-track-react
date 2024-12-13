@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   Form,
   Button,
@@ -6,125 +6,125 @@ import {
   Row,
   Col,
   Alert,
-  Spinner,
-} from 'react-bootstrap';
-import { useNavigate, useLocation } from 'react-router-dom';
-import Select from 'react-select';
-import { fetchTicket, createTicket, updateTicket } from '../../services/ticket';
-import { fetchUsers } from '../../services/authService';
-import { uploadAttachment } from '../../services/attachment';
-import AttachmentsView from './AttachmentsView';
+  Spinner
+} from 'react-bootstrap'
+import { useNavigate, useLocation } from 'react-router-dom'
+import Select from 'react-select'
+import { fetchTicket, createTicket, updateTicket } from '../../services/ticket'
+import { fetchUsers } from '../../services/authService'
+import { uploadAttachment } from '../../services/attachment'
+import AttachmentsView from './AttachmentsView'
 
 const TicketForm = ({ currentUser, isEditMode = false }) => {
-  const location = useLocation();
-  const ticketId = isEditMode ? location.state?.ticketId : null; // Only get ticketId for edit mode
+  const location = useLocation()
+  const ticketId = isEditMode ? location.state?.ticketId : null // Only get ticketId for edit mode
   const [ticketData, setTicketData] = useState({
     title: '',
     description: '',
     status: 'open',
     priority: 'medium',
     created_by: currentUser?.id || 0,
-    assigned_to: 0,
-  });
-  const [users, setUsers] = useState([]);
-  const [attachments, setAttachments] = useState([]);
-  const [showAttachments, setShowAttachments] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(isEditMode); // Only show loading spinner for edit
-  const navigate = useNavigate();
+    assigned_to: 0
+  })
+  const [users, setUsers] = useState([])
+  const [attachments, setAttachments] = useState([])
+  const [showAttachments, setShowAttachments] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(isEditMode) // Only show loading spinner for edit
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchUsersAndTicket = async () => {
       try {
-        const userResponse = await fetchUsers();
+        const userResponse = await fetchUsers()
         const userOptions = userResponse.data.map((user) => ({
           value: user.id,
-          label: user.username,
-        }));
-        setUsers(userOptions);
+          label: user.username
+        }))
+        setUsers(userOptions)
 
         if (isEditMode && ticketId) {
-          const ticketResponse = await fetchTicket(ticketId);
-          setTicketData(ticketResponse.data);
+          const ticketResponse = await fetchTicket(ticketId)
+          setTicketData(ticketResponse.data)
 
           // Set the default selected user for edit
-          const assignee = ticketResponse.data.assignee.username;
+          const assignee = ticketResponse.data.assignee.username
           const defaultUser = userOptions.find(
             (user) => user.label === assignee
-          );
-          setSelectedUser(defaultUser || null);
+          )
+          setSelectedUser(defaultUser || null)
         }
       } catch (error) {
-        console.error(error);
-        setError('Failed to fetch users or ticket data.');
+        console.error(error)
+        setError('Failed to fetch users or ticket data.')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    fetchUsersAndTicket();
-  }, [isEditMode, ticketId]);
+    fetchUsersAndTicket()
+  }, [isEditMode, ticketId])
 
   const handleChange = (e) => {
     setTicketData({
       ...ticketData,
-      [e.target.name]: e.target.value,
-    });
-  };
+      [e.target.name]: e.target.value
+    })
+  }
 
   const handleAssignedToChange = (selectedOption) => {
-    setSelectedUser(selectedOption);
+    setSelectedUser(selectedOption)
     setTicketData((prevData) => ({
       ...prevData,
-      assigned_to: selectedOption ? selectedOption.value : 0,
-    }));
-  };
+      assigned_to: selectedOption ? selectedOption.value : 0
+    }))
+  }
 
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    setAttachments((prev) => [...prev, ...files]);
-  };
+    const files = Array.from(e.target.files)
+    setAttachments((prev) => [...prev, ...files])
+  }
 
   const removeFile = (index) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
-  };
+    setAttachments((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     const submitData = {
       title: ticketData.title,
       description: ticketData.description,
       status: ticketData.status,
       priority: ticketData.priority,
-      assigned_to: ticketData.assigned_to,
-    };
+      assigned_to: ticketData.assigned_to
+    }
 
     try {
-      let response;
+      let response
       if (isEditMode) {
-        response = await updateTicket(ticketId, submitData);
+        response = await updateTicket(ticketId, submitData)
       } else {
-        response = await createTicket(submitData);
+        response = await createTicket(submitData)
       }
 
       if (response.status === 200 || response.status === 201) {
         // Upload attachments if present
         if (attachments.length > 0) {
-          const id = isEditMode ? ticketId : response.data.id;
+          const id = isEditMode ? ticketId : response.data.id
           await Promise.all(
             attachments.map((file) => uploadAttachment(id, file))
-          );
+          )
         }
-        setSuccess(true);
-        navigate('/tickets');
+        setSuccess(true)
+        navigate('/tickets')
       }
     } catch (error) {
-      console.error(error);
-      setError('Failed to submit the ticket. Please try again.');
+      console.error(error)
+      setError('Failed to submit the ticket. Please try again.')
     }
-  };
+  }
 
   if (isLoading) {
     return (
@@ -133,7 +133,7 @@ const TicketForm = ({ currentUser, isEditMode = false }) => {
           <span className="visually-hidden">Loading...</span>
         </Spinner>
       </Container>
-    );
+    )
   }
 
   return (
@@ -262,7 +262,7 @@ const TicketForm = ({ currentUser, isEditMode = false }) => {
         </Col>
       </Row>
     </Container>
-  );
-};
+  )
+}
 
-export default TicketForm;
+export default TicketForm

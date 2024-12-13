@@ -1,13 +1,13 @@
-import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React from 'react'
+import { Box, Typography, Button } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 
 const SessionExpired = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleRedirect = () => {
-    navigate('/signin');
-  };
+    navigate('/signin')
+  }
 
   return (
     <Box
@@ -20,7 +20,7 @@ const SessionExpired = () => {
         textAlign: 'center',
         bgcolor: 'background.default',
         color: 'text.primary',
-        p: 3,
+        p: 3
       }}
     >
       <Typography
@@ -30,7 +30,7 @@ const SessionExpired = () => {
         sx={{
           position: 'absolute',
           top: '2rem',
-          fontWeight: 'bold',
+          fontWeight: 'bold'
         }}
       >
         TickTrack
@@ -53,7 +53,7 @@ const SessionExpired = () => {
         Go to Login
       </Button>
     </Box>
-  );
-};
+  )
+}
 
-export default SessionExpired;
+export default SessionExpired

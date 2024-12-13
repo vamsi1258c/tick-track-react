@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   Container,
   Autocomplete,
@@ -11,24 +11,24 @@ import {
   Button,
   IconButton,
   Box,
-  Alert,
-} from '@mui/material';
-import { Upload as UploadIcon, Close as CloseIcon } from '@mui/icons-material';
-import { Spinner } from 'react-bootstrap';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { fetchTicket, updateTicket } from '../../services/ticket';
-import { fetchUsers } from '../../services/authService';
-import { uploadAttachment } from '../../services/attachment';
-import { fetchConfigMaster } from '../../services/configMaster';
-import { fetchComments, createComment } from '../../services/comment';
-import AttachmentsView from './AttachmentsView';
-import RichTextEditor from './RichTextEditor';
-import { useSnackbar } from '../Snackbar';
+  Alert
+} from '@mui/material'
+import { Upload as UploadIcon, Close as CloseIcon } from '@mui/icons-material'
+import { Spinner } from 'react-bootstrap'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { fetchTicket, updateTicket } from '../../services/ticket'
+import { fetchUsers } from '../../services/authService'
+import { uploadAttachment } from '../../services/attachment'
+import { fetchConfigMaster } from '../../services/configMaster'
+import { fetchComments, createComment } from '../../services/comment'
+import AttachmentsView from './AttachmentsView'
+import RichTextEditor from './RichTextEditor'
+import { useSnackbar } from '../Snackbar'
 
 const TicketEdit = ({ currentUserId }) => {
-  const location = useLocation();
-  const ticketId = location.state?.ticketId;
-  const [validationErrors, setValidationErrors] = useState({});
+  const location = useLocation()
+  const ticketId = location.state?.ticketId
+  const [validationErrors, setValidationErrors] = useState({})
 
   const [ticketData, setTicketData] = useState({
     title: '',
@@ -39,45 +39,45 @@ const TicketEdit = ({ currentUserId }) => {
     subcategory: 'customer_service',
     created_by: 0,
     assigned_to: 0,
-    approved_by: 0,
-  });
+    approved_by: 0
+  })
 
-  const [showAttachments, setShowAttachments] = useState(false);
-  const [attachments, setAttachments] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [showAttachments, setShowAttachments] = useState(false)
+  const [attachments, setAttachments] = useState([])
+  const [users, setUsers] = useState([])
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   // const [subcategories, setSubcategories] = useState([]);
-  const navigate = useNavigate();
-  const [assignedToUser, setAssignedToUser] = useState(null);
-  const [approvedByUser, setApprovedByUser] = useState(null);
-  const [touchedFields, setTouchedFields] = useState({});
-  const [resetTrigger, setResetTrigger] = useState(false);
-  const [configs, setConfigs] = useState([]);
+  const navigate = useNavigate()
+  const [assignedToUser, setAssignedToUser] = useState(null)
+  const [approvedByUser, setApprovedByUser] = useState(null)
+  const [touchedFields, setTouchedFields] = useState({})
+  const [resetTrigger, setResetTrigger] = useState(false)
+  const [configs, setConfigs] = useState([])
   // const [currentSubcat, setCurrentSubcat] = useState([]);
 
   // New state variables for comments
   // const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
-  const { showSnackbar } = useSnackbar();
+  const [newComment, setNewComment] = useState('')
+  const { showSnackbar } = useSnackbar()
 
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        setIsLoading(true);
+        setIsLoading(true)
         const [userResponse, ticketResponse] = await Promise.all([
           fetchUsers(),
           fetchTicket(ticketId),
           fetchComments(ticketId),
-          fetchConfigMaster(),
-        ]);
+          fetchConfigMaster()
+        ])
 
         const userOptions = userResponse.data.map((user) => ({
           value: user.id,
-          label: user.username,
-        }));
-        setUsers(userOptions);
+          label: user.username
+        }))
+        setUsers(userOptions)
 
         let ticketDataTemp = {
           ...ticketResponse.data,
@@ -86,48 +86,48 @@ const TicketEdit = ({ currentUserId }) => {
             : null,
           approved_by: ticketResponse.data.approver
             ? ticketResponse.data.approver.id
-            : null,
-        };
+            : null
+        }
 
-        setTicketData(ticketDataTemp);
+        setTicketData(ticketDataTemp)
 
-        const responseConfig = await fetchConfigMaster();
-        setConfigs(responseConfig.data);
+        const responseConfig = await fetchConfigMaster()
+        setConfigs(responseConfig.data)
 
         // Set subcategories based on the current category of the ticket
         // const initialCategory = ticketResponse.data.category || 'service';
         // setSubcategories(getSubcategories(initialCategory));
 
-        const assignee = ticketResponse.data.assignee?.username;
+        const assignee = ticketResponse.data.assignee?.username
         const assigneeOption = userOptions.find(
           (user) => user.label === assignee
-        );
-        setAssignedToUser(assigneeOption || null);
-        const approver = ticketResponse.data.approver?.username;
+        )
+        setAssignedToUser(assigneeOption || null)
+        const approver = ticketResponse.data.approver?.username
         const approverOption = userOptions.find(
           (user) => user.label === approver
-        );
-        setApprovedByUser(approverOption || null);
+        )
+        setApprovedByUser(approverOption || null)
         // setComments(commentsResponse.data);
       } catch (error) {
-        console.error(error);
-        setError('Failed to fetch ticket, users, or comments.');
-        showSnackbar('Failed to fetch ticket, users, or comments.');
+        console.error(error)
+        setError('Failed to fetch ticket, users, or comments.')
+        showSnackbar('Failed to fetch ticket, users, or comments.')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
-    fetchAllData();
-  }, [currentUserId, ticketId, resetTrigger, showSnackbar]);
+    }
+    fetchAllData()
+  }, [currentUserId, ticketId, resetTrigger, showSnackbar])
 
   // Handle category change to update subcategories
   const handleCategoryChange = (e) => {
-    const selectedCategory = e.target.value;
+    const selectedCategory = e.target.value
     setTicketData((prevData) => ({
       ...prevData,
-      category: selectedCategory,
-    }));
-  };
+      category: selectedCategory
+    }))
+  }
 
   // Function to get subcategories based on selected category
   // const getSubcategories = (category) => {
@@ -137,112 +137,112 @@ const TicketEdit = ({ currentUserId }) => {
   // };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setTicketData({
       ...ticketData,
-      [name]: value,
-    });
-    setValidationErrors((prev) => ({ ...prev, [name]: '' }));
-    setTouchedFields((prev) => ({ ...prev, [name]: true }));
-  };
+      [name]: value
+    })
+    setValidationErrors((prev) => ({ ...prev, [name]: '' }))
+    setTouchedFields((prev) => ({ ...prev, [name]: true }))
+  }
 
   const validateField = (name, value) => {
     if (!value || value.trim() === '') {
       setValidationErrors((prev) => ({
         ...prev,
-        [name]: 'This field is required.',
-      }));
+        [name]: 'This field is required.'
+      }))
     } else {
-      setValidationErrors((prev) => ({ ...prev, [name]: '' }));
+      setValidationErrors((prev) => ({ ...prev, [name]: '' }))
     }
-  };
+  }
 
   const stripHtmlTags = (input) => {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = input;
-    return tempDiv.textContent || tempDiv.innerText || '';
-  };
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = input
+    return tempDiv.textContent || tempDiv.innerText || ''
+  }
 
   const validateDescription = () => {
     if (stripHtmlTags(ticketData.description).trim() === '') {
       setValidationErrors((prev) => ({
         ...prev,
-        description: 'This field is required.',
-      }));
+        description: 'This field is required.'
+      }))
     }
-  };
+  }
 
   const handleBlur = (e) => {
     if (e === 'description') {
-      validateDescription();
-      return;
+      validateDescription()
+      return
     }
-    validateField(e.target.name, e.target.value);
-  };
+    validateField(e.target.name, e.target.value)
+  }
 
   const handleDescriptionChange = (content) => {
-    setTicketData({ ...ticketData, description: content });
-    setValidationErrors((prev) => ({ ...prev, description: '' }));
-  };
+    setTicketData({ ...ticketData, description: content })
+    setValidationErrors((prev) => ({ ...prev, description: '' }))
+  }
 
   const handleAssignedToChange = (selectedOption) => {
-    setAssignedToUser(selectedOption);
+    setAssignedToUser(selectedOption)
     setTicketData((prevData) => ({
       ...prevData,
-      assigned_to: selectedOption ? selectedOption.value : 0,
-    }));
-  };
+      assigned_to: selectedOption ? selectedOption.value : 0
+    }))
+  }
 
   const handleApprovedByChange = (selectedOption) => {
-    setApprovedByUser(selectedOption);
+    setApprovedByUser(selectedOption)
     setTicketData((prevData) => ({
       ...prevData,
-      approved_by: selectedOption ? selectedOption.value : 0,
-    }));
-  };
+      approved_by: selectedOption ? selectedOption.value : 0
+    }))
+  }
 
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    setAttachments((prevAttachments) => [...prevAttachments, ...files]);
-  };
+    const files = Array.from(e.target.files)
+    setAttachments((prevAttachments) => [...prevAttachments, ...files])
+  }
 
   const handleReset = () => {
-    setResetTrigger((prev) => !prev);
-  };
+    setResetTrigger((prev) => !prev)
+  }
 
   const removeFile = (index) => {
     setAttachments((prevAttachments) =>
       prevAttachments.filter((_, i) => i !== index)
-    );
-  };
+    )
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    const errors = {};
+    const errors = {}
     const fieldsToValidate = [
       'title',
       'description',
       'status',
       'priority',
-      'category',
-    ];
+      'category'
+    ]
 
     fieldsToValidate.forEach((field) => {
       const value =
         field === 'description'
           ? stripHtmlTags(ticketData[field])
-          : ticketData[field];
+          : ticketData[field]
 
       if (!value || value.trim() === '') {
-        errors[field] = 'This field is required.';
+        errors[field] = 'This field is required.'
       }
-    });
+    })
 
-    setValidationErrors(errors);
+    setValidationErrors(errors)
 
     if (Object.keys(errors).length > 0) {
-      return;
+      return
     }
 
     const updateData = {
@@ -253,39 +253,39 @@ const TicketEdit = ({ currentUserId }) => {
       category: ticketData.category,
       assigned_to: ticketData.assigned_to,
       subcategory: ticketData.subcategory,
-      approved_by: ticketData.approved_by,
-    };
+      approved_by: ticketData.approved_by
+    }
     try {
       // First, update the ticket
-      const response = await updateTicket(ticketId, updateData);
+      const response = await updateTicket(ticketId, updateData)
       if (response.status === 200) {
         // If attachments are present, upload them
         if (attachments.length > 0) {
           await Promise.all(
             attachments.map(async (attachment) => {
-              await uploadAttachment(ticketId, attachment);
+              await uploadAttachment(ticketId, attachment)
             })
-          );
+          )
         }
 
         if (newComment.trim()) {
           await createComment(ticketId, {
             content: newComment,
             ticket_id: ticketId,
-            user_id: currentUserId,
-          });
+            user_id: currentUserId
+          })
         }
 
-        setSuccess(true);
-        navigate('/tickets');
-        showSnackbar('Updated ticket #' + ticketId);
+        setSuccess(true)
+        navigate('/tickets')
+        showSnackbar('Updated ticket #' + ticketId)
       }
     } catch (error) {
-      console.error(error);
-      setError('Failed to update the ticket. Please try again.');
-      showSnackbar('Failed to update ticket #' + ticketId, 'error');
+      console.error(error)
+      setError('Failed to update the ticket. Please try again.')
+      showSnackbar('Failed to update ticket #' + ticketId, 'error')
     }
-  };
+  }
 
   if (isLoading) {
     return (
@@ -294,29 +294,29 @@ const TicketEdit = ({ currentUserId }) => {
           <span className="visually-hidden">Loading...</span>
         </Spinner>
       </Container>
-    );
+    )
   }
 
   const priorityOptions = configs
     .filter((config) => config.type === 'priority')
     .map((config) => ({
       label: config.label,
-      value: config.value || config.id,
-    }));
+      value: config.value || config.id
+    }))
 
   const statusOptions = configs
     .filter((config) => config.type === 'status')
     .map((config) => ({
       label: config.label,
-      value: config.value || config.id,
-    }));
+      value: config.value || config.id
+    }))
 
   const categoryOptions = configs
     .filter((config) => config.type === 'category')
     .map((config) => ({
       label: config.label,
-      value: config.value || config.id,
-    }));
+      value: config.value || config.id
+    }))
 
   const subcategoryOptions = configs
     .filter(
@@ -325,8 +325,8 @@ const TicketEdit = ({ currentUserId }) => {
     )
     .map((config) => ({
       label: config.label,
-      value: config.value || config.id,
-    }));
+      value: config.value || config.id
+    }))
 
   return (
     <Container maxWidth="md">
@@ -342,7 +342,7 @@ const TicketEdit = ({ currentUserId }) => {
             align: 'center',
             variant: 'h5',
             fontWeight: 'bold',
-            color: 'primary.main',
+            color: 'primary.main'
           }}
           sx={{ p: 0.2, bgcolor: '#f5f5f5' }}
         />
@@ -368,9 +368,9 @@ const TicketEdit = ({ currentUserId }) => {
                   helperText={validationErrors.title}
                   sx={{
                     '& .MuiInputBase-input': {
-                      fontWeight: 500,
+                      fontWeight: 500
                     },
-                    mb: 0.5,
+                    mb: 0.5
                   }}
                 />
               </Grid>
@@ -406,7 +406,7 @@ const TicketEdit = ({ currentUserId }) => {
                       )}
                       onChange={(event, newValue) =>
                         handleChange({
-                          target: { name: 'status', value: newValue?.value },
+                          target: { name: 'status', value: newValue?.value }
                         })
                       }
                       options={statusOptions}
@@ -425,7 +425,7 @@ const TicketEdit = ({ currentUserId }) => {
                       )}
                       onChange={(event, newValue) =>
                         handleChange({
-                          target: { name: 'priority', value: newValue?.value },
+                          target: { name: 'priority', value: newValue?.value }
                         })
                       }
                       options={priorityOptions}
@@ -444,7 +444,7 @@ const TicketEdit = ({ currentUserId }) => {
                       )}
                       onChange={(event, newValue) =>
                         handleCategoryChange({
-                          target: { name: 'category', value: newValue?.value },
+                          target: { name: 'category', value: newValue?.value }
                         })
                       }
                       options={categoryOptions}
@@ -465,8 +465,8 @@ const TicketEdit = ({ currentUserId }) => {
                         handleChange({
                           target: {
                             name: 'subcategory',
-                            value: newValue?.value,
-                          },
+                            value: newValue?.value
+                          }
                         })
                       }
                       options={subcategoryOptions}
@@ -572,7 +572,7 @@ const TicketEdit = ({ currentUserId }) => {
                             display: 'flex',
                             alignItems: 'center',
                             flexWrap: 'wrap',
-                            gap: 1,
+                            gap: 1
                           }}
                         >
                           {attachments.map((file, index) => (
@@ -584,7 +584,7 @@ const TicketEdit = ({ currentUserId }) => {
                                 gap: 0.5,
                                 bgcolor: '#f9f9f9',
                                 p: '1px 6px',
-                                borderRadius: 1,
+                                borderRadius: 1
                               }}
                             >
                               <Typography
@@ -594,7 +594,7 @@ const TicketEdit = ({ currentUserId }) => {
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',
-                                  maxWidth: '100px',
+                                  maxWidth: '100px'
                                 }}
                               >
                                 {file.name}
@@ -655,7 +655,7 @@ const TicketEdit = ({ currentUserId }) => {
         </CardContent>
       </Card>
     </Container>
-  );
-};
+  )
+}
 
-export default TicketEdit;
+export default TicketEdit

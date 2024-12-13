@@ -1,122 +1,127 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Grid, IconButton } from '@mui/material';
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import SideBar from './components/SideBar';
-import TopBar from './components/TopBar';
-import Footer from './components/Footer';
-import Home from './components/Home';
-import Signup from './components/Signup';
-import Settings from './components/Settings';
-import Signin from './components/Signin';
-import SessionExpired from './components/SessionExpired';
-import UsersManage from './components/UsersManage';
-import TicketCreate from './components/tickets/TicketCreate';
-import TicketEdit from './components/tickets/TicketEdit';
-import TicketView from './components/tickets/TicketView';
-import TicketsList from './components/tickets/TicketsList';
-import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import './App.css';
-import { logoutUser } from './services/authService';
-import api, { setAuthToken } from './services/api';
-import Dashboard from './components/Dashboard';
-import UserProfile from './components/UserProfile';
-import UserActivityLog from './components/UserActivityLog';
-import Breadcrumb from './components/Breadcrumb';
-import useIdleTimeout from './hooks/useIdleTimeout';
+import React, { useState, useEffect } from 'react'
+import { Box, Grid, IconButton } from '@mui/material'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import SideBar from './components/SideBar'
+import TopBar from './components/TopBar'
+import Footer from './components/Footer'
+import Home from './components/Home'
+import Signup from './components/Signup'
+import Settings from './components/Settings'
+import Signin from './components/Signin'
+import SessionExpired from './components/SessionExpired'
+import UsersManage from './components/UsersManage'
+import TicketCreate from './components/tickets/TicketCreate'
+import TicketEdit from './components/tickets/TicketEdit'
+import TicketView from './components/tickets/TicketView'
+import TicketsList from './components/tickets/TicketsList'
+import { ChevronLeft, ChevronRight } from '@mui/icons-material'
+import './App.css'
+import { logoutUser } from './services/authService'
+import api, { setAuthToken } from './services/api'
+import Dashboard from './components/Dashboard'
+import UserProfile from './components/UserProfile'
+import UserActivityLog from './components/UserActivityLog'
+import Breadcrumb from './components/Breadcrumb'
+import useIdleTimeout from './hooks/useIdleTimeout'
+import { useDispatch, useSelector } from 'react-redux'
+import { setUser } from './store/appSlice'
 
 function App() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const location = useLocation();
-  const [userId, setUserId] = useState('');
-  const [userName, setUserName] = useState('');
-  const [userRole, setUserRole] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const location = useLocation()
+  const [isLoading, setIsLoading] = useState(true)
+
+  const dispatch = useDispatch()
+  const { userId, userName, userRole } = useSelector((state) => state.app)
 
   const handleSessionTimeout = () => {
-    window.location.href = '/session-expired';
-  };
+    window.location.href = '/session-expired'
+  }
 
   // Trigger session timeout after 30 minutes of inactivity
-  useIdleTimeout(handleSessionTimeout, 1800000);
+  useIdleTimeout(handleSessionTimeout, 1800000)
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    setUserRole(localStorage.getItem('userRole'));
-    setUserName(localStorage.getItem('userName'));
-    setUserId(localStorage.getItem('userId'));
+    const token = localStorage.getItem('authToken')
+    dispatch(
+      setUser({
+        id: localStorage.getItem('userId'),
+        username: localStorage.getItem('userName'),
+        role: localStorage.getItem('userRole')
+      })
+    )
 
     if (token) {
-      setAuthToken(token);
-      setIsAuthenticated(true);
+      setAuthToken(token)
+      setIsAuthenticated(true)
     }
-    setIsLoading(false);
-  }, []);
+    setIsLoading(false)
+  }, [])
 
   const handleAuthFailure = () => {
-    setIsAuthenticated(false);
-    window.location.href = '/signin';
-  };
+    setIsAuthenticated(false)
+    window.location.href = '/signin'
+  }
 
-  api.defaults.authFailureCallback = handleAuthFailure;
+  api.defaults.authFailureCallback = handleAuthFailure
 
   const handleLoginSuccess = (user) => {
-    setIsAuthenticated(true);
-    setUserId(user.id);
-    setUserName(user.username);
-    setUserRole(user.role);
-    localStorage.setItem('userRole', user.role);
-    localStorage.setItem('userName', user.username);
-    localStorage.setItem('userId', user.id);
-  };
+    setIsAuthenticated(true)
+    dispatch(setUser(user))
+    setUser(user)
+    localStorage.setItem('userRole', user.role)
+    localStorage.setItem('userName', user.username)
+    localStorage.setItem('userId', user.id)
+  }
 
   const handleSignOut = () => {
     try {
-      logoutUser();
+      logoutUser()
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
-    setIsAuthenticated(false);
-    setUserName('');
-  };
+    setIsAuthenticated(false)
+    dispatch(setUser())
+  }
 
   const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => !prev);
-  };
+    setIsSidebarOpen((prev) => !prev)
+  }
 
   const hideNavAndSidebar =
-    location.pathname === '/signin' || location.pathname === '/session-expired';
+    location.pathname === '/signin' || location.pathname === '/session-expired'
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
 
   const getBreadcrumbTitle = () => {
     switch (location.pathname) {
       case '/':
-        return 'Dashboard';
+        return 'Dashboard'
       case '/create-ticket':
-        return 'Create Ticket';
+        return 'Create Ticket'
       case '/edit-ticket':
-        return 'Edit Ticket';
+        return 'Edit Ticket'
       case '/view-ticket':
-        return 'View Ticket';
+        return 'View Ticket'
       case '/tickets':
-        return 'Tickets View';
+        return 'Tickets View'
       case '/manage-users':
-        return 'Manage Users';
+        return 'Manage Users'
       case '/settings':
-        return 'Settings';
+        return 'Settings'
       case '/signup':
-        return 'Add Users';
+        return 'Add Users'
       case `/profile/${userId}`:
-        return 'User Profile';
+        return 'User Profile'
       case `/activity/${userId}`:
-        return 'User Activity Log';
+        return 'User Activity Log'
       default:
-        return 'NODISPLAY';
+        return 'NODISPLAY'
     }
-  };
+  }
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -134,7 +139,7 @@ function App() {
               height: '100vh',
               color: '#fff',
               overflow: 'auto',
-              opacity: isSidebarOpen ? 1 : 0,
+              opacity: isSidebarOpen ? 1 : 0
             }}
           >
             <SideBar isOpen={isSidebarOpen} userRole={userRole} />
@@ -152,7 +157,7 @@ function App() {
                 ? 'calc(100% - 200px)'
                 : '100%',
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'column'
           }}
         >
           {!hideNavAndSidebar && (
@@ -164,7 +169,7 @@ function App() {
                 right: 0,
                 zIndex: 1050,
                 width: '100%',
-                height: '45px',
+                height: '45px'
               }}
             >
               <TopBar
@@ -188,7 +193,7 @@ function App() {
               zIndex: 1030,
               marginTop: 0,
               marginLeft: isSidebarOpen ? '0px' : '20px',
-              marginBottom: 8,
+              marginBottom: 8
             }}
           >
             <Breadcrumb title={getBreadcrumbTitle()} />
@@ -199,7 +204,7 @@ function App() {
               flex: '1 0 auto',
               padding: '10px 10px 5px 10px',
               marginTop: !hideNavAndSidebar ? '65px' : '0',
-              marginBottom: 0,
+              marginBottom: 0
             }}
           >
             <Routes>
@@ -346,14 +351,14 @@ function App() {
             color: 'primary.main',
             fontSize: '15px',
             cursor: 'pointer',
-            paddingLeft: '0px',
+            paddingLeft: '0px'
           }}
         >
           {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
         </IconButton>
       )}
     </Box>
-  );
+  )
 }
 
-export default App;
+export default App

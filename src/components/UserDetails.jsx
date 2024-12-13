@@ -15,17 +15,17 @@ import {
   TableRow,
   TableCell,
   Typography,
-  Paper,
-} from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+  Paper
+} from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 import {
   ExpandMore as ExpandMoreIcon,
-  Visibility as VisibilityIcon,
-} from '@mui/icons-material';
-import './UserDetails.css';
+  Visibility as VisibilityIcon
+} from '@mui/icons-material'
+import './UserDetails.css'
 
 export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   // const handleViewClick = (ticketId) => {
   //   navigate(`/view-ticket`, { state: { ticketId } });
@@ -45,7 +45,7 @@ export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
                 marginBottom: 3,
                 backgroundColor: '#f9f9f9',
                 borderRadius: 2,
-                boxShadow: 3,
+                boxShadow: 3
               }}
             >
               <Grid container spacing={2} alignItems="center">
@@ -126,8 +126,8 @@ export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
                             key={ticket.id}
                             sx={{
                               '&:nth-of-type(even)': {
-                                backgroundColor: '#f9f9f9',
-                              },
+                                backgroundColor: '#f9f9f9'
+                              }
                             }}
                           >
                             <TableCell>{ticket.title}</TableCell>
@@ -138,11 +138,11 @@ export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
                                 sx={{
                                   cursor: 'pointer',
                                   fontSize: '1rem',
-                                  color: '#3f51b5',
+                                  color: '#3f51b5'
                                 }}
                                 onClick={() =>
                                   navigate(`/view-ticket`, {
-                                    state: { ticketId: ticket.id },
+                                    state: { ticketId: ticket.id }
                                   })
                                 }
                               />
@@ -195,8 +195,8 @@ export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
                             key={ticket.id}
                             sx={{
                               '&:nth-of-type(even)': {
-                                backgroundColor: '#f9f9f9',
-                              },
+                                backgroundColor: '#f9f9f9'
+                              }
                             }}
                           >
                             <TableCell>{ticket.title}</TableCell>
@@ -207,11 +207,11 @@ export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
                                 sx={{
                                   cursor: 'pointer',
                                   fontSize: '1rem',
-                                  color: '#3f51b5',
+                                  color: '#3f51b5'
                                 }}
                                 onClick={() =>
                                   navigate(`/view-ticket`, {
-                                    state: { ticketId: ticket.id },
+                                    state: { ticketId: ticket.id }
                                   })
                                 }
                               />
@@ -265,8 +265,8 @@ export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
                               key={ticket.id}
                               sx={{
                                 '&:nth-of-type(even)': {
-                                  backgroundColor: '#f9f9f9',
-                                },
+                                  backgroundColor: '#f9f9f9'
+                                }
                               }}
                             >
                               <TableCell>{ticket.title}</TableCell>
@@ -277,11 +277,11 @@ export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
                                   sx={{
                                     cursor: 'pointer',
                                     fontSize: '1rem',
-                                    color: '#3f51b5',
+                                    color: '#3f51b5'
                                   }}
                                   onClick={() =>
                                     navigate(`/view-ticket`, {
-                                      state: { ticketId: ticket.id },
+                                      state: { ticketId: ticket.id }
                                     })
                                   }
                                 />
@@ -332,7 +332,7 @@ export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
         </Button>
       </DialogActions>
     </Dialog>
-  );
-};
+  )
+}
 
-export default UserDetails;
+export default UserDetails

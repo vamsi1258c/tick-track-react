@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   Container,
   Grid,
@@ -7,40 +7,40 @@ import {
   Paper,
   List,
   ListItem,
-  ListItemText,
-} from '@mui/material';
-import { Link } from 'react-router-dom';
-import { fetchActivityLogsByUserId } from '../services/activityLog';
+  ListItemText
+} from '@mui/material'
+import { Link } from 'react-router-dom'
+import { fetchActivityLogsByUserId } from '../services/activityLog'
 
 const Home = () => {
-  const [recentActivity, setRecentActivity] = useState([]);
-  const userRole = localStorage.getItem('userRole');
-  const userId = localStorage.getItem('userId');
-  console.log(userId);
+  const [recentActivity, setRecentActivity] = useState([])
+  const userRole = localStorage.getItem('userRole')
+  const userId = localStorage.getItem('userId')
+  console.log(userId)
 
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const response = await fetchActivityLogsByUserId(userId);
-        setRecentActivity(response.data.slice(-5));
+        const response = await fetchActivityLogsByUserId(userId)
+        setRecentActivity(response.data.slice(-5))
       } catch (error) {
-        console.error('Failed to fetch recent activity logs', error);
+        console.error('Failed to fetch recent activity logs', error)
       }
-    };
+    }
 
-    fetchActivity();
-  }, [userId]);
+    fetchActivity()
+  }, [userId])
 
   const formatDate = (dateString) => {
     if (!dateString) {
-      return 'Date not available';
+      return 'Date not available'
     }
 
     // Remove microseconds if present and create a valid Date object
-    const cleanedDateString = dateString.split('.')[0];
-    const date = new Date(cleanedDateString);
-    return isNaN(date.getTime()) ? 'Date not available' : date.toLocaleString();
-  };
+    const cleanedDateString = dateString.split('.')[0]
+    const date = new Date(cleanedDateString)
+    return isNaN(date.getTime()) ? 'Date not available' : date.toLocaleString()
+  }
 
   return (
     <Container sx={{ marginTop: 5 }}>
@@ -116,7 +116,7 @@ const Home = () => {
         </Grid>
       </Grid>
     </Container>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home

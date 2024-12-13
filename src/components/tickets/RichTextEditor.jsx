@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import Box from '@mui/material/Box';
+import React, { useState } from 'react'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
+import Box from '@mui/material/Box'
 
 const RichTextEditor = ({ value, onChange, placeholder, onBlur }) => {
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false)
 
-  const handleFocus = () => setIsFocused(true);
+  const handleFocus = () => setIsFocused(true)
   const handleBlur = (event) => {
-    setIsFocused(false);
-    if (onBlur) onBlur(event);
-  };
+    setIsFocused(false)
+    if (onBlur) onBlur(event)
+  }
 
   return (
     <Box
@@ -20,7 +20,7 @@ const RichTextEditor = ({ value, onChange, placeholder, onBlur }) => {
         borderRadius: '4px',
         overflowY: 'auto',
         transition: 'border-color 0.3s',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
       }}
     >
       <ReactQuill
@@ -33,7 +33,7 @@ const RichTextEditor = ({ value, onChange, placeholder, onBlur }) => {
         style={{ borderRadius: '4px' }}
       />
     </Box>
-  );
-};
+  )
+}
 
-export default RichTextEditor;
+export default RichTextEditor

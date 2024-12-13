@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   TextField,
@@ -20,201 +20,201 @@ import {
   DialogContent,
   DialogTitle,
   Alert,
-  IconButton,
-} from '@mui/material';
+  IconButton
+} from '@mui/material'
 import {
   fetchConfigMaster,
   createConfigMaster,
   updateConfigMaster,
-  deleteConfigMaster,
-} from '../services/configMaster';
+  deleteConfigMaster
+} from '../services/configMaster'
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
   Close as CloseIcon,
-  Save as SaveIcon,
-} from '@mui/icons-material';
+  Save as SaveIcon
+} from '@mui/icons-material'
 
 const ConfigMasterMaintenance = () => {
-  const [configEntries, setConfigEntries] = useState([]);
+  const [configEntries, setConfigEntries] = useState([])
   const [newConfigData, setNewConfigData] = useState({
     type: '',
     value: '',
     label: '',
     color: '',
-    parent: '',
-  });
-  const [editRowIndex, setEditRowIndex] = useState(null);
+    parent: ''
+  })
+  const [editRowIndex, setEditRowIndex] = useState(null)
   const [configData, setConfigData] = useState({
     type: '',
     value: '',
     label: '',
     color: '',
-    parent: '',
-  });
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+    parent: ''
+  })
+  const [openSnackbar, setOpenSnackbar] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('')
   // const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [configToDelete, setConfigToDelete] = useState(null);
-  const [categoryOptions, setcategoryOptions] = useState([]);
-  const [filterType, setFilterType] = useState('');
-  const [filterLabel, setFilterLabel] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [sortField, setSortField] = useState('type');
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [configToDelete, setConfigToDelete] = useState(null)
+  const [categoryOptions, setcategoryOptions] = useState([])
+  const [filterType, setFilterType] = useState('')
+  const [filterLabel, setFilterLabel] = useState('')
+  const [sortOrder, setSortOrder] = useState('asc')
+  const [sortField, setSortField] = useState('type')
 
   useEffect(() => {
     const getConfigEntries = async () => {
       try {
-        const response = await fetchConfigMaster();
-        setConfigEntries(response.data);
+        const response = await fetchConfigMaster()
+        setConfigEntries(response.data)
       } catch (error) {
-        console.error('Error fetching configuration entries:', error);
+        console.error('Error fetching configuration entries:', error)
       }
-    };
-    getConfigEntries();
+    }
+    getConfigEntries()
     const getCategoryOptions = async () => {
       const categoryData = configEntries
         .filter((config) => config.type === 'category')
         .map((config) => ({
           label: config.label,
-          value: config.value || config.id,
-        }));
-      setcategoryOptions(categoryData);
-    };
-    getCategoryOptions();
-  }, [configEntries]);
+          value: config.value || config.id
+        }))
+      setcategoryOptions(categoryData)
+    }
+    getCategoryOptions()
+  }, [configEntries])
 
   const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') return;
-    setOpenSnackbar(false);
-  };
+    if (reason === 'clickaway') return
+    setOpenSnackbar(false)
+  }
 
   const handleFilterChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value } = event.target
     if (name === 'filterType') {
-      setFilterType(value);
-      setFilterLabel('');
+      setFilterType(value)
+      setFilterLabel('')
     } else if (name === 'filterLabel') {
-      setFilterLabel(value);
+      setFilterLabel(value)
     }
-  };
+  }
 
   const handleInputChange = (event, index, isNewConfig) => {
-    const { name, value } = event.target;
+    const { name, value } = event.target
 
     if (isNewConfig) {
       setNewConfigData({
         ...newConfigData,
-        [name]: value,
-      });
+        [name]: value
+      })
     } else {
       setConfigData({
         ...configData,
-        [name]: value,
-      });
+        [name]: value
+      })
     }
-  };
+  }
 
   const handleEdit = (index) => {
-    setEditRowIndex(index);
-    const entryToEdit = filteredData[index];
+    setEditRowIndex(index)
+    const entryToEdit = filteredData[index]
     setConfigData({
       type: entryToEdit.type,
       value: entryToEdit.value,
       label: entryToEdit.label,
       color: entryToEdit.color,
       parent: entryToEdit.parent,
-      id: entryToEdit.id,
-    });
-  };
+      id: entryToEdit.id
+    })
+  }
 
   const handleSave = async () => {
     try {
-      if (editRowIndex === null) return;
+      if (editRowIndex === null) return
 
       const entryIndex = configEntries.findIndex(
         (item) => item.id === configData.id
-      );
+      )
       if (entryIndex === -1) {
-        setSnackbarMessage('Configuration not found');
-        setOpenSnackbar(true);
-        return;
+        setSnackbarMessage('Configuration not found')
+        setOpenSnackbar(true)
+        return
       }
       const updateData = {
         type: configData.type,
         value: configData.value,
         label: configData.label,
         color: configData.color,
-        parent: configData.parent,
-      };
+        parent: configData.parent
+      }
 
-      await updateConfigMaster(configData.id, updateData);
+      await updateConfigMaster(configData.id, updateData)
 
-      const updatedConfigEntries = [...configEntries];
+      const updatedConfigEntries = [...configEntries]
       updatedConfigEntries[entryIndex] = {
         ...updatedConfigEntries[entryIndex],
-        ...updateData,
-      };
+        ...updateData
+      }
 
-      setConfigEntries(updatedConfigEntries);
-      setEditRowIndex(null);
-      setSnackbarMessage('Configuration updated successfully');
-      setOpenSnackbar(true);
+      setConfigEntries(updatedConfigEntries)
+      setEditRowIndex(null)
+      setSnackbarMessage('Configuration updated successfully')
+      setOpenSnackbar(true)
     } catch (error) {
-      setSnackbarMessage('Error while saving configuration');
-      setOpenSnackbar(true);
+      setSnackbarMessage('Error while saving configuration')
+      setOpenSnackbar(true)
     }
-  };
+  }
 
   const handleCancelEdit = () => {
-    setEditRowIndex(null);
+    setEditRowIndex(null)
     setConfigData({
       type: '',
       value: '',
       label: '',
       color: '',
-      parent: '',
-    });
-  };
+      parent: ''
+    })
+  }
 
   const handleCreateNew = async () => {
     try {
-      await createConfigMaster(newConfigData);
-      setSnackbarMessage('Configuration created successfully');
-      setOpenSnackbar(true);
+      await createConfigMaster(newConfigData)
+      setSnackbarMessage('Configuration created successfully')
+      setOpenSnackbar(true)
       setNewConfigData({
         type: '',
         value: '',
         label: '',
         color: '',
-        parent: '',
-      });
+        parent: ''
+      })
 
-      const response = await fetchConfigMaster();
-      setConfigEntries(response.data);
+      const response = await fetchConfigMaster()
+      setConfigEntries(response.data)
     } catch (error) {
-      setSnackbarMessage('Error while saving configuration');
-      setOpenSnackbar(true);
+      setSnackbarMessage('Error while saving configuration')
+      setOpenSnackbar(true)
     }
-  };
+  }
 
   const handleDelete = async () => {
     try {
-      await deleteConfigMaster(configToDelete.id);
-      setSnackbarMessage('Configuration deleted successfully');
-      setOpenSnackbar(true);
+      await deleteConfigMaster(configToDelete.id)
+      setSnackbarMessage('Configuration deleted successfully')
+      setOpenSnackbar(true)
       setConfigEntries(
         configEntries.filter((config) => config.id !== configToDelete.id)
-      );
-      setOpenDeleteDialog(false);
+      )
+      setOpenDeleteDialog(false)
     } catch (error) {
-      setSnackbarMessage('Error while deleting configuration');
-      setOpenSnackbar(true);
-      setOpenDeleteDialog(false);
+      setSnackbarMessage('Error while deleting configuration')
+      setOpenSnackbar(true)
+      setOpenDeleteDialog(false)
     }
-  };
+  }
 
   const filteredData = configEntries
     .filter(
@@ -230,37 +230,37 @@ const ConfigMasterMaintenance = () => {
       if (sortField === 'type') {
         return sortOrder === 'asc'
           ? a.type.localeCompare(b.type)
-          : b.type.localeCompare(a.type);
+          : b.type.localeCompare(a.type)
       }
       if (sortField === 'label') {
         return sortOrder === 'asc'
           ? a.label.localeCompare(b.label)
-          : b.label.localeCompare(a.label);
+          : b.label.localeCompare(a.label)
       }
       if (sortField === 'value') {
         return sortOrder === 'asc'
           ? a.value.localeCompare(b.value)
-          : b.value.localeCompare(a.value);
+          : b.value.localeCompare(a.value)
       }
-      return 0;
-    });
+      return 0
+    })
 
   const filteredEntries = filterType
     ? configEntries.filter((entry) => entry.type === filterType)
-    : configEntries;
+    : configEntries
 
   const handleSort = (field) => {
-    const isAsc = sortField === field && sortOrder === 'asc';
-    setSortOrder(isAsc ? 'desc' : 'asc');
-    setSortField(field);
-  };
+    const isAsc = sortField === field && sortOrder === 'asc'
+    setSortOrder(isAsc ? 'desc' : 'asc')
+    setSortField(field)
+  }
 
   const sortedData = [...filteredData].sort((a, b) => {
-    const orderMultiplier = sortOrder === 'asc' ? 1 : -1;
-    if (a[sortField] < b[sortField]) return -1 * orderMultiplier;
-    if (a[sortField] > b[sortField]) return 1 * orderMultiplier;
-    return 0;
-  });
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+    if (a[sortField] < b[sortField]) return -1 * orderMultiplier
+    if (a[sortField] > b[sortField]) return 1 * orderMultiplier
+    return 0
+  })
 
   return (
     <Box sx={{ padding: 3, bgcolor: 'background.paper' }}>
@@ -284,7 +284,7 @@ const ConfigMasterMaintenance = () => {
           sx={{
             minWidth: 150,
             borderColor: 'primary.light',
-            '& .MuiSelect-root': { paddingLeft: 2 },
+            '& .MuiSelect-root': { paddingLeft: 2 }
           }}
         >
           <MenuItem value="">All Types</MenuItem>
@@ -307,7 +307,7 @@ const ConfigMasterMaintenance = () => {
           sx={{
             minWidth: 150,
             borderColor: 'primary.light',
-            '& .MuiSelect-root': { paddingLeft: 2 },
+            '& .MuiSelect-root': { paddingLeft: 2 }
           }}
         >
           <MenuItem value="">All Labels</MenuItem>
@@ -332,7 +332,7 @@ const ConfigMasterMaintenance = () => {
                     fontWeight: 'bold',
                     padding: '8px',
                     color: 'white',
-                    width: '10%',
+                    width: '10%'
                   }}
                 >
                   <TableSortLabel
@@ -348,7 +348,7 @@ const ConfigMasterMaintenance = () => {
                     fontWeight: 'bold',
                     padding: '8px',
                     color: 'white',
-                    width: '15%',
+                    width: '15%'
                   }}
                 >
                   <TableSortLabel
@@ -364,7 +364,7 @@ const ConfigMasterMaintenance = () => {
                     fontWeight: 'bold',
                     padding: '8px',
                     color: 'white',
-                    width: '15%',
+                    width: '15%'
                   }}
                 >
                   <TableSortLabel
@@ -380,7 +380,7 @@ const ConfigMasterMaintenance = () => {
                     fontWeight: 'bold',
                     padding: '8px',
                     color: 'white',
-                    width: '10%',
+                    width: '10%'
                   }}
                 >
                   <TableSortLabel
@@ -396,7 +396,7 @@ const ConfigMasterMaintenance = () => {
                     fontWeight: 'bold',
                     padding: '8px',
                     color: 'white',
-                    width: '10%',
+                    width: '10%'
                   }}
                 >
                   <TableSortLabel
@@ -412,7 +412,7 @@ const ConfigMasterMaintenance = () => {
                     fontWeight: 'bold',
                     padding: '8px',
                     color: 'white',
-                    width: '15%',
+                    width: '15%'
                   }}
                 >
                   Actions
@@ -597,8 +597,8 @@ const ConfigMasterMaintenance = () => {
                         <IconButton
                           color="secondary"
                           onClick={() => {
-                            setConfigToDelete(entry);
-                            setOpenDeleteDialog(true);
+                            setConfigToDelete(entry)
+                            setOpenDeleteDialog(true)
                           }}
                         >
                           <DeleteIcon
@@ -649,7 +649,7 @@ const ConfigMasterMaintenance = () => {
         </Alert>
       </Snackbar>
     </Box>
-  );
-};
+  )
+}
 
-export default ConfigMasterMaintenance;
+export default ConfigMasterMaintenance

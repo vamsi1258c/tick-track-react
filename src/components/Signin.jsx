@@ -1,62 +1,62 @@
-import React, { useState } from 'react';
-import { Container, Card, TextField, Button, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../services/authService';
+import React, { useState } from 'react'
+import { Container, Card, TextField, Button, Typography } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
+import { loginUser } from '../services/authService'
 
 const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const navigate = useNavigate()
 
   const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
 
   const handleBlur = (field) => {
     if (field === 'email') {
       if (!email) {
-        setEmailError('Email is required');
+        setEmailError('Email is required')
       } else if (!validateEmail(email)) {
-        setEmailError('Please enter a valid email address');
+        setEmailError('Please enter a valid email address')
       }
     } else if (field === 'password' && !password) {
-      setPasswordError('Password is required');
+      setPasswordError('Password is required')
     }
-  };
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!email) {
-      setEmailError('Email is required');
-      return;
+      setEmailError('Email is required')
+      return
     }
     if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
-      return;
+      setEmailError('Please enter a valid email address')
+      return
     }
     if (!password) {
-      setPasswordError('Password is required');
-      return;
+      setPasswordError('Password is required')
+      return
     }
 
     try {
-      const response = await loginUser({ username: email, password });
+      const response = await loginUser({ username: email, password })
       if (response && response.status === 200) {
-        setIsAuthenticated(true);
-        onLoginSuccess(response.data.user);
-        navigate('/');
+        setIsAuthenticated(true)
+        onLoginSuccess(response.data.user)
+        navigate('/')
       } else {
-        setError('Login failed. Please check your credentials.');
+        setError('Login failed. Please check your credentials.')
       }
     } catch (err) {
-      setError(err?.message);
+      setError(err?.message)
     }
-  };
+  }
 
   return (
     <>
@@ -74,7 +74,7 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          minHeight: '70vh',
+          minHeight: '70vh'
         }}
       >
         <Card variant="outlined" style={{ padding: '2rem', width: '100%' }}>
@@ -91,9 +91,9 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
               size="small"
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value);
-                setEmailError('');
-                setError('');
+                setEmail(e.target.value)
+                setEmailError('')
+                setError('')
               }}
               onBlur={() => handleBlur('email')}
               error={Boolean(emailError)}
@@ -108,9 +108,9 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
               size="small"
               value={password}
               onChange={(e) => {
-                setPassword(e.target.value);
-                setPasswordError('');
-                setError('');
+                setPassword(e.target.value)
+                setPasswordError('')
+                setError('')
               }}
               onBlur={() => handleBlur('password')}
               error={Boolean(passwordError)}
@@ -139,7 +139,7 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
         </Card>
       </Container>
     </>
-  );
-};
+  )
+}
 
-export default Signin;
+export default Signin

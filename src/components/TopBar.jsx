@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -11,57 +11,57 @@ import {
   Divider,
   Box,
   useMediaQuery,
-  Drawer,
-} from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import { getLoggedInUserId } from '../utils/global';
+  Drawer
+} from '@mui/material'
+import { Link, useNavigate } from 'react-router-dom'
+import { getLoggedInUserId } from '../utils/global'
 
 // Import MUI icons
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import TagIcon from '@mui/icons-material/Tag';
-import PersonIcon from '@mui/icons-material/Person';
-import ListAltIcon from '@mui/icons-material/ListAlt';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MenuIcon from '@mui/icons-material/Menu'; // For hamburger menu
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import TagIcon from '@mui/icons-material/Tag'
+import PersonIcon from '@mui/icons-material/Person'
+import ListAltIcon from '@mui/icons-material/ListAlt'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import MenuIcon from '@mui/icons-material/Menu' // For hamburger menu
 
 const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
-  const navigate = useNavigate();
-  const [anchorElProfile, setAnchorElProfile] = useState(null);
-  const [anchorElDropdown, setAnchorElDropdown] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
-  const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down('sm')); // Check if screen is small
+  const navigate = useNavigate()
+  const [anchorElProfile, setAnchorElProfile] = useState(null)
+  const [anchorElDropdown, setAnchorElDropdown] = useState(null)
+  const [drawerOpen, setDrawerOpen] = useState(false) // Drawer state
+  const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down('sm')) // Check if screen is small
 
   // Function to handle sign out
   const handleSignOut = () => {
-    onSignOut(); // Call the sign-out function passed from the parent
-    navigate('/signin'); // Redirect to Sign In page
-  };
+    onSignOut() // Call the sign-out function passed from the parent
+    navigate('/signin') // Redirect to Sign In page
+  }
 
   // Open profile menu
   const handleProfileMenuClick = (event) => {
-    setAnchorElProfile(event.currentTarget);
-  };
+    setAnchorElProfile(event.currentTarget)
+  }
 
   // Close profile menu
   const handleProfileMenuClose = () => {
-    setAnchorElProfile(null);
-  };
+    setAnchorElProfile(null)
+  }
 
   // Open dropdown menu
   const handleDropdownMenuClick = (event) => {
-    setAnchorElDropdown(event.currentTarget);
-  };
+    setAnchorElDropdown(event.currentTarget)
+  }
 
   // Close dropdown menu
   const handleDropdownMenuClose = () => {
-    setAnchorElDropdown(null);
-  };
+    setAnchorElDropdown(null)
+  }
 
   // Toggle Drawer open/close
   const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
-  };
+    setDrawerOpen(!drawerOpen)
+  }
 
   return (
     <AppBar
@@ -75,7 +75,7 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
           display: 'flex',
           justifyContent: 'space-between',
           width: '100%',
-          padding: '0 16px',
+          padding: '0 16px'
         }}
       >
         {/* Left side: Logo, Title, and Create Ticket button */}
@@ -104,8 +104,8 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
                 padding: '4px 5px',
                 backgroundColor: '#1976d2',
                 '&:hover': {
-                  backgroundColor: '#1565c0',
-                },
+                  backgroundColor: '#1565c0'
+                }
               }}
               variant="contained" // Use "contained" style to stand out
             >
@@ -126,8 +126,8 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
                 padding: '4px 8px',
                 borderRadius: '4px',
                 '&:hover': {
-                  backgroundColor: '#1565c0', // Add hover effect for consistency
-                },
+                  backgroundColor: '#1565c0' // Add hover effect for consistency
+                }
               }}
             >
               More <ExpandMoreIcon />
@@ -179,7 +179,7 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
                   open={Boolean(anchorElProfile)}
                   onClose={handleProfileMenuClose}
                   MenuListProps={{
-                    'aria-labelledby': 'user-avatar-menu',
+                    'aria-labelledby': 'user-avatar-menu'
                   }}
                 >
                   {/* User Role */}
@@ -253,7 +253,7 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
         </Drawer>
       </Toolbar>
     </AppBar>
-  );
-};
+  )
+}
 
-export default TopBar;
+export default TopBar

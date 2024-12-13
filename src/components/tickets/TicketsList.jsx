@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { fetchTickets, deleteTicket } from '../../services/ticket';
-import { fetchUsers } from '../../services/authService';
-import { downloadAttachment } from '../../services/attachment';
-import { fetchConfigMaster } from '../../services/configMaster';
-import { useNavigate } from 'react-router-dom';
-import { FaSearch } from 'react-icons/fa';
+import React, { useEffect, useState, useCallback } from 'react'
+import { fetchTickets, deleteTicket } from '../../services/ticket'
+import { fetchUsers } from '../../services/authService'
+import { downloadAttachment } from '../../services/attachment'
+import { fetchConfigMaster } from '../../services/configMaster'
+import { useNavigate } from 'react-router-dom'
+import { FaSearch } from 'react-icons/fa'
 import {
   renderCategoryBadge,
   renderStatusBadge,
-  renderPriorityBadge,
-} from '../../utils/renderBadges';
+  renderPriorityBadge
+} from '../../utils/renderBadges'
 import {
   Table,
   Button,
@@ -29,8 +29,8 @@ import {
   FormControl,
   Select,
   MenuItem,
-  Menu,
-} from '@mui/material';
+  Menu
+} from '@mui/material'
 import {
   Visibility as VisibilityIcon,
   Edit as EditIcon,
@@ -42,45 +42,45 @@ import {
   ExpandLess as ExpandLessIcon,
   ExpandMore as ExpandMoreIcon,
   Close as CloseIcon,
-  MoreVert as MoreVertIcon,
-} from '@mui/icons-material';
+  MoreVert as MoreVertIcon
+} from '@mui/icons-material'
 
-import './TicketsList.css';
-import TicketViewModal from './TicketViewModal';
-import { exportToCSV, exportToExcel } from '../../utils/exportUtils';
-import { useSnackbar } from '../Snackbar';
+import './TicketsList.css'
+import TicketViewModal from './TicketViewModal'
+import { exportToCSV, exportToExcel } from '../../utils/exportUtils'
+import { useSnackbar } from '../Snackbar'
 
 const TicketsList = ({ currentUser, userRole }) => {
-  const [tickets, setTickets] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [configs, setConfigs] = useState([]);
-  const [filter, setFilter] = useState('all');
-  const [ticketToDelete, setTicketToDelete] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState(null);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState([]);
-  const [categoryFilter, setCategoryFilter] = useState([]);
-  const [statusFilter, setStatusFilter] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [userFilter, setUserFilter] = useState([]);
+  const [tickets, setTickets] = useState([])
+  const [users, setUsers] = useState([])
+  const [configs, setConfigs] = useState([])
+  const [filter, setFilter] = useState('all')
+  const [ticketToDelete, setTicketToDelete] = useState(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [selectedTicket, setSelectedTicket] = useState(null)
+  const [showViewModal, setShowViewModal] = useState(false)
+  const [searchText, setSearchText] = useState('')
+  const [priorityFilter, setPriorityFilter] = useState([])
+  const [categoryFilter, setCategoryFilter] = useState([])
+  const [statusFilter, setStatusFilter] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [userFilter, setUserFilter] = useState([])
   const [sortConfig, setSortConfig] = useState({
     key: 'id',
-    direction: 'desc',
-  });
-  const [filtersVisible, setFiltersVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [ticketsPerPage, setTicketsPerPage] = useState(7);
-  const totalPages = Math.ceil(tickets.length / ticketsPerPage);
-  const indexOfLastTicket = currentPage * ticketsPerPage;
-  const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
-  const currentTickets = tickets.slice(indexOfFirstTicket, indexOfLastTicket);
-  const [anchorEl, setAnchorEl] = useState(null);
+    direction: 'desc'
+  })
+  const [filtersVisible, setFiltersVisible] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [ticketsPerPage, setTicketsPerPage] = useState(7)
+  const totalPages = Math.ceil(tickets.length / ticketsPerPage)
+  const indexOfLastTicket = currentPage * ticketsPerPage
+  const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage
+  const currentTickets = tickets.slice(indexOfFirstTicket, indexOfLastTicket)
+  const [anchorEl, setAnchorEl] = useState(null)
 
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-  const navigate = useNavigate();
-  const { showSnackbar } = useSnackbar();
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber)
+  const navigate = useNavigate()
+  const { showSnackbar } = useSnackbar()
 
   const exportColumns = [
     'id',
@@ -93,104 +93,104 @@ const TicketsList = ({ currentUser, userRole }) => {
     'created_at',
     'creator',
     'updated_at',
-    'assignee',
-  ];
+    'assignee'
+  ]
 
   const toggleFilters = () => {
-    setFiltersVisible(!filtersVisible);
-  };
+    setFiltersVisible(!filtersVisible)
+  }
 
   const stripHtml = (html) => {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    return tempDiv.textContent || tempDiv.innerText || '';
-  };
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = html
+    return tempDiv.textContent || tempDiv.innerText || ''
+  }
 
   const loadTickets = useCallback(async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const response = await fetchTickets();
-      const responseUsers = await fetchUsers();
-      setUsers(responseUsers.data);
+      const response = await fetchTickets()
+      const responseUsers = await fetchUsers()
+      setUsers(responseUsers.data)
 
-      const responseConfig = await fetchConfigMaster();
-      setConfigs(responseConfig.data);
+      const responseConfig = await fetchConfigMaster()
+      setConfigs(responseConfig.data)
 
-      setTicketsPerPage(7);
+      setTicketsPerPage(7)
 
-      let filteredTickets = response.data;
+      let filteredTickets = response.data
 
       if (userRole === 'admin' || userRole === 'support') {
         // Admins and support can see all tickets, no filter needed
       } else {
         filteredTickets = filteredTickets.filter(
           (ticket) => ticket.creator?.username === currentUser
-        );
+        )
       }
 
       if (filter === 'assigned_to_me') {
         filteredTickets = filteredTickets.filter(
           (ticket) => ticket.assignee?.username === currentUser
-        );
+        )
       } else if (filter === 'created_by_me') {
         filteredTickets = filteredTickets.filter(
           (ticket) => ticket.creator?.username === currentUser
-        );
+        )
       }
       if (userFilter.length > 0) {
         filteredTickets = filteredTickets.filter((ticket) => {
-          return userFilter.includes(ticket.assignee?.username);
-        });
+          return userFilter.includes(ticket.assignee?.username)
+        })
       }
       if (statusFilter.length > 0) {
         filteredTickets = filteredTickets.filter((ticket) =>
           statusFilter.includes(ticket.status)
-        );
+        )
       }
       if (priorityFilter.length > 0) {
         filteredTickets = filteredTickets.filter((ticket) =>
           priorityFilter.includes(ticket.priority)
-        );
+        )
       }
       if (categoryFilter.length > 0) {
         filteredTickets = filteredTickets.filter((ticket) =>
           categoryFilter.includes(ticket.category)
-        );
+        )
       }
 
       if (searchText?.trim()) {
-        const searchLower = searchText.toLowerCase().trim();
+        const searchLower = searchText.toLowerCase().trim()
 
         filteredTickets = filteredTickets.filter((ticket) => {
-          const title = ticket.title?.toLowerCase() || '';
+          const title = ticket.title?.toLowerCase() || ''
           const plainDescription =
-            stripHtml(ticket.description)?.toLowerCase() || '';
-          const id = String(ticket.id) || '';
+            stripHtml(ticket.description)?.toLowerCase() || ''
+          const id = String(ticket.id) || ''
           return (
             id.includes(searchLower) ||
             title.includes(searchLower) ||
             plainDescription.includes(searchLower)
-          );
-        });
+          )
+        })
       }
 
       // Sorting logic
       filteredTickets.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
+          return sortConfig.direction === 'asc' ? -1 : 1
         }
         if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
+          return sortConfig.direction === 'asc' ? 1 : -1
         }
-        return 0;
-      });
+        return 0
+      })
 
-      setTickets(filteredTickets);
+      setTickets(filteredTickets)
     } catch (error) {
-      console.error('Failed to load tickets', error);
-      showSnackbar('Failed to load tickets', 'error');
+      console.error('Failed to load tickets', error)
+      showSnackbar('Failed to load tickets', 'error')
     }
-    setLoading(false);
+    setLoading(false)
   }, [
     filter,
     currentUser,
@@ -201,89 +201,89 @@ const TicketsList = ({ currentUser, userRole }) => {
     sortConfig,
     userRole,
     userFilter,
-    showSnackbar,
-  ]);
+    showSnackbar
+  ])
 
   useEffect(() => {
-    loadTickets();
-  }, [loadTickets]);
+    loadTickets()
+  }, [loadTickets])
 
   const handleDelete = async (id) => {
     try {
-      await deleteTicket(id);
-      loadTickets();
+      await deleteTicket(id)
+      loadTickets()
     } catch (error) {
-      console.error('Failed to delete ticket', error);
-      showSnackbar('Failed to delete ticket', 'error');
+      console.error('Failed to delete ticket', error)
+      showSnackbar('Failed to delete ticket', 'error')
       if (error.response && error.response.status === 401) {
-        navigate('/signin');
+        navigate('/signin')
       }
     }
-    setShowDeleteModal(false);
-  };
+    setShowDeleteModal(false)
+  }
 
   const handleSort = (key) => {
-    let direction = 'asc';
+    let direction = 'asc'
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+      direction = 'desc'
     }
-    setSortConfig({ key, direction });
-  };
+    setSortConfig({ key, direction })
+  }
 
   const handleViewTicket = (ticket) => {
-    setSelectedTicket(ticket);
-    setShowViewModal(true);
-  };
+    setSelectedTicket(ticket)
+    setShowViewModal(true)
+  }
 
   const handleDownloadAttachment = async (ticketid, attachmentId) => {
     try {
-      await downloadAttachment(ticketid, attachmentId);
+      await downloadAttachment(ticketid, attachmentId)
     } catch (error) {
-      console.error('Failed to download attachment', error);
+      console.error('Failed to download attachment', error)
     }
-  };
+  }
 
   const handleAddUser = () => {
-    navigate('/create-ticket');
-  };
+    navigate('/create-ticket')
+  }
 
   const handleRefresh = () => {
-    loadTickets();
-  };
+    loadTickets()
+  }
 
   const handleTicketsPerPageChange = (event) => {
-    setTicketsPerPage(event.target.value);
-    setCurrentPage(1);
-  };
+    setTicketsPerPage(event.target.value)
+    setCurrentPage(1)
+  }
 
   const handleMoreClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
 
   const handleClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
   const priorityOptions = configs
     .filter((config) => config.type === 'priority')
     .map((config) => ({
       label: config.label,
-      value: config.value || config.id,
-    }));
+      value: config.value || config.id
+    }))
 
   const statusOptions = configs
     .filter((config) => config.type === 'status')
     .map((config) => ({
       label: config.label,
-      value: config.value || config.id,
-    }));
+      value: config.value || config.id
+    }))
 
   const categoryOptions = configs
     .filter((config) => config.type === 'category')
     .map((config) => ({
       label: config.label,
-      value: config.value || config.id,
-    }));
+      value: config.value || config.id
+    }))
 
   return (
     <div className="ticket-list-container">
@@ -300,7 +300,7 @@ const TicketsList = ({ currentUser, userRole }) => {
             sx={{
               textAlign: 'center',
               fontWeight: 'bold',
-              color: 'primary.main',
+              color: 'primary.main'
             }}
           >
             Tickets
@@ -330,7 +330,7 @@ const TicketsList = ({ currentUser, userRole }) => {
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: 'center'
           }}
         >
           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -342,7 +342,7 @@ const TicketsList = ({ currentUser, userRole }) => {
                 height: '30px',
                 border: 'none',
                 backgroundColor: 'transparent',
-                color: 'black',
+                color: 'black'
               }}
             >
               <TuneIcon />
@@ -366,7 +366,7 @@ const TicketsList = ({ currentUser, userRole }) => {
               height: '30px',
               border: 'none',
               backgroundColor: 'transparent',
-              color: 'black',
+              color: 'black'
             }}
           >
             <MoreVertIcon sx={{ fontSize: '1.5rem' }} />
@@ -381,16 +381,16 @@ const TicketsList = ({ currentUser, userRole }) => {
           >
             <MenuItem
               onClick={() => {
-                exportToCSV(tickets, exportColumns, 'tickets');
-                handleClose();
+                exportToCSV(tickets, exportColumns, 'tickets')
+                handleClose()
               }}
             >
               Export CSV
             </MenuItem>
             <MenuItem
               onClick={() => {
-                exportToExcel(tickets, exportColumns, 'tickets');
-                handleClose();
+                exportToExcel(tickets, exportColumns, 'tickets')
+                handleClose()
               }}
             >
               Export Excel
@@ -427,7 +427,7 @@ const TicketsList = ({ currentUser, userRole }) => {
                           <FaSearch />
                         </IconButton>
                       </InputAdornment>
-                    ),
+                    )
                   }}
                 />
               </Grid>
@@ -439,7 +439,7 @@ const TicketsList = ({ currentUser, userRole }) => {
                   size="small"
                   options={[
                     { label: 'Assigned to Me', value: 'assigned_to_me' },
-                    { label: 'Created by Me', value: 'created_by_me' },
+                    { label: 'Created by Me', value: 'created_by_me' }
                   ]}
                   onChange={(event, newValue) =>
                     setFilter(newValue ? newValue.value : 'all')
@@ -464,7 +464,7 @@ const TicketsList = ({ currentUser, userRole }) => {
                   size="small"
                   options={users.map((user) => ({
                     label: user.username,
-                    value: user.username,
+                    value: user.username
                   }))}
                   onChange={(event, newValue) =>
                     setUserFilter(newValue.map((option) => option.value))
@@ -599,10 +599,10 @@ const TicketsList = ({ currentUser, userRole }) => {
                         <IconButton
                           size="small"
                           onClick={(e) => {
-                            e.stopPropagation();
+                            e.stopPropagation()
                             navigate('/view-ticket', {
-                              state: { ticketId: ticket.id },
-                            });
+                              state: { ticketId: ticket.id }
+                            })
                           }}
                           className="action-icon"
                         >
@@ -612,10 +612,10 @@ const TicketsList = ({ currentUser, userRole }) => {
                         <IconButton
                           size="small"
                           onClick={(e) => {
-                            e.stopPropagation();
+                            e.stopPropagation()
                             navigate('/edit-ticket', {
-                              state: { ticketId: ticket.id },
-                            });
+                              state: { ticketId: ticket.id }
+                            })
                           }}
                           className="action-icon"
                         >
@@ -625,9 +625,9 @@ const TicketsList = ({ currentUser, userRole }) => {
                           <IconButton
                             size="small"
                             onClick={(e) => {
-                              e.stopPropagation();
-                              setTicketToDelete(ticket);
-                              setShowDeleteModal(true);
+                              e.stopPropagation()
+                              setTicketToDelete(ticket)
+                              setShowDeleteModal(true)
                             }}
                             className="action-icon"
                           >
@@ -675,7 +675,7 @@ const TicketsList = ({ currentUser, userRole }) => {
                   sx={{
                     border: 'none',
                     boxShadow: 'none',
-                    '& fieldset': { border: 'none' },
+                    '& fieldset': { border: 'none' }
                   }}
                 >
                   {[5, 7, 10, 15, 20, 30, 40, 50].map((num) => (
@@ -703,8 +703,8 @@ const TicketsList = ({ currentUser, userRole }) => {
           '& .MuiDialog-paper': {
             fontFamily: 'Roboto, sans-serif',
             fontSize: '0.875rem',
-            color: '#333',
-          },
+            color: '#333'
+          }
         }}
       >
         <DialogTitle>
@@ -762,7 +762,7 @@ const TicketsList = ({ currentUser, userRole }) => {
         refreshTickets={handleRefresh}
       />
     </div>
-  );
-};
+  )
+}
 
-export default TicketsList;
+export default TicketsList

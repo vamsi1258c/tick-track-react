@@ -1,10 +1,10 @@
-import React from 'react';
-import { Pagination, Box } from '@mui/material';
+import React from 'react'
+import { Pagination, Box } from '@mui/material'
 
 const CustomPagination = ({ currentPage, totalPages, onPageChange }) => {
   const handlePageChange = (event, value) => {
-    onPageChange(value);
-  };
+    onPageChange(value)
+  }
 
   return (
     <Box
@@ -12,7 +12,7 @@ const CustomPagination = ({ currentPage, totalPages, onPageChange }) => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 2,
+        marginTop: 2
       }}
     >
       <Pagination
@@ -26,7 +26,7 @@ const CustomPagination = ({ currentPage, totalPages, onPageChange }) => {
         color="primary"
       />
     </Box>
-  );
-};
+  )
+}
 
-export { CustomPagination };
+export { CustomPagination }

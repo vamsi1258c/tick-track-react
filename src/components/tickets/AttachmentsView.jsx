@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogActions,
@@ -10,64 +10,64 @@ import {
   IconButton,
   CircularProgress,
   Alert,
-  Box,
-} from '@mui/material';
+  Box
+} from '@mui/material'
 import {
   fetchAttachments,
   deleteAttachment,
-  downloadAttachment,
-} from '../../services/attachment'; // Import the download function
+  downloadAttachment
+} from '../../services/attachment' // Import the download function
 import {
   Delete as DeleteIcon,
-  FileDownload as DownloadIcon,
-} from '@mui/icons-material';
-import { useSnackbar } from '../Snackbar';
+  FileDownload as DownloadIcon
+} from '@mui/icons-material'
+import { useSnackbar } from '../Snackbar'
 
 const AttachmentsView = ({ ticketId, show, handleClose }) => {
-  const [attachments, setAttachments] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [attachments, setAttachments] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const { showSnackbar } = useSnackbar();
+  const { showSnackbar } = useSnackbar()
 
   useEffect(() => {
     const loadAttachments = async () => {
       if (show) {
         try {
-          setIsLoading(true);
-          const response = await fetchAttachments(ticketId);
-          setAttachments(response.data);
+          setIsLoading(true)
+          const response = await fetchAttachments(ticketId)
+          setAttachments(response.data)
         } catch (err) {
-          setError('Failed to fetch attachments.');
-          showSnackbar('Failed to fetch attachments.');
+          setError('Failed to fetch attachments.')
+          showSnackbar('Failed to fetch attachments.')
         } finally {
-          setIsLoading(false);
+          setIsLoading(false)
         }
       }
-    };
+    }
 
-    loadAttachments();
-  }, [ticketId, show, showSnackbar]);
+    loadAttachments()
+  }, [ticketId, show, showSnackbar])
 
   const handleDelete = async (attachmentId) => {
     if (window.confirm('Are you sure you want to delete this attachment?')) {
       try {
-        await deleteAttachment(ticketId, attachmentId);
-        setAttachments(attachments.filter((att) => att.id !== attachmentId));
+        await deleteAttachment(ticketId, attachmentId)
+        setAttachments(attachments.filter((att) => att.id !== attachmentId))
       } catch (err) {
-        alert('Failed to delete attachment. Please try again.');
+        alert('Failed to delete attachment. Please try again.')
       }
     }
-  };
+  }
 
   const handleDownload = async (attachmentId) => {
     try {
-      await downloadAttachment(ticketId, attachmentId);
+      await downloadAttachment(ticketId, attachmentId)
     } catch (err) {
-      alert('Failed to download attachment. Please try again.');
-      showSnackbar('Failed to download attachment. Please try again.');
+      alert('Failed to download attachment. Please try again.')
+      showSnackbar('Failed to download attachment. Please try again.')
     }
-  };
+  }
 
   return (
     <Dialog open={show} onClose={handleClose} maxWidth="xs" fullWidth>
@@ -131,7 +131,7 @@ const AttachmentsView = ({ ticketId, show, handleClose }) => {
         </button>
       </DialogActions>
     </Dialog>
-  );
-};
+  )
+}
 
-export default AttachmentsView;
+export default AttachmentsView
