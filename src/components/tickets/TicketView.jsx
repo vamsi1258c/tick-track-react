@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -18,8 +18,8 @@ import {
   DialogContent,
   DialogActions,
   Chip,
-  Autocomplete,
-} from '@mui/material';
+  Autocomplete
+} from '@mui/material'
 import {
   Download as DownloadIcon,
   Person as PersonIcon,
@@ -36,64 +36,64 @@ import {
   Delete as DeleteIcon,
   Refresh as RefreshIcon,
   ArrowBack as ArrowBackIcon,
-  Add as AddIcon,
-} from '@mui/icons-material';
-import DOMPurify from 'dompurify';
-import CommentModal from './CommentModal';
-import StatusDropdown from './StatusDropdown';
-import { useSnackbar } from '../Snackbar';
-import { updateTicket } from '../../services/ticket';
-import { createComment } from '../../services/comment';
-import { downloadAttachment } from '../../services/attachment';
-import { fetchUsers } from '../../services/authService';
-import { fetchTicket, deleteTicket } from '../../services/ticket';
+  Add as AddIcon
+} from '@mui/icons-material'
+import DOMPurify from 'dompurify'
+import CommentModal from './CommentModal'
+import StatusDropdown from './StatusDropdown'
+import { useSnackbar } from '../Snackbar'
+import { updateTicket } from '../../services/ticket'
+import { createComment } from '../../services/comment'
+import { downloadAttachment } from '../../services/attachment'
+import { fetchUsers } from '../../services/authService'
+import { fetchTicket, deleteTicket } from '../../services/ticket'
 import {
   renderCategoryBadge,
   renderStatusBadge,
   renderPriorityBadge,
-  chipStyles,
-} from '../../utils/renderBadges';
-import './TicketDetail.css';
+  chipStyles
+} from '../../utils/renderBadges'
+import './TicketDetail.css'
 
 const TicketView = ({ currentUser }) => {
-  const location = useLocation();
-  const ticketId = location.state?.ticketId;
-  const [selectedTicket, setSelectedTicket] = useState({});
-  const [showCommentModal, setShowCommentModal] = useState(false);
-  const [loadingApprovers, setLoadingApprovers] = useState(false);
-  const [newComment, setNewComment] = useState('');
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [ticketToDelete, setTicketToDelete] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [updatedStatus, setUpdatedStatus] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [value, setValue] = useState(0);
-  const [assignedToUser, setAssignedToUser] = useState(null);
-  const [userOptions, setUserOptions] = useState([]);
+  const location = useLocation()
+  const ticketId = location.state?.ticketId
+  const [selectedTicket, setSelectedTicket] = useState({})
+  const [showCommentModal, setShowCommentModal] = useState(false)
+  const [loadingApprovers, setLoadingApprovers] = useState(false)
+  const [newComment, setNewComment] = useState('')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [ticketToDelete, setTicketToDelete] = useState(null)
+  const [users, setUsers] = useState([])
+  const [updatedStatus, setUpdatedStatus] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [value, setValue] = useState(0)
+  const [assignedToUser, setAssignedToUser] = useState(null)
+  const [userOptions, setUserOptions] = useState([])
 
-  const navigate = useNavigate();
-  const { showSnackbar } = useSnackbar();
+  const navigate = useNavigate()
+  const { showSnackbar } = useSnackbar()
 
   useEffect(() => {
     const loadData = async () => {
-      const responseUsers = await fetchUsers();
-      setUsers(responseUsers.data);
+      const responseUsers = await fetchUsers()
+      setUsers(responseUsers.data)
       const userOptionsTemp = responseUsers.data.map((user) => ({
         value: user.id,
-        label: user.username,
-      }));
-      setUserOptions(userOptionsTemp);
-      const responseTicket = await fetchTicket(ticketId);
-      setSelectedTicket(responseTicket.data);
+        label: user.username
+      }))
+      setUserOptions(userOptionsTemp)
+      const responseTicket = await fetchTicket(ticketId)
+      setSelectedTicket(responseTicket.data)
       const currentAssignee = {
         value: responseTicket.data.assignee.id,
-        label: responseTicket.data.assignee.username,
-      };
-      setAssignedToUser(currentAssignee);
-      setLoading(false);
-    };
-    loadData();
-  }, [ticketId, loading]);
+        label: responseTicket.data.assignee.username
+      }
+      setAssignedToUser(currentAssignee)
+      setLoading(false)
+    }
+    loadData()
+  }, [ticketId, loading])
 
   // const handleSendForApproval = () => {
   //     try {
@@ -108,61 +108,61 @@ const TicketView = ({ currentUser }) => {
 
   const handleDownloadAttachment = async (ticketid, attachmentId) => {
     try {
-      await downloadAttachment(ticketid, attachmentId);
+      await downloadAttachment(ticketid, attachmentId)
     } catch (error) {
-      console.error('Failed to download attachment', error);
-      showSnackbar('Failed to download attachment', 'error');
+      console.error('Failed to download attachment', error)
+      showSnackbar('Failed to download attachment', 'error')
     }
-  };
+  }
 
   const handleCommentSubmit = async (approverId) => {
     try {
       await updateTicket(selectedTicket.id, {
         status: updatedStatus,
-        ...(approverId && approverId !== 0 && { approved_by: approverId }),
-      });
-      setShowCommentModal(false);
-      showSnackbar('Ticket Status has been updated!');
+        ...(approverId && approverId !== 0 && { approved_by: approverId })
+      })
+      setShowCommentModal(false)
+      showSnackbar('Ticket Status has been updated!')
     } catch (error) {
-      showSnackbar('Failed to update the status. Please try again.', 'error');
+      showSnackbar('Failed to update the status. Please try again.', 'error')
     }
-    setLoading(true);
-  };
+    setLoading(true)
+  }
 
   const handleStatusUpdate = async (status, newStatus) => {
-    setLoadingApprovers(true);
-    setUpdatedStatus(newStatus);
-    setShowCommentModal(true);
+    setLoadingApprovers(true)
+    setUpdatedStatus(newStatus)
+    setShowCommentModal(true)
     try {
-      setLoadingApprovers(true);
-      setUpdatedStatus(newStatus);
-      setShowCommentModal(true);
+      setLoadingApprovers(true)
+      setUpdatedStatus(newStatus)
+      setShowCommentModal(true)
     } catch (error) {
-      showSnackbar('Failed to update status. Please try again.', 'error');
+      showSnackbar('Failed to update status. Please try again.', 'error')
     } finally {
-      setLoadingApprovers(false);
+      setLoadingApprovers(false)
     }
-    setLoading(true);
-  };
+    setLoading(true)
+  }
 
   const handleDelete = async (id) => {
     try {
-      await deleteTicket(id);
-      navigate(-1);
-      showSnackbar('Deleted Ticket #' + id, 'success');
+      await deleteTicket(id)
+      navigate(-1)
+      showSnackbar('Deleted Ticket #' + id, 'success')
     } catch (error) {
-      showSnackbar('Failed to delete Ticket!', 'error');
+      showSnackbar('Failed to delete Ticket!', 'error')
     }
-    setShowDeleteModal(false);
-  };
+    setShowDeleteModal(false)
+  }
 
   const handleCommentChange = (e) => {
-    setNewComment(e.target.value);
-  };
+    setNewComment(e.target.value)
+  }
 
   const handleTabChange = (event, newValue) => {
-    setValue(newValue);
-  };
+    setValue(newValue)
+  }
 
   const handleAddComment = async () => {
     if (newComment.trim()) {
@@ -170,37 +170,37 @@ const TicketView = ({ currentUser }) => {
         const response = await createComment(selectedTicket.id, {
           content: newComment,
           ticket_id: selectedTicket.id,
-          user_id: users.find((user) => user.username === currentUser)?.id,
-        });
-        selectedTicket.comments.push(response.data);
-        setNewComment('');
+          user_id: users.find((user) => user.username === currentUser)?.id
+        })
+        selectedTicket.comments.push(response.data)
+        setNewComment('')
       } catch (error) {
-        showSnackbar('Failed to add comment. Please try again.', 'error');
+        showSnackbar('Failed to add comment. Please try again.', 'error')
       }
     }
-  };
+  }
 
   const handleAssignedToChange = async (newValue) => {
-    setAssignedToUser(newValue);
+    setAssignedToUser(newValue)
     if (newValue) {
       try {
         await updateTicket(selectedTicket.id, {
-          assigned_to: newValue.value,
-        });
+          assigned_to: newValue.value
+        })
       } catch (error) {
         showSnackbar(
           'Failed to update the assignee. Please try again.',
           'error'
-        );
+        )
       }
     }
-  };
+  }
 
   function toTitleCase(text) {
     return text
       ?.split('_')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
+      .join(' ')
   }
 
   if (loading) {
@@ -210,12 +210,12 @@ const TicketView = ({ currentUser }) => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          height: '100vh',
+          height: '100vh'
         }}
       >
         <CircularProgress size={48} />
       </div>
-    );
+    )
   }
 
   return (
@@ -227,7 +227,7 @@ const TicketView = ({ currentUser }) => {
           boxShadow: 1,
           borderRadius: 3,
           maxWidth: 1000,
-          margin: 'auto',
+          margin: 'auto'
         }}
       >
         {/* Header */}
@@ -237,7 +237,7 @@ const TicketView = ({ currentUser }) => {
             justifyContent: 'center',
             alignItems: 'center',
             position: 'relative',
-            mb: 1,
+            mb: 1
           }}
         >
           <Typography
@@ -245,7 +245,7 @@ const TicketView = ({ currentUser }) => {
             sx={{
               textAlign: 'center',
               fontWeight: 'bold',
-              color: 'primary.main',
+              color: 'primary.main'
             }}
           >
             Review Ticket #{selectedTicket?.id}
@@ -262,7 +262,7 @@ const TicketView = ({ currentUser }) => {
             disableElevation
             sx={{ mr: 1.5, px: 2, fontSize: '0.7rem', paddingTop: 0 }}
             onClick={() => {
-              navigate(-1);
+              navigate(-1)
             }}
           >
             <ArrowBackIcon />
@@ -274,7 +274,7 @@ const TicketView = ({ currentUser }) => {
             sx={{ mr: 1.5, px: 2, fontSize: '0.7rem', paddingTop: 0 }}
             onClick={() =>
               navigate('/edit-ticket', {
-                state: { ticketId: selectedTicket.id },
+                state: { ticketId: selectedTicket.id }
               })
             }
           >
@@ -285,9 +285,9 @@ const TicketView = ({ currentUser }) => {
               <IconButton
                 size="small"
                 onClick={(e) => {
-                  e.stopPropagation();
-                  setTicketToDelete(selectedTicket);
-                  setShowDeleteModal(true);
+                  e.stopPropagation()
+                  setTicketToDelete(selectedTicket)
+                  setShowDeleteModal(true)
                 }}
                 className="action-icon"
               >
@@ -300,7 +300,7 @@ const TicketView = ({ currentUser }) => {
             disableElevation
             sx={{ mr: 1.5, px: 2, fontSize: '0.7rem', paddingTop: 0 }}
             onClick={() => {
-              setLoading(true);
+              setLoading(true)
             }}
           >
             <RefreshIcon />
@@ -320,7 +320,7 @@ const TicketView = ({ currentUser }) => {
           <Typography
             variant="body2"
             dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(selectedTicket?.description || ''),
+              __html: DOMPurify.sanitize(selectedTicket?.description || '')
             }}
           />{' '}
         </Box>
@@ -368,7 +368,7 @@ const TicketView = ({ currentUser }) => {
                         sx={{
                           ...chipStyles,
                           backgroundColor: '#f8f9fa',
-                          color: '#3D9970',
+                          color: '#3D9970'
                         }}
                       />
                     </Typography>
@@ -405,12 +405,12 @@ const TicketView = ({ currentUser }) => {
                         variant="standard"
                         InputProps={{
                           ...params.InputProps,
-                          disableUnderline: true,
+                          disableUnderline: true
                         }}
                         sx={{
                           ml: 0.3,
                           width: 'auto',
-                          minWidth: '150px',
+                          minWidth: '150px'
                         }}
                       />
                     )}
@@ -418,8 +418,8 @@ const TicketView = ({ currentUser }) => {
                       ml: 0.3,
                       width: 'auto',
                       '& .MuiAutocomplete-input': {
-                        minWidth: '150px',
-                      },
+                        minWidth: '150px'
+                      }
                     }}
                     isOptionEqualToValue={(option, value) =>
                       option.value === value?.value
@@ -500,11 +500,11 @@ const TicketView = ({ currentUser }) => {
                     sx={{
                       mr: 1,
                       '& .MuiInput-underline:before': {
-                        borderBottomColor: 'grey.500',
+                        borderBottomColor: 'grey.500'
                       },
                       '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-                        borderBottomColor: 'primary.main',
-                      },
+                        borderBottomColor: 'primary.main'
+                      }
                     }}
                   />
                   <IconButton
@@ -521,7 +521,7 @@ const TicketView = ({ currentUser }) => {
                     overflowY: 'auto',
                     p: 2,
                     backgroundColor: '#f9f9f9',
-                    borderRadius: 2,
+                    borderRadius: 2
                   }}
                 >
                   {selectedTicket?.comments?.length > 0 ? (
@@ -600,7 +600,7 @@ const TicketView = ({ currentUser }) => {
                     overflowY: 'auto',
                     p: 2,
                     backgroundColor: '#f9f9f9',
-                    borderRadius: 2,
+                    borderRadius: 2
                   }}
                 >
                   {selectedTicket?.activity_logs?.length > 0 ? (
@@ -638,8 +638,8 @@ const TicketView = ({ currentUser }) => {
       <CommentModal
         show={showCommentModal}
         onClose={() => {
-          setShowCommentModal(false);
-          setLoading(true);
+          setShowCommentModal(false)
+          setLoading(true)
         }}
         onSubmit={handleCommentSubmit}
         approvers={users.filter((user) => user.approver)}
@@ -659,8 +659,8 @@ const TicketView = ({ currentUser }) => {
           '& .MuiDialog-paper': {
             fontFamily: 'Roboto, sans-serif',
             fontSize: '0.875rem',
-            color: '#333',
-          },
+            color: '#333'
+          }
         }}
       >
         <DialogTitle>
@@ -703,7 +703,7 @@ const TicketView = ({ currentUser }) => {
         </DialogActions>
       </Dialog>
     </>
-  );
-};
+  )
+}
 
-export default TicketView;
+export default TicketView

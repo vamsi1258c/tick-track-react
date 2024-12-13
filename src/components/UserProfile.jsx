@@ -1,53 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import {
   Button,
   Card,
   Typography,
   CardContent,
-  CardHeader,
-} from '@mui/material';
+  CardHeader
+} from '@mui/material'
 import {
   Edit as EditIcon,
-  ArrowBack as ArrowBackIcon,
-} from '@mui/icons-material';
-import api from '../services/api';
+  ArrowBack as ArrowBackIcon
+} from '@mui/icons-material'
+import api from '../services/api'
 
 const UserProfile = () => {
-  const { id } = useParams(); // Get the user ID from the URL
-  const navigate = useNavigate(); // Initialize useNavigate
-  const location = useLocation(); // Get the current location
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { id } = useParams() // Get the user ID from the URL
+  const navigate = useNavigate() // Initialize useNavigate
+  const location = useLocation() // Get the current location
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await api.get(`/user/${id}`);
-        setUser(response.data);
-        setLoading(false);
+        const response = await api.get(`/user/${id}`)
+        setUser(response.data)
+        setLoading(false)
       } catch (error) {
-        setError('Failed to fetch user details');
-        setLoading(false);
+        setError('Failed to fetch user details')
+        setLoading(false)
       }
-    };
+    }
 
-    fetchUser();
-  }, [id]);
+    fetchUser()
+  }, [id])
 
   const handleBack = () => {
-    navigate(-1); // Go back to the previous page
-  };
+    navigate(-1) // Go back to the previous page
+  }
 
   const handleEditProfile = () => {
-    navigate('/signup', { state: { user } }); // Navigate to /signup with user state
-  };
+    navigate('/signup', { state: { user } }) // Navigate to /signup with user state
+  }
 
-  const isEditing = location.state && location.state.user; // Check if editing
+  const isEditing = location.state && location.state.user // Check if editing
 
-  if (loading) return <Typography>Loading...</Typography>;
-  if (error) return <Typography>{error}</Typography>;
+  if (loading) return <Typography>Loading...</Typography>
+  if (error) return <Typography>{error}</Typography>
 
   return (
     <div style={{ padding: '20px' }}>
@@ -109,7 +109,7 @@ const UserProfile = () => {
         </CardContent>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default UserProfile;
+export default UserProfile

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   Container,
   TextField,
@@ -15,152 +15,152 @@ import {
   FormHelperText,
   FormControlLabel,
   Grid,
-  CardHeader,
-} from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { registerUser, updateUser } from '../services/authService';
-import { useSnackbar } from './Snackbar';
+  CardHeader
+} from '@mui/material'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { registerUser, updateUser } from '../services/authService'
+import { useSnackbar } from './Snackbar'
 
 const Signup = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('');
-  const [fullname, setFullname] = useState('');
-  const [designation, setDesignation] = useState('');
-  const [approver, setApprover] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [passwordError, setPasswordError] = useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = useState('');
-  const [usernameError, setUsernameError] = useState('');
-  const [fullnameError, setFullnameError] = useState('');
-  const [designationError, setDesignationError] = useState('');
-  const [roleError, setRoleError] = useState('');
-  const navigate = useNavigate();
-  const location = useLocation();
-  const isEditing = location.state && location.state.user;
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const { showSnackbar } = useSnackbar();
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [role, setRole] = useState('')
+  const [fullname, setFullname] = useState('')
+  const [designation, setDesignation] = useState('')
+  const [approver, setApprover] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [passwordError, setPasswordError] = useState('')
+  const [confirmPasswordError, setConfirmPasswordError] = useState('')
+  const [usernameError, setUsernameError] = useState('')
+  const [fullnameError, setFullnameError] = useState('')
+  const [designationError, setDesignationError] = useState('')
+  const [roleError, setRoleError] = useState('')
+  const navigate = useNavigate()
+  const location = useLocation()
+  const isEditing = location.state && location.state.user
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  const { showSnackbar } = useSnackbar()
 
   useEffect(() => {
     if (isEditing) {
-      const { user } = location.state;
-      setUsername(user.username);
-      setRole(user.role);
-      setFullname(user.fullname);
-      setDesignation(user.designation);
-      setApprover(user.approver);
+      const { user } = location.state
+      setUsername(user.username)
+      setRole(user.role)
+      setFullname(user.fullname)
+      setDesignation(user.designation)
+      setApprover(user.approver)
     }
-  }, [isEditing, location.state]);
+  }, [isEditing, location.state])
 
   const validatePassword = (password) => {
-    const minLength = 8;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumber = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const minLength = 8
+    const hasUpperCase = /[A-Z]/.test(password)
+    const hasLowerCase = /[a-z]/.test(password)
+    const hasNumber = /\d/.test(password)
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
 
     if (password.length < minLength)
-      return `Password must be at least ${minLength} characters long.`;
+      return `Password must be at least ${minLength} characters long.`
     if (!hasUpperCase)
-      return 'Password must contain at least one uppercase letter.';
+      return 'Password must contain at least one uppercase letter.'
     if (!hasLowerCase)
-      return 'Password must contain at least one lowercase letter.';
-    if (!hasNumber) return 'Password must contain at least one number.';
+      return 'Password must contain at least one lowercase letter.'
+    if (!hasNumber) return 'Password must contain at least one number.'
     if (!hasSpecialChar)
-      return 'Password must contain at least one special character.';
-    return '';
-  };
+      return 'Password must contain at least one special character.'
+    return ''
+  }
 
   const validateFields = () => {
-    let isValid = true;
-    setUsernameError('');
-    setFullnameError('');
-    setRoleError('');
-    setDesignationError('');
-    setPasswordError('');
-    setConfirmPasswordError('');
+    let isValid = true
+    setUsernameError('')
+    setFullnameError('')
+    setRoleError('')
+    setDesignationError('')
+    setPasswordError('')
+    setConfirmPasswordError('')
 
     if (!username || username.trim() === '') {
-      setUsernameError('Username is required.');
-      isValid = false;
+      setUsernameError('Username is required.')
+      isValid = false
     } else if (!emailRegex.test(username)) {
-      setUsernameError('Invalid email format.');
-      isValid = false;
+      setUsernameError('Invalid email format.')
+      isValid = false
     }
 
     if ((!password || password.trim() === '') && !isEditing) {
-      setPasswordError('Password is required.');
-      isValid = false;
+      setPasswordError('Password is required.')
+      isValid = false
     }
 
     if ((!confirmPassword || confirmPassword.trim() === '') && !isEditing) {
-      setConfirmPasswordError('Confirm password is required.');
-      isValid = false;
+      setConfirmPasswordError('Confirm password is required.')
+      isValid = false
     }
 
     if (!fullname || fullname.trim() === '') {
-      setFullnameError('Full name is required.');
-      isValid = false;
+      setFullnameError('Full name is required.')
+      isValid = false
     }
 
     if (!role) {
-      setRoleError('Role is required.');
-      isValid = false;
+      setRoleError('Role is required.')
+      isValid = false
     }
 
     if (!designation || designation.trim() === '') {
-      setDesignationError('Designation is required.');
-      isValid = false;
+      setDesignationError('Designation is required.')
+      isValid = false
     }
 
-    return isValid;
-  };
+    return isValid
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    e.preventDefault()
+    setError('')
+    setLoading(true)
 
     if (!validateFields()) {
-      setLoading(false);
-      return;
+      setLoading(false)
+      return
     }
 
     if (password) {
-      const passwordValidationError = validatePassword(password);
+      const passwordValidationError = validatePassword(password)
       if (passwordValidationError) {
-        setPasswordError(passwordValidationError);
-        setLoading(false);
-        return;
+        setPasswordError(passwordValidationError)
+        setLoading(false)
+        return
       }
       if (password !== confirmPassword) {
-        setConfirmPasswordError('Passwords do not match.');
-        setLoading(false);
-        return;
+        setConfirmPasswordError('Passwords do not match.')
+        setLoading(false)
+        return
       }
     }
 
     try {
-      const payload = { username, role, fullname, designation, approver };
-      if (password) payload.password = password;
+      const payload = { username, role, fullname, designation, approver }
+      if (password) payload.password = password
 
       if (isEditing) {
-        await updateUser(location.state.user.id, payload);
-        showSnackbar('Updated user ' + username);
+        await updateUser(location.state.user.id, payload)
+        showSnackbar('Updated user ' + username)
       } else {
-        await registerUser(payload);
-        showSnackbar('Created user ' + username);
+        await registerUser(payload)
+        showSnackbar('Created user ' + username)
       }
-      navigate('/manage-users');
+      navigate('/manage-users')
     } catch (err) {
-      setError(err.message);
-      showSnackbar('Failed to create/update user ' + username, 'error');
+      setError(err.message)
+      showSnackbar('Failed to create/update user ' + username, 'error')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Container maxWidth="md">
@@ -171,7 +171,7 @@ const Signup = () => {
             align: 'center',
             variant: 'h5',
             fontWeight: 'bold',
-            color: 'primary.main',
+            color: 'primary.main'
           }}
           sx={{ p: 0.3, bgcolor: '#f5f5f5', textAlign: 'center' }}
         />
@@ -193,8 +193,8 @@ const Signup = () => {
                   size="small"
                   value={username}
                   onChange={(e) => {
-                    setUsername(e.target.value);
-                    setUsernameError('');
+                    setUsername(e.target.value)
+                    setUsernameError('')
                   }}
                   onBlur={() =>
                     !username && setUsernameError('Username is required.')
@@ -212,8 +212,8 @@ const Signup = () => {
                   size="small"
                   value={fullname}
                   onChange={(e) => {
-                    setFullname(e.target.value);
-                    setFullnameError('');
+                    setFullname(e.target.value)
+                    setFullnameError('')
                   }}
                   onBlur={() =>
                     !fullname && setFullnameError('Full name is required.')
@@ -235,8 +235,8 @@ const Signup = () => {
                   size="small"
                   value={password}
                   onChange={(e) => {
-                    setPassword(e.target.value);
-                    setPasswordError('');
+                    setPassword(e.target.value)
+                    setPasswordError('')
                   }}
                   onBlur={() =>
                     password && setPasswordError(validatePassword(password))
@@ -254,8 +254,8 @@ const Signup = () => {
                   size="small"
                   value={confirmPassword}
                   onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    setConfirmPasswordError('');
+                    setConfirmPassword(e.target.value)
+                    setConfirmPasswordError('')
                   }}
                   onBlur={() =>
                     confirmPassword &&
@@ -283,8 +283,8 @@ const Signup = () => {
                   <Select
                     value={role}
                     onChange={(e) => {
-                      setRole(e.target.value);
-                      setRoleError('');
+                      setRole(e.target.value)
+                      setRoleError('')
                     }}
                     onBlur={() => !role && setRoleError('Role is required.')}
                     label="Role"
@@ -307,8 +307,8 @@ const Signup = () => {
                   size="small"
                   value={designation}
                   onChange={(e) => {
-                    setDesignation(e.target.value);
-                    setDesignationError('');
+                    setDesignation(e.target.value)
+                    setDesignationError('')
                   }}
                   onBlur={() =>
                     !designation &&
@@ -357,7 +357,7 @@ const Signup = () => {
         </CardContent>
       </Card>
     </Container>
-  );
-};
+  )
+}
 
-export default Signup;
+export default Signup

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Breadcrumbs, Button, Typography } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import React from 'react'
+import { Breadcrumbs, Button, Typography } from '@mui/material'
+import { Link as RouterLink } from 'react-router-dom'
 
 const Breadcrumb = ({ title }) => {
   return (
@@ -14,7 +14,7 @@ const Breadcrumb = ({ title }) => {
             backgroundColor: '#fff',
             zIndex: 1040,
             borderBottom: '1px solid #ddd',
-            padding: '0px 5px',
+            padding: '0px 5px'
           }}
         >
           <Breadcrumbs
@@ -23,7 +23,7 @@ const Breadcrumb = ({ title }) => {
               fontSize: '.7rem',
               margin: 0,
               padding: 0,
-              height: '20px',
+              height: '20px'
             }}
           >
             <Button
@@ -38,7 +38,7 @@ const Breadcrumb = ({ title }) => {
                 height: '20px',
                 minWidth: 'auto',
                 lineHeight: 1.5,
-                color: 'primary.main',
+                color: 'primary.main'
               }}
             >
               Home
@@ -53,7 +53,7 @@ const Breadcrumb = ({ title }) => {
         </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default Breadcrumb;
+export default Breadcrumb

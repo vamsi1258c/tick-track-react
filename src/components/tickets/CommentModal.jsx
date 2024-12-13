@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Modal } from 'react-bootstrap';
+import React, { useState } from 'react'
+import { Modal } from 'react-bootstrap'
 import {
   DialogTitle,
   DialogContent,
@@ -12,11 +12,11 @@ import {
   TextField,
   Button,
   CircularProgress,
-  Box,
-} from '@mui/material';
-import { DoubleArrow as DoubleArrowIcon } from '@mui/icons-material';
-import { createComment } from '../../services/comment';
-import { useSnackbar } from '../Snackbar';
+  Box
+} from '@mui/material'
+import { DoubleArrow as DoubleArrowIcon } from '@mui/icons-material'
+import { createComment } from '../../services/comment'
+import { useSnackbar } from '../Snackbar'
 
 const CommentModal = ({
   show,
@@ -27,47 +27,47 @@ const CommentModal = ({
   ticketId,
   currentUserId,
   status,
-  newStatus,
+  newStatus
 }) => {
-  const [selectedApprover, setSelectedApprover] = useState(null);
-  const [comment, setComment] = useState('');
+  const [selectedApprover, setSelectedApprover] = useState(null)
+  const [comment, setComment] = useState('')
 
-  const { showSnackbar } = useSnackbar();
+  const { showSnackbar } = useSnackbar()
 
   const handleApproverChange = (e) => {
-    setSelectedApprover(e.target.value);
-  };
+    setSelectedApprover(e.target.value)
+  }
 
   const handleCommentChange = (e) => {
-    setComment(e.target.value);
-  };
+    setComment(e.target.value)
+  }
 
   const handleSubmit = async () => {
-    await onSubmit(selectedApprover);
+    await onSubmit(selectedApprover)
 
     // Create the comment
-    const newComment = comment.trim();
+    const newComment = comment.trim()
 
     if (newComment) {
       try {
         await createComment(ticketId, {
           content: newComment,
           ticket_id: ticketId,
-          user_id: currentUserId,
-        });
-        setComment('');
+          user_id: currentUserId
+        })
+        setComment('')
       } catch (error) {
-        showSnackbar('Failed to submit comment. Please try again.');
-        console.error('Error submitting comment:', error);
+        showSnackbar('Failed to submit comment. Please try again.')
+        console.error('Error submitting comment:', error)
       }
     }
-  };
+  }
 
   function toTitleCase(text) {
     return text
       ?.split('_')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
+      .join(' ')
   }
 
   return (
@@ -76,7 +76,7 @@ const CommentModal = ({
         sx={{
           backgroundColor: 'primary.main',
           color: 'white',
-          fontWeight: 'bold',
+          fontWeight: 'bold'
         }}
       >
         <Box display="flex" alignItems="center" justifyContent="center" my={3}>
@@ -94,7 +94,7 @@ const CommentModal = ({
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              minHeight: '100px',
+              minHeight: '100px'
             }}
           >
             <CircularProgress />
@@ -155,7 +155,7 @@ const CommentModal = ({
         </Button>
       </DialogActions>
     </Modal>
-  );
-};
+  )
+}
 
-export default CommentModal;
+export default CommentModal

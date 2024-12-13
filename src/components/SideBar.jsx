@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React from 'react'
+import { NavLink } from 'react-router-dom'
 import {
   Drawer,
   List,
@@ -7,13 +7,13 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Box,
-} from '@mui/material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import GroupIcon from '@mui/icons-material/Group';
-import SettingsIcon from '@mui/icons-material/Settings';
-import './Sidebar.css';
+  Box
+} from '@mui/material'
+import DashboardIcon from '@mui/icons-material/Dashboard'
+import LocalOfferIcon from '@mui/icons-material/LocalOffer'
+import GroupIcon from '@mui/icons-material/Group'
+import SettingsIcon from '@mui/icons-material/Settings'
+import './Sidebar.css'
 
 const SideBar = ({ isOpen, userRole }) => {
   return (
@@ -33,8 +33,8 @@ const SideBar = ({ isOpen, userRole }) => {
           transition: 'width 0.3s ease',
           borderRight: '1px solid #ddd',
           backgroundColor: '#f5f5f5',
-          paddingTop: 5,
-        },
+          paddingTop: 5
+        }
       }}
       open={isOpen}
     >
@@ -43,7 +43,7 @@ const SideBar = ({ isOpen, userRole }) => {
           display: 'flex',
           marginTop: 2,
           flexDirection: 'column',
-          height: '100%',
+          height: '100%'
         }}
       >
         {/* Main Navigation */}
@@ -114,7 +114,7 @@ const SideBar = ({ isOpen, userRole }) => {
         </List>
       </Box>
     </Drawer>
-  );
-};
+  )
+}
 
-export default SideBar;
+export default SideBar
