@@ -1,7 +1,6 @@
 import api from './api';
-import { createActivityLog } from './activityLog';  
-import { getLoggedInUserId } from '../utils/global';  
-
+import { createActivityLog } from './activityLog';
+import { getLoggedInUserId } from '../utils/global';
 
 // Helper function to send an email
 // const sendEmail = async (emailData) => {
@@ -16,7 +15,7 @@ import { getLoggedInUserId } from '../utils/global';
 // Fetch all tickets
 export const fetchTickets = async () => {
   try {
-    const response = await api.get('/ticket');  
+    const response = await api.get('/ticket');
     return response;
   } catch (error) {
     console.log('Error fetching tickets:', error);
@@ -27,7 +26,7 @@ export const fetchTickets = async () => {
 // Fetch a single ticket by ID
 export const fetchTicket = async (ticketId) => {
   try {
-    const response = await api.get(`/ticket/${ticketId}`);  
+    const response = await api.get(`/ticket/${ticketId}`);
     return response;
   } catch (error) {
     console.log('Error fetching ticket:', error);
@@ -41,18 +40,18 @@ export const createTicket = async (ticketData) => {
     const response = await api.post('/ticket', ticketData);
 
     // Log ticket creation activity
-    createActivityLog({ 
-      "action": `Created ticket`, 
-      "user_id": getLoggedInUserId(),
-      "ticket_id": response.data.id
+    createActivityLog({
+      action: `Created ticket`,
+      user_id: getLoggedInUserId(),
+      ticket_id: response.data.id,
     });
 
     // Send email notification
     // const emailData = {
     //   subject: 'New Ticket Created',
-    //   recipients: [response.data.assignee.username],  
+    //   recipients: [response.data.assignee.username],
     //   body: `A new ticket has been created:\n\nTitle: ${ticketData.title}\nDescription: ${ticketData.description}`,
-    //   sender: 'noreply@vforit.com', 
+    //   sender: 'noreply@vforit.com',
     // };
     // await sendEmail(emailData);
 
@@ -68,10 +67,10 @@ export const updateTicket = async (ticketId, ticketData) => {
     const response = await api.put(`/ticket/${ticketId}`, ticketData);
 
     // Log ticket update activity
-    createActivityLog({ 
-      "action": `Updated ticket`, 
-      "user_id": getLoggedInUserId(),
-      "ticket_id": ticketId
+    createActivityLog({
+      action: `Updated ticket`,
+      user_id: getLoggedInUserId(),
+      ticket_id: ticketId,
     });
 
     return response;
@@ -84,12 +83,12 @@ export const updateTicket = async (ticketId, ticketData) => {
 // Delete a ticket by ID
 export const deleteTicket = async (ticketId) => {
   try {
-    const response = await api.delete(`/ticket/${ticketId}`);  
+    const response = await api.delete(`/ticket/${ticketId}`);
 
     // Log ticket deletion activity
-    createActivityLog({ 
-      "action": `Deleted ticket with ID: ${ticketId}`, 
-      "user_id": getLoggedInUserId()
+    createActivityLog({
+      action: `Deleted ticket with ID: ${ticketId}`,
+      user_id: getLoggedInUserId(),
     });
 
     return response;

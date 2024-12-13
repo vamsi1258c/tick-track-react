@@ -7,7 +7,14 @@ const CustomPagination = ({ currentPage, totalPages, onPageChange }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 2 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 2,
+      }}
+    >
       <Pagination
         count={totalPages}
         page={currentPage}

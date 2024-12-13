@@ -7,13 +7,13 @@ import { getLoggedInUserId } from '../utils/global';
 export const registerUser = async (userData) => {
   try {
     const response = await api.post('/register', userData);
-    createActivityLog({ 
-      "action": `Created user: ${userData.username}`, 
-      "user_id": getLoggedInUserId() 
+    createActivityLog({
+      action: `Created user: ${userData.username}`,
+      user_id: getLoggedInUserId(),
     });
     return response;
   } catch (error) {
-    console.error("Failed to register user:", error);
+    console.error('Failed to register user:', error);
     throw error.response.data;
   }
 };
@@ -28,17 +28,17 @@ export const loginUser = async (userData) => {
       localStorage.setItem('authToken', access_token);
       localStorage.setItem('refreshToken', refresh_token);
       setAuthToken(access_token);
-      
+
       // Log login activity
-      createActivityLog({ 
-        "action": "User logged in", 
-        "user_id": response.data.user.id
+      createActivityLog({
+        action: 'User logged in',
+        user_id: response.data.user.id,
       });
     }
 
     return response;
   } catch (error) {
-    console.error("Login failed:", error);
+    console.error('Login failed:', error);
     throw error;
   }
 };
@@ -47,9 +47,9 @@ export const loginUser = async (userData) => {
 export const logoutUser = async () => {
   try {
     // Log logout activity
-    await createActivityLog({ 
-      "action": `User logged out`, 
-      "user_id": getLoggedInUserId() 
+    await createActivityLog({
+      action: `User logged out`,
+      user_id: getLoggedInUserId(),
     });
 
     await api.post('/logout');
@@ -57,7 +57,7 @@ export const logoutUser = async () => {
     localStorage.clear();
     setAuthToken();
   } catch (error) {
-    console.error("Logout failed:", error);
+    console.error('Logout failed:', error);
     throw error.response.data;
   }
 };
@@ -68,7 +68,7 @@ export const fetchUsers = async () => {
     const response = await api.get('/user');
     return response;
   } catch (error) {
-    console.error("Failed to fetch users:", error);
+    console.error('Failed to fetch users:', error);
     throw error.response.data;
   }
 };
@@ -79,14 +79,14 @@ export const updateUser = async (userId, userData) => {
     const response = await api.put(`/user/${userId}`, userData);
 
     // Log user update activity
-    createActivityLog({ 
-      "action": `Updated user: ${userData.username}`, 
-      "user_id": getLoggedInUserId() 
+    createActivityLog({
+      action: `Updated user: ${userData.username}`,
+      user_id: getLoggedInUserId(),
     });
 
     return response;
   } catch (error) {
-    console.error("Failed to update user:", error);
+    console.error('Failed to update user:', error);
     throw error.response.data;
   }
 };
@@ -97,14 +97,14 @@ export const deleteUser = async (userId) => {
     const response = await api.delete(`/user/${userId}`);
 
     // Log user deletion activity
-    createActivityLog({ 
-      "action": `Deleted user with ID: ${userId}`, 
-      "user_id": getLoggedInUserId() 
+    createActivityLog({
+      action: `Deleted user with ID: ${userId}`,
+      user_id: getLoggedInUserId(),
     });
 
     return response;
   } catch (error) {
-    console.error("Failed to delete user:", error);
+    console.error('Failed to delete user:', error);
     throw error.response.data;
   }
 };

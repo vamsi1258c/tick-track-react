@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import 'bootstrap/dist/css/bootstrap.min.css';  
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, createTheme } from '@mui/material';
 import { SnackbarProvider } from './components/Snackbar';
@@ -54,7 +54,7 @@ const theme = createTheme({
           },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
             borderWidth: '1px',
-            borderColor: '#1976d2',  
+            borderColor: '#1976d2',
           },
         },
       },

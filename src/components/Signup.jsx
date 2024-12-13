@@ -15,7 +15,7 @@ import {
   FormHelperText,
   FormControlLabel,
   Grid,
-  CardHeader
+  CardHeader,
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { registerUser, updateUser } from '../services/authService';
@@ -43,7 +43,6 @@ const Signup = () => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const { showSnackbar } = useSnackbar();
 
-
   useEffect(() => {
     if (isEditing) {
       const { user } = location.state;
@@ -62,11 +61,15 @@ const Signup = () => {
     const hasNumber = /\d/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-    if (password.length < minLength) return `Password must be at least ${minLength} characters long.`;
-    if (!hasUpperCase) return 'Password must contain at least one uppercase letter.';
-    if (!hasLowerCase) return 'Password must contain at least one lowercase letter.';
+    if (password.length < minLength)
+      return `Password must be at least ${minLength} characters long.`;
+    if (!hasUpperCase)
+      return 'Password must contain at least one uppercase letter.';
+    if (!hasLowerCase)
+      return 'Password must contain at least one lowercase letter.';
     if (!hasNumber) return 'Password must contain at least one number.';
-    if (!hasSpecialChar) return 'Password must contain at least one special character.';
+    if (!hasSpecialChar)
+      return 'Password must contain at least one special character.';
     return '';
   };
 
@@ -145,15 +148,15 @@ const Signup = () => {
 
       if (isEditing) {
         await updateUser(location.state.user.id, payload);
-        showSnackbar('Updated user '+username);
+        showSnackbar('Updated user ' + username);
       } else {
         await registerUser(payload);
-        showSnackbar('Created user '+username);
+        showSnackbar('Created user ' + username);
       }
       navigate('/manage-users');
     } catch (err) {
       setError(err.message);
-      showSnackbar('Failed to create/update user '+username, 'error');
+      showSnackbar('Failed to create/update user ' + username, 'error');
     } finally {
       setLoading(false);
     }
@@ -173,7 +176,11 @@ const Signup = () => {
           sx={{ p: 0.3, bgcolor: '#f5f5f5', textAlign: 'center' }}
         />
         <CardContent>
-          {error && <Typography color="error" align="center">{error}</Typography>}
+          {error && (
+            <Typography color="error" align="center">
+              {error}
+            </Typography>
+          )}
 
           <form onSubmit={handleSubmit}>
             {/* Full Name and Username in one row */}
@@ -189,7 +196,9 @@ const Signup = () => {
                     setUsername(e.target.value);
                     setUsernameError('');
                   }}
-                  onBlur={() => !username && setUsernameError('Username is required.')}
+                  onBlur={() =>
+                    !username && setUsernameError('Username is required.')
+                  }
                   helperText={usernameError}
                   error={Boolean(usernameError)}
                   disabled={isEditing}
@@ -206,7 +215,9 @@ const Signup = () => {
                     setFullname(e.target.value);
                     setFullnameError('');
                   }}
-                  onBlur={() => !fullname && setFullnameError('Full name is required.')}
+                  onBlur={() =>
+                    !fullname && setFullnameError('Full name is required.')
+                  }
                   helperText={fullnameError}
                   error={Boolean(fullnameError)}
                 />
@@ -227,7 +238,9 @@ const Signup = () => {
                     setPassword(e.target.value);
                     setPasswordError('');
                   }}
-                  onBlur={() => password && setPasswordError(validatePassword(password))}
+                  onBlur={() =>
+                    password && setPasswordError(validatePassword(password))
+                  }
                   helperText={passwordError}
                   error={Boolean(passwordError)}
                 />
@@ -245,7 +258,12 @@ const Signup = () => {
                     setConfirmPasswordError('');
                   }}
                   onBlur={() =>
-                    confirmPassword && setConfirmPasswordError(password !== confirmPassword ? 'Passwords do not match.' : '')
+                    confirmPassword &&
+                    setConfirmPasswordError(
+                      password !== confirmPassword
+                        ? 'Passwords do not match.'
+                        : ''
+                    )
                   }
                   helperText={confirmPasswordError}
                   error={Boolean(confirmPasswordError)}
@@ -256,7 +274,11 @@ const Signup = () => {
             {/* Role and Designation in one row */}
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <FormControl fullWidth margin="normal" error={Boolean(roleError)}>
+                <FormControl
+                  fullWidth
+                  margin="normal"
+                  error={Boolean(roleError)}
+                >
                   <InputLabel>Role</InputLabel>
                   <Select
                     value={role}
@@ -288,7 +310,10 @@ const Signup = () => {
                     setDesignation(e.target.value);
                     setDesignationError('');
                   }}
-                  onBlur={() => !designation && setDesignationError('Designation is required.')}
+                  onBlur={() =>
+                    !designation &&
+                    setDesignationError('Designation is required.')
+                  }
                   helperText={designationError}
                   error={Boolean(designationError)}
                 />
@@ -320,7 +345,10 @@ const Signup = () => {
                 </Button>
               </Grid>
               <Grid item>
-                <Button variant="outlined" onClick={() => navigate('/manage-users')}>
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate('/manage-users')}
+                >
                   Cancel
                 </Button>
               </Grid>
@@ -329,7 +357,6 @@ const Signup = () => {
         </CardContent>
       </Card>
     </Container>
-
   );
 };
 

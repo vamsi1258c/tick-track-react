@@ -14,7 +14,7 @@ import TicketCreate from './components/tickets/TicketCreate';
 import TicketEdit from './components/tickets/TicketEdit';
 import TicketView from './components/tickets/TicketView';
 import TicketsList from './components/tickets/TicketsList';
-import { ChevronLeft, ChevronRight } from '@mui/icons-material'; 
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import './App.css';
 import { logoutUser } from './services/authService';
 import api, { setAuthToken } from './services/api';
@@ -84,7 +84,8 @@ function App() {
     setIsSidebarOpen((prev) => !prev);
   };
 
-  const hideNavAndSidebar = location.pathname === '/signin' || location.pathname === '/session-expired';
+  const hideNavAndSidebar =
+    location.pathname === '/signin' || location.pathname === '/session-expired';
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -146,88 +147,183 @@ function App() {
             transition: 'margin-left 0.3s ease',
             padding: 0,
             height: '100vh',
-            width: isSidebarOpen && !hideNavAndSidebar ? 'calc(100% - 200px)' : '100%',
+            width:
+              isSidebarOpen && !hideNavAndSidebar
+                ? 'calc(100% - 200px)'
+                : '100%',
             display: 'flex',
             flexDirection: 'column',
           }}
         >
           {!hideNavAndSidebar && (
-            <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1050, width: '100%', height: '45px' }}>
-              <TopBar isAuthenticated={isAuthenticated} onSignOut={handleSignOut} userName={userName} userRole={userRole} />
+            <Box
+              sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 1050,
+                width: '100%',
+                height: '45px',
+              }}
+            >
+              <TopBar
+                isAuthenticated={isAuthenticated}
+                onSignOut={handleSignOut}
+                userName={userName}
+                userRole={userRole}
+              />
             </Box>
           )}
 
-          <Box sx={{
-            position: 'fixed',
-            top: '45px',
-            left: isSidebarOpen && !hideNavAndSidebar ? '200px' : '5px',
-            width: isSidebarOpen && !hideNavAndSidebar ? 'calc(100% - 200px)' : '100%',
-            zIndex: 1030,
-            marginTop: 0,
-            marginLeft: isSidebarOpen ? '0px' : '20px',
-            marginBottom: 8,
-          }}>
+          <Box
+            sx={{
+              position: 'fixed',
+              top: '45px',
+              left: isSidebarOpen && !hideNavAndSidebar ? '200px' : '5px',
+              width:
+                isSidebarOpen && !hideNavAndSidebar
+                  ? 'calc(100% - 200px)'
+                  : '100%',
+              zIndex: 1030,
+              marginTop: 0,
+              marginLeft: isSidebarOpen ? '0px' : '20px',
+              marginBottom: 8,
+            }}
+          >
             <Breadcrumb title={getBreadcrumbTitle()} />
           </Box>
 
-          <Box sx={{
-            flex: '1 0 auto',
-            padding: '10px 10px 5px 10px',
-            marginTop: !hideNavAndSidebar ? '65px' : '0',
-            marginBottom: 0,
-          }}>
+          <Box
+            sx={{
+              flex: '1 0 auto',
+              padding: '10px 10px 5px 10px',
+              marginTop: !hideNavAndSidebar ? '65px' : '0',
+              marginBottom: 0,
+            }}
+          >
             <Routes>
               {/* Protected Routes */}
               <Route
                 path="/"
-                element={isAuthenticated ? <Dashboard /> : <Navigate to="/signin" replace />}
+                element={
+                  isAuthenticated ? (
+                    <Dashboard />
+                  ) : (
+                    <Navigate to="/signin" replace />
+                  )
+                }
               />
               <Route
                 path="/create-ticket"
-                element={isAuthenticated ? <TicketCreate currentUser={userName} isEditMode={false} /> : <Navigate to="/signin" replace />}
+                element={
+                  isAuthenticated ? (
+                    <TicketCreate currentUser={userName} isEditMode={false} />
+                  ) : (
+                    <Navigate to="/signin" replace />
+                  )
+                }
               />
               <Route
                 path="/edit-ticket"
-                element={isAuthenticated ? <TicketEdit currentUserId={userId} userRole={userRole} /> : <Navigate to="/signin" replace />}
+                element={
+                  isAuthenticated ? (
+                    <TicketEdit currentUserId={userId} userRole={userRole} />
+                  ) : (
+                    <Navigate to="/signin" replace />
+                  )
+                }
               />
               <Route
                 path="/view-ticket"
-                element={isAuthenticated ? <TicketView currentUser={userName} userRole={userRole} /> : <Navigate to="/signin" replace />}
+                element={
+                  isAuthenticated ? (
+                    <TicketView currentUser={userName} userRole={userRole} />
+                  ) : (
+                    <Navigate to="/signin" replace />
+                  )
+                }
               />
               <Route
                 path="/tickets"
-                element={isAuthenticated ? <TicketsList currentUser={userName} userRole={userRole} /> : <Navigate to="/signin" replace />}
+                element={
+                  isAuthenticated ? (
+                    <TicketsList currentUser={userName} userRole={userRole} />
+                  ) : (
+                    <Navigate to="/signin" replace />
+                  )
+                }
               />
               <Route
                 path="/manage-users"
-                element={isAuthenticated
-                  ? userRole === 'admin'
-                    ? <UsersManage currentUser={userName} userRole={userRole} />
-                    : <Home />
-                  : <Navigate to="/signin" state={{ from: location }} replace />
+                element={
+                  isAuthenticated ? (
+                    userRole === 'admin' ? (
+                      <UsersManage currentUser={userName} userRole={userRole} />
+                    ) : (
+                      <Home />
+                    )
+                  ) : (
+                    <Navigate to="/signin" state={{ from: location }} replace />
+                  )
                 }
               />
               <Route
                 path="/settings"
-                element={isAuthenticated ? <Settings /> : <Navigate to="/signin" replace />}
+                element={
+                  isAuthenticated ? (
+                    <Settings />
+                  ) : (
+                    <Navigate to="/signin" replace />
+                  )
+                }
               />
-              <Route path="/signup" element={isAuthenticated ? <Signup /> : <Navigate to="/signin" replace />} />
+              <Route
+                path="/signup"
+                element={
+                  isAuthenticated ? (
+                    <Signup />
+                  ) : (
+                    <Navigate to="/signin" replace />
+                  )
+                }
+              />
 
               {/* Public Routes */}
-              <Route path="/signin" element={<Signin setIsAuthenticated={setIsAuthenticated} onLoginSuccess={handleLoginSuccess} />} />
+              <Route
+                path="/signin"
+                element={
+                  <Signin
+                    setIsAuthenticated={setIsAuthenticated}
+                    onLoginSuccess={handleLoginSuccess}
+                  />
+                }
+              />
 
               <Route path="/session-expired" element={<SessionExpired />} />
 
               {/* User Profile Route */}
               <Route
                 path="/profile/:id"
-                element={isAuthenticated ? <UserProfile /> : <Navigate to="/signin" replace />}
+                element={
+                  isAuthenticated ? (
+                    <UserProfile />
+                  ) : (
+                    <Navigate to="/signin" replace />
+                  )
+                }
               />
 
               {/* User Activity Log Route */}
               <Route
                 path="/activity/:id"
-                element={isAuthenticated ? <UserActivityLog /> : <Navigate to="/signin" replace />}
+                element={
+                  isAuthenticated ? (
+                    <UserActivityLog />
+                  ) : (
+                    <Navigate to="/signin" replace />
+                  )
+                }
               />
             </Routes>
           </Box>
@@ -256,7 +352,6 @@ function App() {
           {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
         </IconButton>
       )}
-
     </Box>
   );
 }

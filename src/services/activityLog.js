@@ -3,33 +3,41 @@ import api from './api';
 // Fetch all activity logs
 export const fetchActivityLogs = async () => {
   try {
-    const response = await api.get('/activity-log');  
+    const response = await api.get('/activity-log');
     return response;
   } catch (error) {
     console.log('Error fetching activity logs:', error);
-    throw error.response?.data || 'An error occurred while fetching activity logs';
+    throw (
+      error.response?.data || 'An error occurred while fetching activity logs'
+    );
   }
 };
 
 // Fetch a single activity log by ID
 export const fetchActivityLog = async (logId) => {
   try {
-    const response = await api.get(`/activity-log/${logId}`);  
+    const response = await api.get(`/activity-log/${logId}`);
     return response;
   } catch (error) {
     console.log('Error fetching activity log:', error);
-    throw error.response?.data || 'An error occurred while fetching the activity log';
+    throw (
+      error.response?.data ||
+      'An error occurred while fetching the activity log'
+    );
   }
 };
 
 // Delete an activity log by ID
 export const deleteActivityLog = async (logId) => {
   try {
-    const response = await api.delete(`/activity-log/${logId}`);  
+    const response = await api.delete(`/activity-log/${logId}`);
     return response;
   } catch (error) {
     console.log('Error deleting activity log:', error);
-    throw error.response?.data || 'An error occurred while deleting the activity log';
+    throw (
+      error.response?.data ||
+      'An error occurred while deleting the activity log'
+    );
   }
 };
 
@@ -51,7 +59,10 @@ export const fetchActivityLogsByUserId = async (userId) => {
     return response;
   } catch (error) {
     console.log('Error fetching activity logs for user:', error);
-    throw error.response?.data || 'An error occurred while fetching activity logs for this user';
+    throw (
+      error.response?.data ||
+      'An error occurred while fetching activity logs for this user'
+    );
   }
 };
 
@@ -62,6 +73,9 @@ export const fetchActivityLogsByTicketId = async (ticketId) => {
     return response;
   } catch (error) {
     console.log('Error fetching activity logs for ticket:', error);
-    throw error.response?.data || 'An error occurred while fetching activity logs for this ticket';
+    throw (
+      error.response?.data ||
+      'An error occurred while fetching activity logs for this ticket'
+    );
   }
 };

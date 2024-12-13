@@ -29,7 +29,11 @@ export const SnackbarProvider = ({ children }) => {
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={handleClose} severity={snackbar.severity} variant="filled">
+        <Alert
+          onClose={handleClose}
+          severity={snackbar.severity}
+          variant="filled"
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>

@@ -1,11 +1,19 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, Box } from '@mui/material';
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Box,
+} from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import GroupIcon from '@mui/icons-material/Group';
 import SettingsIcon from '@mui/icons-material/Settings';
-import './Sidebar.css';   
+import './Sidebar.css';
 
 const SideBar = ({ isOpen, userRole }) => {
   return (
@@ -30,17 +38,24 @@ const SideBar = ({ isOpen, userRole }) => {
       }}
       open={isOpen}
     >
-      <Box sx={{ display: 'flex', marginTop: 2, flexDirection: 'column', height: '100%' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          marginTop: 2,
+          flexDirection: 'column',
+          height: '100%',
+        }}
+      >
         {/* Main Navigation */}
         <List sx={{ marginTop: 2, marginLeft: 2, padding: 0 }}>
           {/* Dashboard */}
           <ListItem
             button
-            component={NavLink}   
+            component={NavLink}
             to="/"
             exact
-            className="sidebar-link"   
-            activeClassName="active"   
+            className="sidebar-link"
+            activeClassName="active"
           >
             <ListItemIcon className="sidebar-icon">
               <DashboardIcon />
@@ -51,10 +66,10 @@ const SideBar = ({ isOpen, userRole }) => {
           {/* Tickets */}
           <ListItem
             button
-            component={NavLink}   
+            component={NavLink}
             to="/tickets"
-            className="sidebar-link"   
-            activeClassName="active"   
+            className="sidebar-link"
+            activeClassName="active"
           >
             <ListItemIcon className="sidebar-icon">
               <LocalOfferIcon />
@@ -66,10 +81,10 @@ const SideBar = ({ isOpen, userRole }) => {
           {userRole === 'admin' && (
             <ListItem
               button
-              component={NavLink}   
+              component={NavLink}
               to="/manage-users"
-              className="sidebar-link"   
-              activeClassName="active"   
+              className="sidebar-link"
+              activeClassName="active"
             >
               <ListItemIcon className="sidebar-icon">
                 <GroupIcon />
@@ -86,10 +101,10 @@ const SideBar = ({ isOpen, userRole }) => {
         <List sx={{ marginTop: 'auto', padding: 0 }}>
           <ListItem
             button
-            component={NavLink}   
+            component={NavLink}
             to="/settings"
-            className="sidebar-link"   
-            activeClassName="active"   
+            className="sidebar-link"
+            activeClassName="active"
           >
             <ListItemIcon className="sidebar-icon">
               <SettingsIcon />

@@ -60,10 +60,23 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
 
   return (
     <>
-      <Typography variant="h4" align="center" gutterBottom style={{ padding: '1rem', fontWeight: 'bold' }}>
+      <Typography
+        variant="h4"
+        align="center"
+        gutterBottom
+        style={{ padding: '1rem', fontWeight: 'bold' }}
+      >
         TickTrack
       </Typography>
-      <Container maxWidth="xs" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh' }}>
+      <Container
+        maxWidth="xs"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '70vh',
+        }}
+      >
         <Card variant="outlined" style={{ padding: '2rem', width: '100%' }}>
           <Typography variant="h5" align="center" gutterBottom>
             Sign In
@@ -104,11 +117,22 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
               helperText={passwordError}
             />
             {error && (
-              <Typography color="error" align="center" variant="body2" style={{ marginTop: '1rem' }}>
+              <Typography
+                color="error"
+                align="center"
+                variant="body2"
+                style={{ marginTop: '1rem' }}
+              >
                 {error}
               </Typography>
             )}
-            <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: '1.5rem' }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              style={{ marginTop: '1.5rem' }}
+            >
               Sign In
             </Button>
           </form>
@@ -117,6 +141,5 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
     </>
   );
 };
-
 
 export default Signin;
