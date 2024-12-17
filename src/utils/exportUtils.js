@@ -1,4 +1,4 @@
-import { utils, writeFile } from 'xlsx'
+import ExcelJS from 'exceljs';
 
 // Convert to Title Case
 const toTitleCase = (str) => {
@@ -18,7 +18,6 @@ const removeHtmlTags = (str) => {
 
 // Utility function to extract fullname from objects like assignee and creator
 const extractFullName = (value) => {
-  console.log(value)
   if (value && value.fullname) {
     return value.fullname || ''
   }
@@ -52,14 +51,15 @@ export const exportToCSV = (data, headers, fileName) => {
     )
   ].join('\n')
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  link.href = URL.createObjectURL(blob)
-  link.download = `${fileName}.csv`
-  link.click()
-}
+  // Create a Blob object and use FileSaver for downloading the CSV file
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${fileName}.csv`;
+  link.click();
+};
 
-// Utility function to export data to Excel
+// Utility function to export data to Excel (XLSX)
 export const exportToExcel = (data, headers, fileName) => {
   const cleanData = data.map((row) => {
     const cleanedRow = { ...row }
@@ -77,24 +77,24 @@ export const exportToExcel = (data, headers, fileName) => {
     return cleanedRow
   })
 
-  // Map data based on headers
-  const ws_data = [
-    headers,
-    ...cleanData.map((row) =>
-      headers.map((header) => String(row[header] || ''))
-    )
-  ]
+  // Create a new workbook and worksheet
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Sheet 1');
 
-  // Convert headers to Title Case
-  const titleCaseHeaders = headers.map((header) => toTitleCase(header))
+  // Add headers to the worksheet
+  worksheet.addRow(headers.map(header => toTitleCase(header)));
 
-  // Create a new worksheet with title-cased headers
-  const ws = utils.aoa_to_sheet([titleCaseHeaders, ...ws_data.slice(1)])
+  // Add data to the worksheet
+  cleanData.forEach(row => {
+    worksheet.addRow(headers.map(header => row[header] || ''));
+  });
 
-  // Create a new workbook
-  const wb = utils.book_new()
-  utils.book_append_sheet(wb, ws, 'Sheet 1')
-
-  // Write to file
-  writeFile(wb, `${fileName}.xlsx`)
-}
+  // Set file type and download the Excel file
+  workbook.xlsx.writeBuffer().then((buffer) => {
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${fileName}.xlsx`;
+    link.click();
+  });
+};

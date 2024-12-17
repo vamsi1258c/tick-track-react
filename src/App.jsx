@@ -57,7 +57,7 @@ function App() {
       setIsAuthenticated(true)
     }
     setIsLoading(false)
-  }, [])
+  }, [dispatch])
 
   const handleAuthFailure = () => {
     setIsAuthenticated(false)
