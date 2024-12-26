@@ -13,8 +13,8 @@ import {
   useMediaQuery,
   Drawer
 } from '@mui/material'
+import { useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { getLoggedInUserId } from '../utils/global'
 
 // Import MUI icons
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
@@ -23,9 +23,12 @@ import TagIcon from '@mui/icons-material/Tag'
 import PersonIcon from '@mui/icons-material/Person'
 import ListAltIcon from '@mui/icons-material/ListAlt'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import MenuIcon from '@mui/icons-material/Menu' // For hamburger menu
+import MenuIcon from '@mui/icons-material/Menu'
 
-const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
+const TopBar = ({ isAuthenticated, onSignOut }) => {
+  const userName = useSelector((state) => state.app.userName)
+  const userRole = useSelector((state) => state.app.userRole)
+  const userId = useSelector((state) => state.app.userId)
   const navigate = useNavigate()
   const [anchorElProfile, setAnchorElProfile] = useState(null)
   const [anchorElDropdown, setAnchorElDropdown] = useState(null)
@@ -190,14 +193,14 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
                   {/* Profile and Activity Log Links */}
                   <MenuItem
                     component={Link}
-                    to={`/profile/${getLoggedInUserId()}`}
+                    to={`/profile/${userId}`}
                     sx={{ display: 'flex', alignItems: 'center' }}
                   >
                     <PersonIcon style={{ marginRight: '8px' }} /> View Profile
                   </MenuItem>
                   <MenuItem
                     component={Link}
-                    to={`/activity/${getLoggedInUserId()}`}
+                    to={`/activity/${userId}`}
                     sx={{ display: 'flex', alignItems: 'center' }}
                   >
                     <ListAltIcon style={{ marginRight: '8px' }} /> View Activity
@@ -225,14 +228,14 @@ const TopBar = ({ isAuthenticated, onSignOut, userName, userRole }) => {
               <>
                 <Button
                   component={Link}
-                  to={`/profile/${getLoggedInUserId()}`}
+                  to={`/profile/${userId}`}
                   sx={{ marginBottom: 2 }}
                 >
                   View Profile
                 </Button>
                 <Button
                   component={Link}
-                  to={`/activity/${getLoggedInUserId()}`}
+                  to={`/activity/${userId}`}
                   sx={{ marginBottom: 2 }}
                 >
                   View Activity Log

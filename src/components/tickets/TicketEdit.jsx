@@ -24,8 +24,10 @@ import { fetchComments, createComment } from '../../services/comment'
 import AttachmentsView from './AttachmentsView'
 import RichTextEditor from './RichTextEditor'
 import { useSnackbar } from '../Snackbar'
+import { useSelector } from 'react-redux'
 
-const TicketEdit = ({ currentUserId }) => {
+const TicketEdit = () => {
+  const userId = useSelector((state) => state.app.userId)
   const location = useLocation()
   const ticketId = location.state?.ticketId
   const [validationErrors, setValidationErrors] = useState({})
@@ -118,7 +120,7 @@ const TicketEdit = ({ currentUserId }) => {
       }
     }
     fetchAllData()
-  }, [currentUserId, ticketId, resetTrigger, showSnackbar])
+  }, [userId, ticketId, resetTrigger, showSnackbar])
 
   // Handle category change to update subcategories
   const handleCategoryChange = (e) => {
@@ -272,7 +274,7 @@ const TicketEdit = ({ currentUserId }) => {
           await createComment(ticketId, {
             content: newComment,
             ticket_id: ticketId,
-            user_id: currentUserId
+            user_id: userId
           })
         }
 

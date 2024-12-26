@@ -22,8 +22,10 @@ import { fetchUsers } from '../../services/authService'
 import RichTextEditor from './RichTextEditor'
 import { Autocomplete } from '@mui/material'
 import { useSnackbar } from '../Snackbar'
+import { useSelector } from 'react-redux'
 
-const TicketCreate = ({ currentUser }) => {
+const TicketCreate = () => {
+  const userName = useSelector((state) => state.app.userName)
   const [ticketData, setTicketData] = useState({
     title: '',
     description: '',
@@ -68,12 +70,12 @@ const TicketCreate = ({ currentUser }) => {
         setUsers(
           response.data.map((user) => ({ id: user.id, label: user.username }))
         )
-        const currentUserId = response.data.find(
-          (user) => user.username === currentUser
+        const userNameId = response.data.find(
+          (user) => user.username === userName
         )?.id
         setTicketData((prevData) => ({
           ...prevData,
-          created_by: currentUserId
+          created_by: userNameId
         }))
       } catch (error) {
         setError('Failed to fetch users.')
@@ -88,7 +90,7 @@ const TicketCreate = ({ currentUser }) => {
 
     fetchAllUsers()
     fetchAllConfigs()
-  }, [currentUser, showSnackbar])
+  }, [userName, showSnackbar])
 
   useEffect(() => {
     setSubcategories(getSubcategories(ticketData.category))

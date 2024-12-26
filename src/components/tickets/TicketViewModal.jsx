@@ -34,13 +34,10 @@ const TicketViewModal = ({
   show,
   onClose,
   selectedTicket,
-  users,
   renderCategoryBadge,
   renderStatusBadge,
   renderPriorityBadge,
-  navigate,
-  currentUser,
-  refreshTickets
+  navigate
 }) => {
   function toTitleCase(text) {
     return text

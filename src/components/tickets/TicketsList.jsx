@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { fetchTickets, deleteTicket } from '../../services/ticket'
 import { fetchUsers } from '../../services/authService'
-import { downloadAttachment } from '../../services/attachment'
+// import { downloadAttachment } from '../../services/attachment'
 import { fetchConfigMaster } from '../../services/configMaster'
 import { useNavigate } from 'react-router-dom'
 import { FaSearch } from 'react-icons/fa'
@@ -44,13 +44,16 @@ import {
   Close as CloseIcon,
   MoreVert as MoreVertIcon
 } from '@mui/icons-material'
+import { useSelector } from 'react-redux'
 
 import './TicketsList.css'
 import TicketViewModal from './TicketViewModal'
 import { exportToCSV, exportToExcel } from '../../utils/exportUtils'
 import { useSnackbar } from '../Snackbar'
 
-const TicketsList = ({ currentUser, userRole }) => {
+const TicketsList = () => {
+  const userName = useSelector((state) => state.app.userName)
+  const userRole = useSelector((state) => state.app.userRole)
   const [tickets, setTickets] = useState([])
   const [users, setUsers] = useState([])
   const [configs, setConfigs] = useState([])
@@ -81,6 +84,8 @@ const TicketsList = ({ currentUser, userRole }) => {
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber)
   const navigate = useNavigate()
   const { showSnackbar } = useSnackbar()
+
+  console.log('INSIDE TICKET LIST', userName, userRole)
 
   const exportColumns = [
     'id',
@@ -124,17 +129,17 @@ const TicketsList = ({ currentUser, userRole }) => {
         // Admins and support can see all tickets, no filter needed
       } else {
         filteredTickets = filteredTickets.filter(
-          (ticket) => ticket.creator?.username === currentUser
+          (ticket) => ticket.creator?.username === userName
         )
       }
 
       if (filter === 'assigned_to_me') {
         filteredTickets = filteredTickets.filter(
-          (ticket) => ticket.assignee?.username === currentUser
+          (ticket) => ticket.assignee?.username === userName
         )
       } else if (filter === 'created_by_me') {
         filteredTickets = filteredTickets.filter(
-          (ticket) => ticket.creator?.username === currentUser
+          (ticket) => ticket.creator?.username === userName
         )
       }
       if (userFilter.length > 0) {
@@ -193,7 +198,7 @@ const TicketsList = ({ currentUser, userRole }) => {
     setLoading(false)
   }, [
     filter,
-    currentUser,
+    userName,
     priorityFilter,
     categoryFilter,
     statusFilter,
@@ -235,13 +240,13 @@ const TicketsList = ({ currentUser, userRole }) => {
     setShowViewModal(true)
   }
 
-  const handleDownloadAttachment = async (ticketid, attachmentId) => {
-    try {
-      await downloadAttachment(ticketid, attachmentId)
-    } catch (error) {
-      console.error('Failed to download attachment', error)
-    }
-  }
+  // const handleDownloadAttachment = async (ticketid, attachmentId) => {
+  //   try {
+  //     await downloadAttachment(ticketid, attachmentId)
+  //   } catch (error) {
+  //     console.error('Failed to download attachment', error)
+  //   }
+  // }
 
   const handleAddUser = () => {
     navigate('/create-ticket')
@@ -621,7 +626,7 @@ const TicketsList = ({ currentUser, userRole }) => {
                         >
                           <EditIcon sx={{ fontSize: 15 }} />
                         </IconButton>
-                        {ticket.creator?.username === currentUser && (
+                        {ticket.creator?.username === userName && (
                           <IconButton
                             size="small"
                             onClick={(e) => {
@@ -751,15 +756,10 @@ const TicketsList = ({ currentUser, userRole }) => {
         show={showViewModal}
         onClose={() => setShowViewModal(false)}
         selectedTicket={selectedTicket}
-        users={users}
         renderCategoryBadge={renderCategoryBadge}
         renderStatusBadge={renderStatusBadge}
         renderPriorityBadge={renderPriorityBadge}
-        handleDownloadAttachment={handleDownloadAttachment}
         navigate={navigate}
-        currentUser={currentUser}
-        setShowViewModal={setShowViewModal}
-        refreshTickets={handleRefresh}
       />
     </div>
   )

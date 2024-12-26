@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   Box,
@@ -55,7 +56,8 @@ import {
 } from '../../utils/renderBadges'
 import './TicketDetail.css'
 
-const TicketView = ({ currentUser }) => {
+const TicketView = () => {
+  const userName = useSelector((state) => state.app.userName)
   const location = useLocation()
   const ticketId = location.state?.ticketId
   const [selectedTicket, setSelectedTicket] = useState({})
@@ -170,7 +172,7 @@ const TicketView = ({ currentUser }) => {
         const response = await createComment(selectedTicket.id, {
           content: newComment,
           ticket_id: selectedTicket.id,
-          user_id: users.find((user) => user.username === currentUser)?.id
+          user_id: users.find((user) => user.username === userName)?.id
         })
         selectedTicket.comments.push(response.data)
         setNewComment('')
@@ -280,7 +282,7 @@ const TicketView = ({ currentUser }) => {
           >
             <EditIcon />
           </IconButton>
-          {selectedTicket.creator?.username === currentUser &&
+          {selectedTicket.creator?.username === userName &&
             selectedTicket.status === 'closed' && (
               <IconButton
                 size="small"
@@ -306,7 +308,6 @@ const TicketView = ({ currentUser }) => {
             <RefreshIcon />
           </IconButton>
           <StatusDropdown
-            currentUser={currentUser}
             selectedTicket={selectedTicket}
             onUpdateStatus={handleStatusUpdate}
           />
@@ -645,7 +646,6 @@ const TicketView = ({ currentUser }) => {
         approvers={users.filter((user) => user.approver)}
         loading={loadingApprovers}
         ticketId={selectedTicket?.id}
-        currentUserId={users.find((user) => user.username === currentUser)?.id}
         status={selectedTicket.status}
         newStatus={updatedStatus}
       />

@@ -1,9 +1,11 @@
-// Helper function to get loggedInUser from localStorage
+import { store } from '../store/store'
+
+// Helper function to get loggedInUser from Redux store
 export const getLoggedInUser = () => {
-  return localStorage.getItem('userName')
+  return store.getState().app.userName
 }
 
-// Helper function to get loggedInUser from localStorage
+// Helper function to get loggedInUserId from Redux store
 export const getLoggedInUserId = () => {
-  return Number(localStorage.getItem('userId'))
+  return store.getState().app.userId
 }

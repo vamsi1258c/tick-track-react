@@ -2,14 +2,17 @@ import React, { useState } from 'react'
 import { Container, Card, TextField, Button, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { loginUser } from '../services/authService'
+import { useDispatch } from 'react-redux'
+import { setUser } from '../store/appSlice'
 
-const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
+const Signin = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [emailError, setEmailError] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -47,7 +50,7 @@ const Signin = ({ setIsAuthenticated, onLoginSuccess }) => {
     try {
       const response = await loginUser({ username: email, password })
       if (response && response.status === 200) {
-        setIsAuthenticated(true)
+        dispatch(setUser(response.data.user))
         onLoginSuccess(response.data.user)
         navigate('/')
       } else {

@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { MenuItem, Select, FormControl, CircularProgress } from '@mui/material'
 import { fetchConfigMaster } from '../../services/configMaster'
+import { useSelector } from 'react-redux'
 
-const StatusDropdown = ({ currentUser, selectedTicket, onUpdateStatus }) => {
+const StatusDropdown = ({ selectedTicket, onUpdateStatus }) => {
+  const userName = useSelector((state) => state.app.userName)
   const [status, setStatus] = useState(selectedTicket?.status || 'open')
   const [availableStatuses, setAvailableStatuses] = useState([])
   const [statusOptions, setStatusOptions] = useState([])
   const [loading, setLoading] = useState(true)
 
   // Determine if the current user has specific roles
-  const isCreator = currentUser === selectedTicket?.creator?.username
-  const isAssignee = currentUser === selectedTicket?.assignee?.username
-  const isApprover = currentUser === selectedTicket?.approver?.username
+  const isCreator = userName === selectedTicket?.creator?.username
+  const isAssignee = userName === selectedTicket?.assignee?.username
+  const isApprover = userName === selectedTicket?.approver?.username
 
   console.log('test rerender issue')
 
@@ -85,7 +87,7 @@ const StatusDropdown = ({ currentUser, selectedTicket, onUpdateStatus }) => {
       )
 
     setAvailableStatuses(filteredOptions)
-  }, [status, statusOptions, currentUser, getAvailableStatuses])
+  }, [status, statusOptions, userName, getAvailableStatuses])
 
   // Handle status change
   const handleChange = (event) => {
