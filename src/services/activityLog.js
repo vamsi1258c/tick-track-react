@@ -44,7 +44,6 @@ export const deleteActivityLog = async (logId) => {
 // Create a new activity log
 export const createActivityLog = async (logData) => {
   try {
-    console.log(logData)
     const response = await api.post('/activity-log', logData)
     return response
   } catch (error) {

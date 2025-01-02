@@ -35,7 +35,8 @@ export const getUserIdFromToken = (token) => {
 
 export const refreshTokenFun = async () => {
   try {
-    const refreshToken = store.getState().app.refreshToken
+    const globalState = store.getState()
+    const refreshToken = globalState?.app?.refreshToken
     const response = await api.post(
       '/refresh',
       {},

@@ -18,7 +18,6 @@ const removeHtmlTags = (str) => {
 
 // Utility function to extract fullname from objects like assignee and creator
 const extractFullName = (value) => {
-  console.log(value)
   if (value && value.fullname) {
     return value.fullname || ''
   }

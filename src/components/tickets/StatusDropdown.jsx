@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { MenuItem, Select, FormControl, CircularProgress } from '@mui/material'
 import { fetchConfigMaster } from '../../services/configMaster'
 import { useSelector } from 'react-redux'
+import { isUserInRole } from '../../utils/global'
 
 const StatusDropdown = ({ selectedTicket, onUpdateStatus }) => {
   const userName = useSelector((state) => state.app.userName)
@@ -11,11 +12,9 @@ const StatusDropdown = ({ selectedTicket, onUpdateStatus }) => {
   const [loading, setLoading] = useState(true)
 
   // Determine if the current user has specific roles
-  const isCreator = userName === selectedTicket?.creator?.username
-  const isAssignee = userName === selectedTicket?.assignee?.username
-  const isApprover = userName === selectedTicket?.approver?.username
-
-  console.log('test rerender issue')
+  const isCreator = isUserInRole(userName, selectedTicket, 'creator')
+  const isAssignee = isUserInRole(userName, selectedTicket, 'assignee')
+  const isApprover = isUserInRole(userName, selectedTicket, 'approver')
 
   // Fetch status options from the backend
   useEffect(() => {

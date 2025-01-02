@@ -25,7 +25,6 @@ export const fetchComment = async (commentId) => {
 // Create a new comment on a specific ticket
 export const createComment = async (ticketId, commentData) => {
   try {
-    console.log(commentData)
     const response = await api.post(`/ticket/${ticketId}/comments`, commentData)
     return response
   } catch (error) {

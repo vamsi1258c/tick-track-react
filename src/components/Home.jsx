@@ -17,7 +17,6 @@ const Home = () => {
   const [recentActivity, setRecentActivity] = useState([])
   const userId = useSelector((state) => state.app.userId)
   const userRole = useSelector((state) => state.app.userRole)
-  console.log(userId)
 
   useEffect(() => {
     const fetchActivity = async () => {

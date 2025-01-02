@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { fetchTickets, deleteTicket } from '../../services/ticket'
 import { fetchUsers } from '../../services/authService'
-// import { downloadAttachment } from '../../services/attachment'
 import { fetchConfigMaster } from '../../services/configMaster'
 import { useNavigate } from 'react-router-dom'
 import { FaSearch } from 'react-icons/fa'
@@ -84,8 +83,6 @@ const TicketsList = () => {
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber)
   const navigate = useNavigate()
   const { showSnackbar } = useSnackbar()
-
-  console.log('INSIDE TICKET LIST', userName, userRole)
 
   const exportColumns = [
     'id',
@@ -239,14 +236,6 @@ const TicketsList = () => {
     setSelectedTicket(ticket)
     setShowViewModal(true)
   }
-
-  // const handleDownloadAttachment = async (ticketid, attachmentId) => {
-  //   try {
-  //     await downloadAttachment(ticketid, attachmentId)
-  //   } catch (error) {
-  //     console.error('Failed to download attachment', error)
-  //   }
-  // }
 
   const handleAddUser = () => {
     navigate('/create-ticket')

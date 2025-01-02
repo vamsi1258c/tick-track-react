@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Grid, IconButton } from '@mui/material'
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import {
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+  Navigate
+} from 'react-router-dom'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistor } from './store/store'
 import SideBar from './components/SideBar'
@@ -34,12 +40,13 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const userId = useSelector((state) => state.app.userId)
   const userRole = useSelector((state) => state.app.userRole)
   const isAuthenticated = Boolean(userId)
 
   const handleSessionTimeout = () => {
-    window.location.href = '/session-expired'
+    navigate('/session-expired', { replace: true })
   }
 
   // Trigger session timeout after 30 minutes of inactivity
@@ -61,9 +68,9 @@ function App() {
   }, [dispatch])
 
   const handleAuthFailure = () => {
-    dispatch(setUser({ id: null, username: '', role: '' }))
+    dispatch(setUser())
     dispatch(clearTokens())
-    window.location.href = '/signin'
+    navigate('/signin', { replace: true })
   }
 
   api.defaults.authFailureCallback = handleAuthFailure
@@ -78,10 +85,11 @@ function App() {
   const handleSignOut = () => {
     try {
       logoutUser()
+      navigate('/signin', { replace: true })
     } catch (err) {
       console.error(err)
     }
-    dispatch(setUser({ id: null, username: '', role: '' }))
+    dispatch(setUser())
     dispatch(clearTokens())
     localStorage.removeItem('authToken')
     localStorage.removeItem('refreshToken')
