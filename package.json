@@ -19,6 +19,7 @@
     "bootstrap": "^5.3.3",
     "dayjs": "^1.11.13",
     "dompurify": "^3.1.7",
+    "exceljs": "^4.4.0",
     "html-to-text": "^9.0.5",
     "jwt-decode": "^4.0.0",
     "papaparse": "^5.4.1",
@@ -83,5 +84,9 @@
       "npm run lint",
       "git add"
     ]
+  },
+  "overrides": {
+    "nth-check": "2.1.1",
+    "postcss": ">=8.4.31"
   }
 }
