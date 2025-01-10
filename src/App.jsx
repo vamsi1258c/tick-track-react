@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Grid, IconButton } from '@mui/material'
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import {
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+  Navigate
+} from 'react-router-dom'
+import { PersistGate } from 'redux-persist/integration/react'
+import { persistor } from './store/store'
 import SideBar from './components/SideBar'
 import TopBar from './components/TopBar'
 import Footer from './components/Footer'
@@ -24,19 +32,21 @@ import UserActivityLog from './components/UserActivityLog'
 import Breadcrumb from './components/Breadcrumb'
 import useIdleTimeout from './hooks/useIdleTimeout'
 import { useDispatch, useSelector } from 'react-redux'
-import { setUser } from './store/appSlice'
+import { setUser, setTokens, clearTokens } from './store/appSlice'
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const location = useLocation()
   const [isLoading, setIsLoading] = useState(true)
 
   const dispatch = useDispatch()
-  const { userId, userName, userRole } = useSelector((state) => state.app)
+  const navigate = useNavigate()
+  const userId = useSelector((state) => state.app.userId)
+  const userRole = useSelector((state) => state.app.userRole)
+  const isAuthenticated = Boolean(userId)
 
   const handleSessionTimeout = () => {
-    window.location.href = '/session-expired'
+    navigate('/session-expired', { replace: true })
   }
 
   // Trigger session timeout after 30 minutes of inactivity
@@ -44,45 +54,48 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem('authToken')
-    dispatch(
-      setUser({
-        id: localStorage.getItem('userId'),
-        username: localStorage.getItem('userName'),
-        role: localStorage.getItem('userRole')
-      })
-    )
+    const refreshToken = localStorage.getItem('refreshToken')
+    const userId = localStorage.getItem('userId')
+    const userName = localStorage.getItem('userName')
+    const userRole = localStorage.getItem('userRole')
 
     if (token) {
       setAuthToken(token)
-      setIsAuthenticated(true)
+      dispatch(setTokens({ authToken: token, refreshToken }))
+      dispatch(setUser({ id: userId, username: userName, role: userRole }))
     }
     setIsLoading(false)
   }, [dispatch])
 
   const handleAuthFailure = () => {
-    setIsAuthenticated(false)
-    window.location.href = '/signin'
+    dispatch(setUser())
+    dispatch(clearTokens())
+    navigate('/signin', { replace: true })
   }
 
   api.defaults.authFailureCallback = handleAuthFailure
 
   const handleLoginSuccess = (user) => {
-    setIsAuthenticated(true)
     dispatch(setUser(user))
-    setUser(user)
-    localStorage.setItem('userRole', user.role)
-    localStorage.setItem('userName', user.username)
     localStorage.setItem('userId', user.id)
+    localStorage.setItem('userName', user.username)
+    localStorage.setItem('userRole', user.role)
   }
 
   const handleSignOut = () => {
     try {
       logoutUser()
+      navigate('/signin', { replace: true })
     } catch (err) {
       console.error(err)
     }
-    setIsAuthenticated(false)
     dispatch(setUser())
+    dispatch(clearTokens())
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('userId')
+    localStorage.removeItem('userName')
+    localStorage.removeItem('userRole')
   }
 
   const toggleSidebar = () => {
@@ -124,240 +137,240 @@ function App() {
   }
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Grid container sx={{ flexGrow: 1 }}>
-        {!hideNavAndSidebar && (
-          <Box
-            sx={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              position: 'fixed',
-              width: isSidebarOpen ? '200px' : '20px',
-              transition: 'left 0.3s ease, width 0.3s ease',
-              zIndex: 1000,
-              height: '100vh',
-              color: '#fff',
-              overflow: 'auto',
-              opacity: isSidebarOpen ? 1 : 0
-            }}
-          >
-            <SideBar isOpen={isSidebarOpen} userRole={userRole} />
-          </Box>
-        )}
-
-        <Box
-          sx={{
-            marginLeft: isSidebarOpen && !hideNavAndSidebar ? '200px' : '20px',
-            transition: 'margin-left 0.3s ease',
-            padding: 0,
-            height: '100vh',
-            width:
-              isSidebarOpen && !hideNavAndSidebar
-                ? 'calc(100% - 200px)'
-                : '100%',
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
+    <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+      <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Grid container sx={{ flexGrow: 1 }}>
           {!hideNavAndSidebar && (
             <Box
               sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
                 position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                zIndex: 1050,
-                width: '100%',
-                height: '45px'
+                width: isSidebarOpen ? '200px' : '20px',
+                transition: 'left 0.3s ease, width 0.3s ease',
+                zIndex: 1000,
+                height: '100vh',
+                color: '#fff',
+                overflow: 'auto',
+                opacity: isSidebarOpen ? 1 : 0
               }}
             >
-              <TopBar
-                isAuthenticated={isAuthenticated}
-                onSignOut={handleSignOut}
-                userName={userName}
-                userRole={userRole}
-              />
+              <SideBar isOpen={isSidebarOpen} userRole={userRole} />
             </Box>
           )}
 
           <Box
             sx={{
-              position: 'fixed',
-              top: '45px',
-              left: isSidebarOpen && !hideNavAndSidebar ? '200px' : '5px',
+              marginLeft:
+                isSidebarOpen && !hideNavAndSidebar ? '200px' : '20px',
+              transition: 'margin-left 0.3s ease',
+              padding: 0,
+              height: '100vh',
               width:
                 isSidebarOpen && !hideNavAndSidebar
                   ? 'calc(100% - 200px)'
                   : '100%',
-              zIndex: 1030,
-              marginTop: 0,
-              marginLeft: isSidebarOpen ? '0px' : '20px',
-              marginBottom: 8
+              display: 'flex',
+              flexDirection: 'column'
             }}
           >
-            <Breadcrumb title={getBreadcrumbTitle()} />
-          </Box>
+            {!hideNavAndSidebar && (
+              <Box
+                sx={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  zIndex: 1050,
+                  width: '100%',
+                  height: '45px'
+                }}
+              >
+                <TopBar
+                  isAuthenticated={isAuthenticated}
+                  onSignOut={handleSignOut}
+                />
+              </Box>
+            )}
 
-          <Box
-            sx={{
-              flex: '1 0 auto',
-              padding: '10px 10px 5px 10px',
-              marginTop: !hideNavAndSidebar ? '65px' : '0',
-              marginBottom: 0
-            }}
-          >
-            <Routes>
-              {/* Protected Routes */}
-              <Route
-                path="/"
-                element={
-                  isAuthenticated ? (
-                    <Dashboard />
-                  ) : (
-                    <Navigate to="/signin" replace />
-                  )
-                }
-              />
-              <Route
-                path="/create-ticket"
-                element={
-                  isAuthenticated ? (
-                    <TicketCreate currentUser={userName} isEditMode={false} />
-                  ) : (
-                    <Navigate to="/signin" replace />
-                  )
-                }
-              />
-              <Route
-                path="/edit-ticket"
-                element={
-                  isAuthenticated ? (
-                    <TicketEdit currentUserId={userId} userRole={userRole} />
-                  ) : (
-                    <Navigate to="/signin" replace />
-                  )
-                }
-              />
-              <Route
-                path="/view-ticket"
-                element={
-                  isAuthenticated ? (
-                    <TicketView currentUser={userName} userRole={userRole} />
-                  ) : (
-                    <Navigate to="/signin" replace />
-                  )
-                }
-              />
-              <Route
-                path="/tickets"
-                element={
-                  isAuthenticated ? (
-                    <TicketsList currentUser={userName} userRole={userRole} />
-                  ) : (
-                    <Navigate to="/signin" replace />
-                  )
-                }
-              />
-              <Route
-                path="/manage-users"
-                element={
-                  isAuthenticated ? (
-                    userRole === 'admin' ? (
-                      <UsersManage currentUser={userName} userRole={userRole} />
+            <Box
+              sx={{
+                position: 'fixed',
+                top: '45px',
+                left: isSidebarOpen && !hideNavAndSidebar ? '200px' : '5px',
+                width:
+                  isSidebarOpen && !hideNavAndSidebar
+                    ? 'calc(100% - 200px)'
+                    : '100%',
+                zIndex: 1030,
+                marginTop: 0,
+                marginLeft: isSidebarOpen ? '0px' : '20px',
+                marginBottom: 8
+              }}
+            >
+              <Breadcrumb title={getBreadcrumbTitle()} />
+            </Box>
+
+            <Box
+              sx={{
+                flex: '1 0 auto',
+                padding: '10px 10px 5px 10px',
+                marginTop: !hideNavAndSidebar ? '65px' : '0',
+                marginBottom: 0
+              }}
+            >
+              <Routes>
+                {/* Protected Routes */}
+                <Route
+                  path="/"
+                  element={
+                    isAuthenticated ? (
+                      <Dashboard />
                     ) : (
-                      <Home />
+                      <Navigate to="/signin" replace />
                     )
-                  ) : (
-                    <Navigate to="/signin" state={{ from: location }} replace />
-                  )
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  isAuthenticated ? (
-                    <Settings />
-                  ) : (
-                    <Navigate to="/signin" replace />
-                  )
-                }
-              />
-              <Route
-                path="/signup"
-                element={
-                  isAuthenticated ? (
-                    <Signup />
-                  ) : (
-                    <Navigate to="/signin" replace />
-                  )
-                }
-              />
+                  }
+                />
+                <Route
+                  path="/create-ticket"
+                  element={
+                    isAuthenticated ? (
+                      <TicketCreate isEditMode={false} />
+                    ) : (
+                      <Navigate to="/signin" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="/edit-ticket"
+                  element={
+                    isAuthenticated ? (
+                      <TicketEdit />
+                    ) : (
+                      <Navigate to="/signin" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="/view-ticket"
+                  element={
+                    isAuthenticated ? (
+                      <TicketView />
+                    ) : (
+                      <Navigate to="/signin" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="/tickets"
+                  element={
+                    isAuthenticated ? (
+                      <TicketsList />
+                    ) : (
+                      <Navigate to="/signin" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="/manage-users"
+                  element={
+                    isAuthenticated ? (
+                      userRole === 'admin' ? (
+                        <UsersManage />
+                      ) : (
+                        <Home />
+                      )
+                    ) : (
+                      <Navigate
+                        to="/signin"
+                        state={{ from: location }}
+                        replace
+                      />
+                    )
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    isAuthenticated && userRole === 'admin' ? (
+                      <Settings />
+                    ) : (
+                      <Navigate to="/signin" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="/signup"
+                  element={
+                    isAuthenticated ? (
+                      <Signup />
+                    ) : (
+                      <Navigate to="/signin" replace />
+                    )
+                  }
+                />
 
-              {/* Public Routes */}
-              <Route
-                path="/signin"
-                element={
-                  <Signin
-                    setIsAuthenticated={setIsAuthenticated}
-                    onLoginSuccess={handleLoginSuccess}
-                  />
-                }
-              />
+                {/* Public Routes */}
+                <Route
+                  path="/signin"
+                  element={<Signin onLoginSuccess={handleLoginSuccess} />}
+                />
 
-              <Route path="/session-expired" element={<SessionExpired />} />
+                <Route path="/session-expired" element={<SessionExpired />} />
 
-              {/* User Profile Route */}
-              <Route
-                path="/profile/:id"
-                element={
-                  isAuthenticated ? (
-                    <UserProfile />
-                  ) : (
-                    <Navigate to="/signin" replace />
-                  )
-                }
-              />
+                {/* User Profile Route */}
+                <Route
+                  path="/profile/:id"
+                  element={
+                    isAuthenticated ? (
+                      <UserProfile />
+                    ) : (
+                      <Navigate to="/signin" replace />
+                    )
+                  }
+                />
 
-              {/* User Activity Log Route */}
-              <Route
-                path="/activity/:id"
-                element={
-                  isAuthenticated ? (
-                    <UserActivityLog />
-                  ) : (
-                    <Navigate to="/signin" replace />
-                  )
-                }
-              />
-            </Routes>
+                {/* User Activity Log Route */}
+                <Route
+                  path="/activity/:id"
+                  element={
+                    isAuthenticated ? (
+                      <UserActivityLog />
+                    ) : (
+                      <Navigate to="/signin" replace />
+                    )
+                  }
+                />
+              </Routes>
+            </Box>
+            <Footer sx={{ marginTop: 'auto' }} />
           </Box>
-          <Footer sx={{ marginTop: 'auto' }} />
-        </Box>
-      </Grid>
+        </Grid>
 
-      {/* Sidebar Toggle Button */}
-      {!hideNavAndSidebar && (
-        <IconButton
-          onClick={toggleSidebar}
-          sx={{
-            position: 'fixed',
-            top: '10px',
-            left: '0',
-            bottom: '0',
-            zIndex: 1100,
-            background: 'none',
-            border: 'none',
-            color: 'primary.main',
-            fontSize: '15px',
-            cursor: 'pointer',
-            paddingLeft: '0px'
-          }}
-        >
-          {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
-        </IconButton>
-      )}
-    </Box>
+        {/* Sidebar Toggle Button */}
+        {!hideNavAndSidebar && (
+          <IconButton
+            onClick={toggleSidebar}
+            sx={{
+              position: 'fixed',
+              top: '10px',
+              left: '0',
+              bottom: '0',
+              zIndex: 1100,
+              background: 'none',
+              border: 'none',
+              color: 'primary.main',
+              fontSize: '15px',
+              cursor: 'pointer',
+              paddingLeft: '0px'
+            }}
+          >
+            {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
+          </IconButton>
+        )}
+      </Box>
+    </PersistGate>
   )
 }
 

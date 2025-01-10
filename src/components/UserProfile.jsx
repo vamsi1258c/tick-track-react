@@ -14,9 +14,9 @@ import {
 import api from '../services/api'
 
 const UserProfile = () => {
-  const { id } = useParams() // Get the user ID from the URL
-  const navigate = useNavigate() // Initialize useNavigate
-  const location = useLocation() // Get the current location
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)

@@ -14,6 +14,7 @@ import {
   CircularProgress,
   Box
 } from '@mui/material'
+import { useSelector } from 'react-redux'
 import { DoubleArrow as DoubleArrowIcon } from '@mui/icons-material'
 import { createComment } from '../../services/comment'
 import { useSnackbar } from '../Snackbar'
@@ -25,10 +26,10 @@ const CommentModal = ({
   approvers,
   loading,
   ticketId,
-  currentUserId,
   status,
   newStatus
 }) => {
+  const userId = useSelector((state) => state.app.userId)
   const [selectedApprover, setSelectedApprover] = useState(null)
   const [comment, setComment] = useState('')
 
@@ -53,7 +54,7 @@ const CommentModal = ({
         await createComment(ticketId, {
           content: newComment,
           ticket_id: ticketId,
-          user_id: currentUserId
+          user_id: userId
         })
         setComment('')
       } catch (error) {

@@ -27,10 +27,6 @@ import './UserDetails.css'
 export const UserDetails = ({ showModal, handleClose, selectedUser }) => {
   const navigate = useNavigate()
 
-  // const handleViewClick = (ticketId) => {
-  //   navigate(`/view-ticket`, { state: { ticketId } });
-  // };
-
   return (
     <Dialog open={showModal} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>

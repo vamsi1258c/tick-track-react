@@ -32,7 +32,6 @@ export const fetchConfigMasterById = async (configId) => {
 // Create a new configuration entry
 export const createConfigMaster = async (configData) => {
   try {
-    console.log(configData)
     const response = await api.post('/configmaster', configData)
 
     // Log config entry creation activity

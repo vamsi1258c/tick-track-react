@@ -2,6 +2,8 @@ import api from './api'
 import { setAuthToken } from './api'
 import { createActivityLog } from './activityLog'
 import { getLoggedInUserId } from '../utils/global'
+import { store } from '../store/store'
+import { setTokens, clearTokens } from '../store/appSlice'
 
 // Register user
 export const registerUser = async (userData) => {
@@ -25,8 +27,9 @@ export const loginUser = async (userData) => {
 
     if (response.status === 200) {
       const { access_token, refresh_token } = response.data
-      localStorage.setItem('authToken', access_token)
-      localStorage.setItem('refreshToken', refresh_token)
+      store.dispatch(
+        setTokens({ authToken: access_token, refreshToken: refresh_token })
+      )
       setAuthToken(access_token)
 
       // Log login activity
@@ -53,8 +56,7 @@ export const logoutUser = async () => {
     })
 
     await api.post('/logout')
-    localStorage.removeItem('authToken')
-    localStorage.clear()
+    store.dispatch(clearTokens())
     setAuthToken()
   } catch (error) {
     console.error('Logout failed:', error)

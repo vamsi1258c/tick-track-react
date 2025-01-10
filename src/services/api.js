@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode'
+import { store } from '../store/store'
+import { setTokens, clearTokens } from '../store/appSlice'
 
 // Create an instance of axios
 const api = axios.create({
@@ -33,7 +35,8 @@ export const getUserIdFromToken = (token) => {
 
 export const refreshTokenFun = async () => {
   try {
-    const refreshToken = localStorage.getItem('refreshToken')
+    const globalState = store.getState()
+    const refreshToken = globalState?.app?.refreshToken
     const response = await api.post(
       '/refresh',
       {},
@@ -45,6 +48,9 @@ export const refreshTokenFun = async () => {
       }
     )
 
+    store.dispatch(
+      setTokens({ authToken: response.data.access_token, refreshToken })
+    )
     return response.data
   } catch (error) {
     throw error.response.data
@@ -66,8 +72,7 @@ api.interceptors.response.use(
       // Prevent retrying the refresh token request itself to avoid a loop
       if (originalRequest.url === '/refresh') {
         // Refresh token has failed, handle the failure (redirect to login)
-        localStorage.removeItem('authToken')
-        localStorage.removeItem('refreshToken')
+        store.dispatch(clearTokens())
         window.location.href = '/session-expired'
       }
 
@@ -89,12 +94,11 @@ api.interceptors.response.use(
         // Set the new token in the headers of the original request
         originalRequest.headers['Authorization'] = `Bearer ${newToken}`
         api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
-        localStorage.setItem('authToken', newToken)
 
         // Retry the original request with the new token
         return api(originalRequest)
       } catch (refreshError) {
-        localStorage.removeItem('authToken')
+        store.dispatch(clearTokens())
         setAuthToken()
         if (api.defaults.authFailureCallback) {
           api.defaults.authFailureCallback()

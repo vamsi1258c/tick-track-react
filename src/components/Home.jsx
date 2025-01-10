@@ -9,14 +9,14 @@ import {
   ListItem,
   ListItemText
 } from '@mui/material'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { fetchActivityLogsByUserId } from '../services/activityLog'
 
 const Home = () => {
   const [recentActivity, setRecentActivity] = useState([])
-  const userRole = localStorage.getItem('userRole')
-  const userId = localStorage.getItem('userId')
-  console.log(userId)
+  const userId = useSelector((state) => state.app.userId)
+  const userRole = useSelector((state) => state.app.userRole)
 
   useEffect(() => {
     const fetchActivity = async () => {

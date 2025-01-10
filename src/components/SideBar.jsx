@@ -9,13 +9,15 @@ import {
   Divider,
   Box
 } from '@mui/material'
+import { useSelector } from 'react-redux'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import GroupIcon from '@mui/icons-material/Group'
 import SettingsIcon from '@mui/icons-material/Settings'
 import './Sidebar.css'
 
-const SideBar = ({ isOpen, userRole }) => {
+const SideBar = ({ isOpen }) => {
+  const userRole = useSelector((state) => state.app.userRole)
   return (
     <Drawer
       variant="permanent"
@@ -99,18 +101,20 @@ const SideBar = ({ isOpen, userRole }) => {
 
         {/* Settings at the bottom */}
         <List sx={{ marginTop: 'auto', padding: 0 }}>
-          <ListItem
-            button
-            component={NavLink}
-            to="/settings"
-            className="sidebar-link"
-            activeClassName="active"
-          >
-            <ListItemIcon className="sidebar-icon">
-              <SettingsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Settings" className="sidebar-text" />
-          </ListItem>
+          {userRole === 'admin' && (
+            <ListItem
+              button
+              component={NavLink}
+              to="/settings"
+              className="sidebar-link"
+              activeClassName="active"
+            >
+              <ListItemIcon className="sidebar-icon">
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Settings" className="sidebar-text" />
+            </ListItem>
+          )}
         </List>
       </Box>
     </Drawer>
